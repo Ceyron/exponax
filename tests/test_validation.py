@@ -46,7 +46,7 @@ def test_diffusion_1d():
     diffusivity = 0.1
 
     analytical_solution = lambda t, x: jnp.exp(
-        -4 * (2 * jnp.pi / domain_extent) ** 2 * diffusivity * t
+        -(4 * 2 * jnp.pi / domain_extent) ** 2 * diffusivity * t
     ) * jnp.sin(4 * 2 * jnp.pi * x / domain_extent)
 
     grid = ex.get_grid(num_spatial_dims, domain_extent, num_points)
