@@ -1,10 +1,8 @@
 import jax.numpy as jnp
-
-from jax import Array
+from jaxtyping import Array
 
 from ..base_stepper import BaseStepper
 from ..nonlinear_functions import GradientNormNonlinearFun
-from jaxtyping import Complex, Float, Array
 
 
 class NormalizedGradientNormStepper(BaseStepper):
@@ -19,7 +17,11 @@ class NormalizedGradientNormStepper(BaseStepper):
         *,
         dt: float = 0.1,
         normalized_coefficients: list[float] = [
-            0.0, 0.0, -1.0 / (60.0**2), 0.0, -1.0 / (60.0**4)
+            0.0,
+            0.0,
+            -1.0 / (60.0**2),
+            0.0,
+            -1.0 / (60.0**4),
         ],
         normalized_gradient_norm_scale: float = 1.0 / (60.0**2),
         order: int = 2,
@@ -39,7 +41,7 @@ class NormalizedGradientNormStepper(BaseStepper):
         - `dt`: time step (default: 0.1)
         - `normalized_coefficients`: coefficients for the linear operator,
           `normalized_coefficients[i]` is the coefficient for the `i`-th
-          derivative 
+          derivative
         - `normalized_gradient_norm_scale`: scale for the gradient norm
         - `order`: order of the derivative operator (default: 2)
         - `dealiasing_fraction`: fraction of the wavenumbers being kept before

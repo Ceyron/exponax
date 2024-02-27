@@ -2,17 +2,10 @@
 Nonlinear terms as they are found in reaction-diffusion(-advection) equations.
 """
 
-import jax
 import jax.numpy as jnp
-import equinox as eqx
-from jaxtyping import Complex, Array, Float, Bool
-from typing import Callable
-from ..spectral import (
-    space_indices,
-    spatial_shape,
-    build_laplace_operator,
-)
+from jaxtyping import Array, Complex
 
+from ..spectral import build_laplace_operator, space_indices, spatial_shape
 from .base import BaseNonlinearFun
 
 

@@ -1,13 +1,13 @@
-from typing import Union
+from typing import TypeVar, Union
 
 import jax.numpy as jnp
-
-from jax import Array
+from jaxtyping import Array, Complex, Float
 
 from ..base_stepper import BaseStepper
 from ..nonlinear_functions import ConvectionNonlinearFun
-from jaxtyping import Complex, Float, Array
-from ..spectral import build_laplace_operator, build_gradient_inner_product_operator
+from ..spectral import build_gradient_inner_product_operator, build_laplace_operator
+
+D = TypeVar("D")
 
 
 class KortevegDeVries(BaseStepper):

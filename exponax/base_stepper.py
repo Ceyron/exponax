@@ -1,17 +1,15 @@
-import jax
-import jax.numpy as jnp
 import equinox as eqx
-from jaxtyping import Array, Float, Complex
+import jax.numpy as jnp
+from jaxtyping import Array, Complex, Float
 
-from .exponential_integrators import BaseETDRK, ETDRK0, ETDRK1, ETDRK2, ETDRK3, ETDRK4
+from .exponential_integrators import ETDRK0, ETDRK1, ETDRK2, ETDRK3, ETDRK4, BaseETDRK
+from .nonlinear_functions import BaseNonlinearFun
 from .spectral import (
     build_derivative_operator,
     space_indices,
     spatial_shape,
     wavenumber_shape,
 )
-
-from .nonlinear_functions import BaseNonlinearFun
 
 
 class BaseStepper(eqx.Module):

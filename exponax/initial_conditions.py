@@ -1,28 +1,26 @@
+from abc import ABC, abstractmethod
+from typing import List
+
+import equinox as eqx
 import jax.numpy as jnp
 import jax.random as jr
-from typing import List
-import equinox as eqx
-from jaxtyping import Complex, Array, Float, PRNGKeyArray
-
-from abc import ABC, abstractmethod
-from typing import Optional
+from jaxtyping import Array, Float, PRNGKeyArray
 
 from .sample_stepper import Diffusion
 from .spectral import (
     build_scaled_wavenumbers,
-    spatial_shape,
-    wavenumber_shape,
+    build_scaling_array,
     low_pass_filter_mask,
     space_indices,
-    build_scaling_array,
+    spatial_shape,
+    wavenumber_shape,
 )
 from .utils import get_grid
 
-### --- Base classes --- ###
+# --- Base classes ---
 
 
 class BaseIC(eqx.Module, ABC):
-
     @abstractmethod
     def __call__(self, x: Float[Array, "D ... N"]) -> Float[Array, "1 ... N"]:
         """
@@ -85,7 +83,7 @@ class BaseRandomICGenerator(eqx.Module):
         return ic_fun(grid)
 
 
-### Utilities to create ICs for multi-channel fields
+# Utilities to create ICs for multi-channel fields
 
 
 class MultiChannelIC(eqx.Module):
@@ -120,7 +118,7 @@ class RandomMultiChannelICGenerator(eqx.Module):
         return jnp.concatenate(u_list, axis=0)
 
 
-### New version
+# New version
 
 # class TruncatedFourierSeries(BaseIC):
 #     coefficient_array: Complex[Array, "1 ... (N//2)+1"]
@@ -220,7 +218,7 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
         return u
 
 
-### --- Legacy Sine Waves (truncated Fourier series) --- ###
+# --- Legacy Sine Waves (truncated Fourier series) ---
 
 # class SineWaves(BaseIC):
 #     L: float
@@ -400,7 +398,7 @@ class DiffusedNoise(BaseRandomICGenerator):
         return ic
 
 
-### Gausian Random Field ###
+# Gausian Random Field
 
 
 class GaussianRandomField(BaseRandomICGenerator):
@@ -461,7 +459,7 @@ class GaussianRandomField(BaseRandomICGenerator):
         return ic
 
 
-### Discontinuities ###
+# Discontinuities
 
 
 class Discontinuities(BaseIC):

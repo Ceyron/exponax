@@ -1,13 +1,7 @@
-import jax
 import jax.numpy as jnp
-import equinox as eqx
-from jaxtyping import Complex, Array, Float, Bool
-from ..spectral import (
-    build_laplace_operator,
-    build_wavenumbers,
-    build_scaling_array,
-)
+from jaxtyping import Array, Complex
 
+from ..spectral import build_laplace_operator, build_scaling_array, build_wavenumbers
 from .base import BaseNonlinearFun
 
 

@@ -1,12 +1,7 @@
-import jax
 import jax.numpy as jnp
-import equinox as eqx
-from jaxtyping import Complex, Array, Float, Bool
-from ..spectral import (
-    space_indices,
-    spatial_shape,
-)
+from jaxtyping import Array, Complex
 
+from ..spectral import space_indices, spatial_shape
 from .base import BaseNonlinearFun
 
 

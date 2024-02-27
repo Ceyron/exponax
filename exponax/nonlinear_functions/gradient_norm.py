@@ -1,12 +1,8 @@
 import jax
 import jax.numpy as jnp
-import equinox as eqx
-from jaxtyping import Complex, Array, Float, Bool
-from ..spectral import (
-    space_indices,
-    spatial_shape,
-)
+from jaxtyping import Array, Complex, Float
 
+from ..spectral import space_indices, spatial_shape
 from .base import BaseNonlinearFun
 
 
@@ -73,4 +69,4 @@ class GradientNormNonlinearFun(BaseNonlinearFun):
         #     )
 
         # Requires minus to move term to the rhs
-        return - self.scale * 0.5 * u_gradient_norm_squared_hat
+        return -self.scale * 0.5 * u_gradient_norm_squared_hat

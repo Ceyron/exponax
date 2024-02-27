@@ -1,6 +1,7 @@
 import jax
 import jax.numpy as jnp
 import pytest
+
 import exponax as ex
 
 
@@ -45,6 +46,7 @@ def test_instantiate():
         ]:
             normalized_simulator(num_spatial_dims, num_points)
 
+
 @pytest.mark.parametrize(
     "specific_stepper,general_stepper_coefficients",
     [
@@ -69,7 +71,7 @@ def test_instantiate():
             ex.HyperDiffusion(1, 3.0, 50, 0.1, hyper_diffusivity=0.00001),
             [0.0, 0.0, 0.0, 0.0, -0.00001],
         ),
-    ]
+    ],
 )
 def test_specific_stepper_to_general_linear_stepper(
     specific_stepper,
@@ -98,6 +100,7 @@ def test_specific_stepper_to_general_linear_stepper(
     general_pred = general_stepper(u_0)
 
     assert specific_pred == pytest.approx(general_pred, rel=1e-4)
+
 
 @pytest.mark.parametrize(
     "specific_stepper,general_stepper_scale,general_stepper_coefficients",
@@ -135,16 +138,26 @@ def test_specific_stepper_to_general_linear_stepper(
             [0.0, 0.0, 0.05],
         ),
         (
-            ex.KortevegDeVries(1, 3.0, 50, 0.1, pure_dispersivity=1.0, convection_scale=-6.0),
+            ex.KortevegDeVries(
+                1, 3.0, 50, 0.1, pure_dispersivity=1.0, convection_scale=-6.0
+            ),
             -6.0,
-            [0.0, 0.0, 0.0, -1.0]
+            [0.0, 0.0, 0.0, -1.0],
         ),
         (
-            ex.KuramotoSivashinskyConservative(1, 3.0, 50, 0.1, convection_scale=1.0, second_order_diffusivity=1.0, fourth_order_diffusivity=1.0),
+            ex.KuramotoSivashinskyConservative(
+                1,
+                3.0,
+                50,
+                0.1,
+                convection_scale=1.0,
+                second_order_diffusivity=1.0,
+                fourth_order_diffusivity=1.0,
+            ),
             1.0,
-            [0.0, 0.0, -1.0, 0.0, -1.0]
-        )
-    ]
+            [0.0, 0.0, -1.0, 0.0, -1.0],
+        ),
+    ],
 )
 def test_specific_stepper_to_general_convection_stepper(
     specific_stepper,
@@ -175,6 +188,7 @@ def test_specific_stepper_to_general_convection_stepper(
     general_pred = general_stepper(u_0)
 
     assert specific_pred == pytest.approx(general_pred, rel=1e-4)
+
 
 @pytest.mark.parametrize(
     "specific_stepper,general_stepper_scale,general_stepper_coefficients",
@@ -207,11 +221,19 @@ def test_specific_stepper_to_general_convection_stepper(
         ),
         # nonlinear problems
         (
-            ex.KuramotoSivashinsky(1, 3.0, 50, 0.1, gradient_norm_scale=1.0, second_order_diffusivity=1.0, fourth_order_diffusivity=1.0),
+            ex.KuramotoSivashinsky(
+                1,
+                3.0,
+                50,
+                0.1,
+                gradient_norm_scale=1.0,
+                second_order_diffusivity=1.0,
+                fourth_order_diffusivity=1.0,
+            ),
             1.0,
-            [0.0, 0.0, -1.0, 0.0, -1.0]
-        )
-    ]
+            [0.0, 0.0, -1.0, 0.0, -1.0],
+        ),
+    ],
 )
 def test_specific_to_general_gradient_norm_stepper(
     specific_stepper,
@@ -243,6 +265,7 @@ def test_specific_to_general_gradient_norm_stepper(
 
     assert specific_pred == pytest.approx(general_pred, rel=1e-4)
 
+
 @pytest.mark.parametrize(
     "coefficients",
     [
@@ -254,7 +277,7 @@ def test_specific_to_general_gradient_norm_stepper(
         [0.0, -0.2, 0.01],  # advection-diffusion
         [0.0, 0.0, 0.0, 0.001],  # dispersion
         [0.0, 0.0, 0.0, 0.0, -0.0001],  # hyperdiffusion
-    ]
+    ],
 )
 def test_linear_normalized_stepper(coefficients):
     num_spatial_dims = 1

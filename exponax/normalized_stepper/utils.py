@@ -15,7 +15,7 @@ def normalize_coefficients(
         the coefficient for the `i`-th derivative
     """
     normalized_coefficients = tuple(
-        c  / (domain_extent**i) for i, c in enumerate(coefficients)
+        c / (domain_extent**i) for i, c in enumerate(coefficients)
     )
     return normalized_coefficients
 

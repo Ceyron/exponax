@@ -1,7 +1,6 @@
-import jax
-import jax.numpy as jnp
 import equinox as eqx
-from jaxtyping import Array, Float, Complex
+import jax.numpy as jnp
+from jaxtyping import Array, Complex, Float
 
 from .spectral import build_derivative_operator, build_laplace_operator, spatial_shape
 

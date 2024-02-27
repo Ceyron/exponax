@@ -1,9 +1,10 @@
-import jax.numpy as jnp
-import equinox as eqx
-from jaxtyping import Complex, Array, Float
-from typing import Callable
+from typing import TypeVar
 
-from .nonlinear_functions import BaseNonlinearFun, ZeroNonlinearFun
+import equinox as eqx
+import jax.numpy as jnp
+from jaxtyping import Array, Complex
+
+from .nonlinear_functions import BaseNonlinearFun
 
 # E can either be 1 (single channel) or num_channels (multi-channel) for either
 # the same linear operator for each channel or a different linear operator for
@@ -45,6 +46,9 @@ class ETDRK0(BaseETDRK):
         u_hat: Complex[Array, "C ... (N//2)+1"],
     ) -> Complex[Array, "C ... (N//2)+1"]:
         return self._exp_term * u_hat
+
+
+M = TypeVar("M")
 
 
 def roots_of_unity(M: int) -> Complex[Array, "M"]:

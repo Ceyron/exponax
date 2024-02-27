@@ -1,11 +1,8 @@
-import jax.numpy as jnp
-
-from jax import Array
+from jax import Array, Complex
 
 from ..base_stepper import BaseStepper
 from ..nonlinear_functions import ConvectionNonlinearFun
-from jaxtyping import Complex, Float, Array
-from ..spectral import build_laplace_operator, build_gradient_inner_product_operator
+from ..spectral import build_laplace_operator
 
 
 class Burgers(BaseStepper):
@@ -49,7 +46,6 @@ class Burgers(BaseStepper):
         self,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> Complex[Array, "1 ... (N//2)+1"]:
-
         # The linear operator is the same for all D channels
         return self.diffusivity * build_laplace_operator(derivative_operator)
 

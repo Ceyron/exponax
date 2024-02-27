@@ -1,11 +1,12 @@
-from typing import Union
+from typing import Callable, Union
 
 import jax
 import jax.numpy as jnp
 import jax.random as jr
 import jax.tree_util as jtu
-from jaxtyping import Array, Float, Complex, PyTree, PRNGKeyArray
-from typing import Callable, Tuple
+import matplotlib.pyplot as plt
+from jaxtyping import Array, Float, PRNGKeyArray, PyTree
+from matplotlib.animation import FuncAnimation
 
 
 def get_grid(
@@ -249,7 +250,7 @@ def stack_sub_trajectories(
             n, ...)`. `n_stacks` is the number of subtrajectories stacked
             together, i.e., `n_timesteps - n + 1`.
     """
-    n_time_steps = [l.shape[0] for l in jtu.tree_leaves(trj)]
+    n_time_steps = [leaf.shape[0] for leaf in jtu.tree_leaves(trj)]
 
     if len(set(n_time_steps)) != 1:
         raise ValueError(
@@ -273,10 +274,6 @@ def stack_sub_trajectories(
     )
 
     return sub_trjs
-
-
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 
 
 def get_animation(trj, *, vlim=(-1, 1)):

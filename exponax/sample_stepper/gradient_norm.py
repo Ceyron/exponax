@@ -1,10 +1,8 @@
 import jax.numpy as jnp
-
-from jax import Array
+from jaxtyping import Array, Complex
 
 from ..base_stepper import BaseStepper
 from ..nonlinear_functions import GradientNormNonlinearFun
-from jaxtyping import Complex, Float, Array
 
 
 class GeneralGradientNormStepper(BaseStepper):

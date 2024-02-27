@@ -1,16 +1,14 @@
 import jax.numpy as jnp
-
-from jax import Array
+from jaxtyping import Array, Complex
 
 from ..base_stepper import BaseStepper
 from ..nonlinear_functions import (
-    PolynomialNonlinearFun,
-    GrayScottNonlinearFun,
-    CahnHilliardNonlinearFun,
     BelousovZhabotinskyNonlinearFun,
+    CahnHilliardNonlinearFun,
+    GrayScottNonlinearFun,
+    PolynomialNonlinearFun,
 )
-from jaxtyping import Complex, Float, Array
-from ..spectral import build_laplace_operator, build_gradient_inner_product_operator
+from ..spectral import build_laplace_operator
 
 
 class SwiftHohenberg(BaseStepper):
@@ -137,7 +135,7 @@ class GrayScott(BaseStepper):
         )
 
 
-### !!! Below models lack validation ###
+# !!! Below models lack validation
 
 
 class FisherKPP(BaseStepper):

@@ -1,12 +1,9 @@
-import jax
-import jax.numpy as jnp
-import equinox as eqx
-from jaxtyping import Complex, Array, Float, Bool
-from ..spectral import (
-    wavenumber_shape,
-    low_pass_filter_mask,
-)
 from abc import ABC, abstractmethod
+
+import equinox as eqx
+from jaxtyping import Array, Bool, Complex
+
+from ..spectral import low_pass_filter_mask, wavenumber_shape
 
 
 class BaseNonlinearFun(eqx.Module, ABC):

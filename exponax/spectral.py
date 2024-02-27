@@ -1,6 +1,9 @@
+from typing import TypeVar, Union
+
 import jax.numpy as jnp
-from jaxtyping import Array, Float, Complex, PyTree, PRNGKeyArray, Bool
-from typing import Union
+from jaxtyping import Array, Bool, Complex, Float
+
+D = TypeVar("D")
 
 
 def build_wavenumbers(
@@ -107,7 +110,7 @@ def derivative(
     derivative_operator = build_derivative_operator(
         D, domain_extent, N, indexing=indexing
     )
-    ## I decided to not use this fix
+    # # I decided to not use this fix
 
     # # Required for even N, no effect for odd N
     # derivative_operator_fixed = (

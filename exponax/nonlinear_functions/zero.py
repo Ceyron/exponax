@@ -1,7 +1,5 @@
-import jax
 import jax.numpy as jnp
-import equinox as eqx
-from jaxtyping import Complex, Array, Float, Bool
+from jaxtyping import Array, Complex
 
 from .base import BaseNonlinearFun
 

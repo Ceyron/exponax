@@ -2,31 +2,47 @@ from .burgers import Burgers
 from .convection import GeneralConvectionStepper
 from .gradient_norm import GeneralGradientNormStepper
 from .korteveg_de_vries import KortevegDeVries
-from .kuramoto_sivashinsky import (
-    KuramotoSivashinsky,
-    KuramotoSivashinskyConservative,
-)
+from .kuramoto_sivashinsky import KuramotoSivashinsky, KuramotoSivashinskyConservative
 from .linear import (
     Advection,
-    Diffusion,
     AdvectionDiffusion,
+    Diffusion,
     Dispersion,
-    HyperDiffusion,
     GeneralLinearStepper,
+    HyperDiffusion,
 )
-from .navier_stokes import (
-    NavierStokesVorticity2d,
-    KolmogorovFlowVorticity2d,
-)
-from .nikolaevskiy import (
-    Nikolaevskiy,
-    NikolaevskiyConservative,
-)
+from .navier_stokes import KolmogorovFlowVorticity2d, NavierStokesVorticity2d
+from .nikolaevskiy import Nikolaevskiy, NikolaevskiyConservative
 from .reaction import (
-    SwiftHohenberg,
-    GrayScott,
-    FisherKPP,
     AllenCahn,
-    CahnHilliard,
     BelousovZhabotinsky,
+    CahnHilliard,
+    FisherKPP,
+    GrayScott,
+    SwiftHohenberg,
 )
+
+__all__ = [
+    "Advection",
+    "BelousovZhabotinsky",
+    "Diffusion",
+    "AdvectionDiffusion",
+    "Dispersion",
+    "HyperDiffusion",
+    "Burgers",
+    "KuramotoSivashinsky",
+    "KuramotoSivashinskyConservative",
+    "SwiftHohenberg",
+    "GrayScott",
+    "KortevegDeVries",
+    "FisherKPP",
+    "AllenCahn",
+    "CahnHilliard",
+    "GeneralLinearStepper",
+    "GeneralConvectionStepper",
+    "GeneralGradientNormStepper",
+    "Nikolaevskiy",
+    "NikolaevskiyConservative",
+    "NavierStokesVorticity2d",
+    "KolmogorovFlowVorticity2d",
+]
