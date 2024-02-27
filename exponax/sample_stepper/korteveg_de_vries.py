@@ -24,7 +24,7 @@ class KortevegDeVries(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        convection_scale: float = -6 / 2,
+        convection_scale: float = -6.0,
         pure_dispersivity: Union[Float[Array, "D"], float] = 1.0,
         advect_over_diffuse_dispersivity: Union[Float[Array, "D"], float] = 0.0,
         diffusivity: float = 0.0,
@@ -82,5 +82,5 @@ class KortevegDeVries(BaseStepper):
             num_channels=self.num_channels,
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
-            convection_scale=self.convection_scale,
+            scale=self.convection_scale,
         )

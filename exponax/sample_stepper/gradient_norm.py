@@ -20,7 +20,7 @@ class GeneralGradientNormStepper(BaseStepper):
         dt: float,
         *,
         coefficients: list[float] = [0.0, 0.0, -1.0, 0.0, -1.0],
-        gradient_norm_scale: float = 0.5,
+        gradient_norm_scale: float = 1.0,
         order=2,
         dealiasing_fraction: float = 2 / 3,
         n_circle_points: int = 16,

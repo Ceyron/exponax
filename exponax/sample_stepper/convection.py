@@ -20,7 +20,7 @@ class GeneralConvectionStepper(BaseStepper):
         dt: float,
         *,
         coefficients: list[float] = [0.0, 0.0, 0.01],
-        convection_scale: float = 0.5,
+        convection_scale: float = 1.0,
         order=2,
         dealiasing_fraction: float = 2 / 3,
         n_circle_points: int = 16,
@@ -70,6 +70,6 @@ class GeneralConvectionStepper(BaseStepper):
             num_channels=self.num_channels,
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
-            convection_scale=self.convection_scale,
+            scale=self.convection_scale,
             zero_mode_fix=False,  # Todo: check this
         )

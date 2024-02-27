@@ -11,7 +11,7 @@ from .base import BaseNonlinearFun
 
 
 class ConvectionNonlinearFun(BaseNonlinearFun):
-    convection_scale: float
+    scale: float
     zero_mode_fix: bool
 
     def __init__(
@@ -22,10 +22,13 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         *,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
         dealiasing_fraction: float,
-        convection_scale: float = 0.5,
+        scale: float = 1.0,
         zero_mode_fix: bool = False,
     ):
-        self.convection_scale = convection_scale
+        """
+        Uses by default a scaling of 0.5 to take into account the conservative evaluation
+        """
+        self.scale = scale
         self.zero_mode_fix = zero_mode_fix
         super().__init__(
             num_spatial_dims,
@@ -65,4 +68,4 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
             axis=1,
         )
         # Requires minus to move term to the rhs
-        return -self.convection_scale * u_divergence_on_outer_product_hat
+        return - self.scale * 0.5 * u_divergence_on_outer_product_hat

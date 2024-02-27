@@ -12,6 +12,7 @@ from ..spectral import build_laplace_operator, build_gradient_inner_product_oper
 
 
 class KuramotoSivashinsky(BaseStepper):
+    gradient_norm_scale: float
     second_order_diffusivity: float
     fourth_order_diffusivity: float
     dealiasing_fraction: float
@@ -23,6 +24,7 @@ class KuramotoSivashinsky(BaseStepper):
         num_points: int,
         dt: float,
         *,
+        gradient_norm_scale: float = 1.0,
         second_order_diffusivity: float = 1.0,
         fourth_order_diffusivity: float = 1.0,
         dealiasing_fraction: float = 2 / 3,
@@ -36,6 +38,7 @@ class KuramotoSivashinsky(BaseStepper):
         The advantage is that the number of channels is always 1 no matter the
         number of spatial dimensions.
         """
+        self.gradient_norm_scale = gradient_norm_scale
         self.second_order_diffusivity = second_order_diffusivity
         self.fourth_order_diffusivity = fourth_order_diffusivity
         self.dealiasing_fraction = dealiasing_fraction
@@ -72,11 +75,12 @@ class KuramotoSivashinsky(BaseStepper):
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
             zero_mode_fix=True,
-            scale=0.5,
+            scale=self.gradient_norm_scale,
         )
 
 
 class KuramotoSivashinskyConservative(BaseStepper):
+    convection_scale: float
     second_order_diffusivity: float
     fourth_order_diffusivity: float
     dealiasing_fraction: float
@@ -88,6 +92,7 @@ class KuramotoSivashinskyConservative(BaseStepper):
         num_points: int,
         dt: float,
         *,
+        convection_scale: float = 1.0,
         second_order_diffusivity: float = 1.0,
         fourth_order_diffusivity: float = 1.0,
         dealiasing_fraction: float = 2 / 3,
@@ -100,6 +105,7 @@ class KuramotoSivashinskyConservative(BaseStepper):
         Burgers equation). This also means that the number of channels grow with
         the number of spatial dimensions.
         """
+        self.convection_scale = convection_scale
         self.second_order_diffusivity = second_order_diffusivity
         self.fourth_order_diffusivity = fourth_order_diffusivity
         self.dealiasing_fraction = dealiasing_fraction
@@ -136,5 +142,5 @@ class KuramotoSivashinskyConservative(BaseStepper):
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
             zero_mode_fix=True,
-            convection_scale=0.5,
+            scale=self.convection_scale,
         )

@@ -21,12 +21,16 @@ class Burgers(BaseStepper):
         dt: float,
         *,
         diffusivity: float = 0.1,
-        convection_scale: float = 0.5,
+        convection_scale: float = 1.0,
         order=2,
         dealiasing_fraction: float = 2 / 3,
         n_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
+        """
+        Convection is always scaled by 0.5, use `convection_scale` to multiply
+        an additional factor.
+        """
         self.diffusivity = diffusivity
         self.convection_scale = convection_scale
         self.dealiasing_fraction = dealiasing_fraction
@@ -59,5 +63,5 @@ class Burgers(BaseStepper):
             num_channels=self.num_channels,
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
-            convection_scale=self.convection_scale,
+            scale=self.convection_scale,
         )

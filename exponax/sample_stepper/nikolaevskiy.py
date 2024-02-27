@@ -12,6 +12,7 @@ from ..spectral import build_laplace_operator, build_gradient_inner_product_oper
 
 
 class Nikolaevskiy(BaseStepper):
+    gradient_norm_scale: float
     second_order_diffusivity: float
     fourth_order_diffusivity: float
     sixth_order_diffusivity: float
@@ -24,6 +25,7 @@ class Nikolaevskiy(BaseStepper):
         num_points: int,
         dt: float,
         *,
+        gradient_norm_scale: float = 1.0,
         second_order_diffusivity: float = 0.1,
         fourth_order_diffusivity: float = 1.0,
         sixth_order_diffusivity: float = 1.0,
@@ -32,6 +34,7 @@ class Nikolaevskiy(BaseStepper):
         n_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
+        self.gradient_norm_scale = gradient_norm_scale
         self.second_order_diffusivity = second_order_diffusivity
         self.fourth_order_diffusivity = fourth_order_diffusivity
         self.sixth_order_diffusivity = sixth_order_diffusivity
@@ -72,11 +75,12 @@ class Nikolaevskiy(BaseStepper):
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
             zero_mode_fix=True,
-            scale=0.5,
+            scale=self.gradient_norm_scale,
         )
 
 
 class NikolaevskiyConservative(BaseStepper):
+    convection_scale: float
     second_order_diffusivity: float
     fourth_order_diffusivity: float
     sixth_order_diffusivity: float
@@ -89,6 +93,7 @@ class NikolaevskiyConservative(BaseStepper):
         num_points: int,
         dt: float,
         *,
+        convection_scale: float = 1.0,
         second_order_diffusivity: float = 0.1,
         fourth_order_diffusivity: float = 1.0,
         sixth_order_diffusivity: float = 1.0,
@@ -97,6 +102,7 @@ class NikolaevskiyConservative(BaseStepper):
         n_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
+        self.convection_scale = convection_scale
         self.second_order_diffusivity = second_order_diffusivity
         self.fourth_order_diffusivity = fourth_order_diffusivity
         self.sixth_order_diffusivity = sixth_order_diffusivity
@@ -137,5 +143,5 @@ class NikolaevskiyConservative(BaseStepper):
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
             zero_mode_fix=True,
-            convection_scale=0.5,
+            scale=self.convection_scale,
         )

@@ -23,8 +23,11 @@ class GradientNormNonlinearFun(BaseNonlinearFun):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
         dealiasing_fraction: float,
         zero_mode_fix: bool = True,
-        scale: float = 0.5,
+        scale: float = 1.0,
     ):
+        """
+        Uses by default a scaling of 0.5 to take into account the conservative evaluation
+        """
         super().__init__(
             num_spatial_dims,
             num_points,
@@ -70,4 +73,4 @@ class GradientNormNonlinearFun(BaseNonlinearFun):
         #     )
 
         # Requires minus to move term to the rhs
-        return -self.scale * u_gradient_norm_squared_hat
+        return - self.scale * 0.5 * u_gradient_norm_squared_hat
