@@ -1,4 +1,4 @@
-from jax import Array, Complex
+from jaxtyping import Array, Complex
 
 from ..base_stepper import BaseStepper
 from ..nonlinear_functions import ConvectionNonlinearFun
