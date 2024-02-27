@@ -1,9 +1,9 @@
-import jax
 import jax.numpy as jnp
 import pytest
+
 import exponax as ex
 
-### Linear steppers
+# Linear steppers
 
 # linear steppers do not make spatial and temporal truncation errors, hence we
 # can directly compare them with the analytical solution without performing a
@@ -46,7 +46,7 @@ def test_diffusion_1d():
     diffusivity = 0.1
 
     analytical_solution = lambda t, x: jnp.exp(
-        -(4 * 2 * jnp.pi / domain_extent) ** 2 * diffusivity * t
+        -((4 * 2 * jnp.pi / domain_extent) ** 2) * diffusivity * t
     ) * jnp.sin(4 * 2 * jnp.pi * x / domain_extent)
 
     grid = ex.get_grid(num_spatial_dims, domain_extent, num_points)
@@ -64,3 +64,13 @@ def test_diffusion_1d():
     u_1_pred = stepper(u_0)
 
     assert u_1_pred == pytest.approx(u_1, rel=1e-4)
+
+
+# Nonlinear steppers
+
+# Burgers can be test by comparing it with the solution obtained by Cole-Hopf
+# transformation.
+
+
+# The Korteveg-de Vries equation has an analytical solution, given the initial
+# condition is a soliton.
