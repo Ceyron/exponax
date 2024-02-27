@@ -3,7 +3,6 @@ import jax.numpy as jnp
 
 def normalize_coefficients(
     domain_extent: float,
-    dt: float,
     coefficients: tuple[float],
 ) -> tuple[float]:
     """
@@ -12,19 +11,17 @@ def normalize_coefficients(
 
     **Arguments:**
     - `domain_extent`: extent of the domain
-    - `dt`: time step
     - `coefficients`: coefficients for the linear operator, `coefficients[i]` is
         the coefficient for the `i`-th derivative
     """
     normalized_coefficients = tuple(
-        c * dt / (domain_extent**i) for i, c in enumerate(coefficients)
+        c  / (domain_extent**i) for i, c in enumerate(coefficients)
     )
     return normalized_coefficients
 
 
 def denormalize_coefficients(
     domain_extent: float,
-    dt: float,
     normalized_coefficients: tuple[float],
 ) -> tuple[float]:
     """
@@ -33,13 +30,12 @@ def denormalize_coefficients(
 
     **Arguments:**
     - `domain_extent`: extent of the domain
-    - `dt`: time step
     - `normalized_coefficients`: coefficients for the linear operator,
         `normalized_coefficients[i]` is the coefficient for the `i`-th
         derivative
     """
     coefficients = tuple(
-        c_n / dt * domain_extent**i for i, c_n in enumerate(normalized_coefficients)
+        c_n * domain_extent**i for i, c_n in enumerate(normalized_coefficients)
     )
     return coefficients
 

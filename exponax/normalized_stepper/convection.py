@@ -18,8 +18,8 @@ class NormalizedConvectionStepper(BaseStepper):
         num_points: int,
         *,
         dt: float = 0.1,
-        normalized_coefficients: list[float] = [0.0, 0.0, 0.01 * 0.1],
-        normalized_convection_scale: float = 0.5,
+        normalized_coefficients: list[float] = [0.0, 0.0, 0.01],
+        normalized_convection_scale: float = 1.0,
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,
         n_circle_points: int = 16,
@@ -61,7 +61,7 @@ class NormalizedConvectionStepper(BaseStepper):
           derivative (default: [0.0, 0.0, 0.01 * 0.1] refers to a diffusion
           (2nd) order term)
         - `normalized_convection_scale`: convection scale for the nonlinear
-            function (default: 0.5)
+            function (default: 1.0)
         - `order`: order of exponential time differencing Runge Kutta method,
           can be 1, 2, 3, 4 (default: 2)
         - `dealiasing_fraction`: fraction of the wavenumbers being kept before
@@ -91,7 +91,7 @@ class NormalizedConvectionStepper(BaseStepper):
         # Now the linear operator is unscaled
         linear_operator = sum(
             jnp.sum(
-                c / self.dt * (derivative_operator) ** i,
+                c * (derivative_operator) ** i,
                 axis=0,
                 keepdims=True,
             )
@@ -106,5 +106,5 @@ class NormalizedConvectionStepper(BaseStepper):
             num_channels=self.num_channels,
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
-            convection_scale=self.normalized_convection_scale,
+            scale=self.normalized_convection_scale,
         )

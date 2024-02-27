@@ -18,8 +18,10 @@ class NormalizedGradientNormStepper(BaseStepper):
         num_points: int,
         *,
         dt: float = 0.1,
-        normalized_coefficients: list[float] = [0.0, 0.0, 0.01 * 0.1],
-        normalized_gradient_norm_scale: float = 0.5,
+        normalized_coefficients: list[float] = [
+            0.0, 0.0, -1.0 / (60.0**2), 0.0, -1.0 / (60.0**4)
+        ],
+        normalized_gradient_norm_scale: float = 1.0 / (60.0**2),
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,
         n_circle_points: int = 16,
@@ -29,16 +31,16 @@ class NormalizedGradientNormStepper(BaseStepper):
         the number of channels do **not** grow with the number of spatial
         dimensions. They are always 1.
 
+        By default: the KS equation on L=60.0
+
         **Arguments:**
         - `num_spatial_dims`: number of spatial dimensions
         - `num_points`: number of points in each spatial dimension
         - `dt`: time step (default: 0.1)
         - `normalized_coefficients`: coefficients for the linear operator,
           `normalized_coefficients[i]` is the coefficient for the `i`-th
-          derivative (default: [0.0, 0.0, 0.01 * 0.1] refers to a diffusion
-          operator)
+          derivative 
         - `normalized_gradient_norm_scale`: scale for the gradient norm
-            (default: 0.5)
         - `order`: order of the derivative operator (default: 2)
         - `dealiasing_fraction`: fraction of the wavenumbers being kept before
           applying any nonlinearity (default: 2/3)
@@ -66,7 +68,7 @@ class NormalizedGradientNormStepper(BaseStepper):
     def _build_linear_operator(self, derivative_operator: Array) -> Array:
         linear_operator = sum(
             jnp.sum(
-                c / self.dt * (derivative_operator) ** i,
+                c * (derivative_operator) ** i,
                 axis=0,
                 keepdims=True,
             )
