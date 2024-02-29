@@ -1,7 +1,7 @@
 from .burgers import Burgers
 from .convection import GeneralConvectionStepper
 from .gradient_norm import GeneralGradientNormStepper
-from .korteveg_de_vries import KortevegDeVries
+from .korteveg_de_vries import KortewegDeVries
 from .kuramoto_sivashinsky import KuramotoSivashinsky, KuramotoSivashinskyConservative
 from .linear import (
     Advection,
@@ -34,7 +34,7 @@ __all__ = [
     "KuramotoSivashinskyConservative",
     "SwiftHohenberg",
     "GrayScott",
-    "KortevegDeVries",
+    "KortewegDeVries",
     "FisherKPP",
     "AllenCahn",
     "CahnHilliard",

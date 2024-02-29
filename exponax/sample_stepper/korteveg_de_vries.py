@@ -10,7 +10,7 @@ from ..spectral import build_gradient_inner_product_operator, build_laplace_oper
 D = TypeVar("D")
 
 
-class KortevegDeVries(BaseStepper):
+class KortewegDeVries(BaseStepper):
     convection_scale: float
     pure_dispersivity: Float[Array, "D"]
     advect_over_diffuse_dispersivity: Float[Array, "D"]

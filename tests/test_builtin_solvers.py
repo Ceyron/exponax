@@ -22,7 +22,7 @@ def test_instantiate():
             ex.KuramotoSivashinskyConservative,
             ex.SwiftHohenberg,
             ex.GrayScott,
-            ex.KortevegDeVries,
+            ex.KortewegDeVries,
             ex.FisherKPP,
             ex.AllenCahn,
             ex.CahnHilliard,
@@ -138,7 +138,7 @@ def test_specific_stepper_to_general_linear_stepper(
             [0.0, 0.0, 0.05],
         ),
         (
-            ex.KortevegDeVries(
+            ex.KortewegDeVries(
                 1, 3.0, 50, 0.1, pure_dispersivity=1.0, convection_scale=-6.0
             ),
             -6.0,
