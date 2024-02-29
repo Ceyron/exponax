@@ -69,5 +69,5 @@ class GeneralGradientNormStepper(BaseStepper):
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
             scale=self.gradient_norm_scale,
-            zero_mode_fix=False,  # Todo: check this
+            zero_mode_fix=True,  # Todo: check this
         )
