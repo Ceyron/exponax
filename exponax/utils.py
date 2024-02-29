@@ -62,6 +62,28 @@ def get_grid(
     return grid
 
 
+def wrap_bc(u):
+    """
+    Wraps the periodic boundary conditions around the array `u`.
+
+    This can be used to plot the solution of a periodic problem on the full
+    interval [0, L] by plotting `wrap_bc(u)` instead of `u`.
+
+    **Parameters:**
+        - `u`: The array to wrap, shape `(N,)`.
+
+    **Returns:**
+        - `u_wrapped`: The wrapped array, shape `(N + 1,)`.
+    """
+    _, *spatial_shape = u.shape
+    num_spatial_dims = len(spatial_shape)
+
+    padding_config = ((0, 0),) + ((0, 1),) * num_spatial_dims
+    u_wrapped = jnp.pad(u, padding_config, mode="wrap")
+
+    return u_wrapped
+
+
 def rollout(
     stepper_fn: Union[Callable[[PyTree], PyTree], Callable[[PyTree, PyTree], PyTree]],
     n: int,

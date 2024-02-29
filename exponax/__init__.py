@@ -52,6 +52,7 @@ from .utils import (
     repeat,
     rollout,
     stack_sub_trajectories,
+    wrap_bc,
 )
 
 __all__ = [
@@ -102,4 +103,5 @@ __all__ = [
     "denormalize_convection_scale",
     "normalize_gradient_norm_scale",
     "denormalize_gradient_norm_scale",
+    "wrap_bc",
 ]
