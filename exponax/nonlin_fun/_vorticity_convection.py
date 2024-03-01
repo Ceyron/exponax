@@ -1,8 +1,8 @@
 import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
-from ..spectral import build_laplace_operator, build_scaling_array, build_wavenumbers
-from .base import BaseNonlinearFun
+from .._spectral import build_laplace_operator, build_scaling_array, build_wavenumbers
+from ._base import BaseNonlinearFun
 
 
 class VorticityConvection2d(BaseNonlinearFun):

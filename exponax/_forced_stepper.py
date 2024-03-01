@@ -1,7 +1,7 @@
 import equinox as eqx
 from jaxtyping import Array, Complex, Float
 
-from .base_stepper import BaseStepper
+from ._base_stepper import BaseStepper
 
 
 class ForcedStepper(eqx.Module):

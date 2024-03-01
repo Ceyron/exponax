@@ -1,8 +1,8 @@
 import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
-from ..spectral import space_indices, spatial_shape
-from .base import BaseNonlinearFun
+from .._spectral import space_indices, spatial_shape
+from ._base import BaseNonlinearFun
 
 
 class PolynomialNonlinearFun(BaseNonlinearFun):

@@ -1,7 +1,7 @@
 import jax.numpy as jnp
 from jaxtyping import Array
 
-from ..base_stepper import BaseStepper
+from .._base_stepper import BaseStepper
 from ..nonlin_fun import ZeroNonlinearFun
 
 

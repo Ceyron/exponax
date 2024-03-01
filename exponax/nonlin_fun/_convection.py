@@ -2,11 +2,11 @@ import jax
 import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
 
-from ..spectral import space_indices, spatial_shape
-from .base import BaseNonlinearFun
+from .._spectral import space_indices, spatial_shape
+from ._base import BaseNonlinearFun
 
 
-class GradientNormNonlinearFun(BaseNonlinearFun):
+class ConvectionNonlinearFun(BaseNonlinearFun):
     scale: float
     zero_mode_fix: bool
 
@@ -18,12 +18,14 @@ class GradientNormNonlinearFun(BaseNonlinearFun):
         *,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
         dealiasing_fraction: float,
-        zero_mode_fix: bool = True,
         scale: float = 1.0,
+        zero_mode_fix: bool = False,
     ):
         """
         Uses by default a scaling of 0.5 to take into account the conservative evaluation
         """
+        self.scale = scale
+        self.zero_mode_fix = zero_mode_fix
         super().__init__(
             num_spatial_dims,
             num_points,
@@ -31,8 +33,6 @@ class GradientNormNonlinearFun(BaseNonlinearFun):
             derivative_operator=derivative_operator,
             dealiasing_fraction=dealiasing_fraction,
         )
-        self.zero_mode_fix = zero_mode_fix
-        self.scale = scale
 
     def zero_fix(
         self,
@@ -44,29 +44,24 @@ class GradientNormNonlinearFun(BaseNonlinearFun):
         self,
         u_hat: Complex[Array, "C ... (N//2)+1"],
     ) -> Complex[Array, "C ... (N//2)+1"]:
-        u_gradient_hat = self.derivative_operator[None, :] * u_hat[:, None]
-        u_gradient_dealiased_hat = self.dealiasing_mask * u_gradient_hat
-        u_gradient = jnp.fft.irfftn(
-            u_gradient_dealiased_hat,
+        u_hat_dealiased = self.dealiasing_mask * u_hat
+        u = jnp.fft.irfftn(
+            u_hat_dealiased,
             s=spatial_shape(self.num_spatial_dims, self.num_points),
             axes=space_indices(self.num_spatial_dims),
         )
-
-        # Reduces the axis introduced by the gradient
-        u_gradient_norm_squared = jnp.sum(u_gradient**2, axis=1)
+        u_outer_product = u[:, None] * u[None, :]
 
         if self.zero_mode_fix:
             # Maybe there is more efficient way
-            u_gradient_norm_squared = jax.vmap(self.zero_fix)(u_gradient_norm_squared)
+            u_outer_product = jax.vmap(self.zero_fix)(u_outer_product)
 
-        u_gradient_norm_squared_hat = jnp.fft.rfftn(
-            u_gradient_norm_squared, axes=space_indices(self.num_spatial_dims)
+        u_outer_product_hat = jnp.fft.rfftn(
+            u_outer_product, axes=space_indices(self.num_spatial_dims)
         )
-        # if self.zero_mode_fix:
-        #     # Fix the mean mode
-        #     u_gradient_norm_squared_hat = u_gradient_norm_squared_hat.at[..., 0].set(
-        #         u_hat[..., 0]
-        #     )
-
+        u_divergence_on_outer_product_hat = jnp.sum(
+            self.derivative_operator[None, :] * u_outer_product_hat,
+            axis=1,
+        )
         # Requires minus to move term to the rhs
-        return -self.scale * 0.5 * u_gradient_norm_squared_hat
+        return -self.scale * 0.5 * u_divergence_on_outer_product_hat

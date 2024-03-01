@@ -3,9 +3,9 @@ from typing import TypeVar, Union
 import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
 
-from ..base_stepper import BaseStepper
+from .._base_stepper import BaseStepper
+from .._spectral import build_gradient_inner_product_operator, build_laplace_operator
 from ..nonlin_fun import ConvectionNonlinearFun
-from ..spectral import build_gradient_inner_product_operator, build_laplace_operator
 
 D = TypeVar("D")
 

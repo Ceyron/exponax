@@ -1,9 +1,9 @@
-from .burgers import Burgers
-from .convection import GeneralConvectionStepper
-from .gradient_norm import GeneralGradientNormStepper
-from .korteveg_de_vries import KortewegDeVries
-from .kuramoto_sivashinsky import KuramotoSivashinsky, KuramotoSivashinskyConservative
-from .linear import (
+from ._burgers import Burgers
+from ._convection import GeneralConvectionStepper
+from ._gradient_norm import GeneralGradientNormStepper
+from ._korteveg_de_vries import KortewegDeVries
+from ._kuramoto_sivashinsky import KuramotoSivashinsky, KuramotoSivashinskyConservative
+from ._linear import (
     Advection,
     AdvectionDiffusion,
     Diffusion,
@@ -11,9 +11,9 @@ from .linear import (
     GeneralLinearStepper,
     HyperDiffusion,
 )
-from .navier_stokes import KolmogorovFlowVorticity2d, NavierStokesVorticity2d
-from .nikolaevskiy import Nikolaevskiy, NikolaevskiyConservative
-from .reaction import (
+from ._navier_stokes import KolmogorovFlowVorticity2d, NavierStokesVorticity2d
+from ._nikolaevskiy import Nikolaevskiy, NikolaevskiyConservative
+from ._reaction import (
     AllenCahn,
     BelousovZhabotinsky,
     CahnHilliard,

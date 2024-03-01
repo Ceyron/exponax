@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import equinox as eqx
 from jaxtyping import Array, Float, PRNGKeyArray
 
-from ..utils import get_grid
+from .._utils import get_grid
 
 
 class BaseIC(eqx.Module, ABC):

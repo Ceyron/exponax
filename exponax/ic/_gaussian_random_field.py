@@ -2,13 +2,13 @@ import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import Array, Float, PRNGKeyArray
 
-from ..spectral import (
+from .._spectral import (
     build_scaled_wavenumbers,
     space_indices,
     spatial_shape,
     wavenumber_shape,
 )
-from .base_ic import BaseRandomICGenerator
+from ._base_ic import BaseRandomICGenerator
 
 
 class GaussianRandomField(BaseRandomICGenerator):

@@ -1,8 +1,8 @@
 import equinox as eqx
 from jaxtyping import Array, Complex, Float
 
-from .base_stepper import BaseStepper
-from .utils import repeat
+from ._base_stepper import BaseStepper
+from ._utils import repeat
 
 
 class RepeatedStepper(eqx.Module):

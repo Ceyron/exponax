@@ -1,8 +1,10 @@
-from . import ic, metrics, nonlin_fun, normalized, poisson, stepper
-from .forced_stepper import ForcedStepper
-from .repeated_stepper import RepeatedStepper
-from .spectral import derivative
-from .utils import (
+from . import _metrics as metrics
+from . import _poisson as poisson
+from . import ic, nonlin_fun, normalized, stepper
+from ._forced_stepper import ForcedStepper
+from ._repeated_stepper import RepeatedStepper
+from ._spectral import derivative
+from ._utils import (
     build_ic_set,
     get_animation,
     get_grid,

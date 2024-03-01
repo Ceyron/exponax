@@ -2,9 +2,9 @@ import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import Array, Float, PRNGKeyArray
 
-from ..spectral import spatial_shape
+from .._spectral import spatial_shape
 from ..stepper import Diffusion
-from .base_ic import BaseRandomICGenerator
+from ._base_ic import BaseRandomICGenerator
 
 
 class DiffusedNoise(BaseRandomICGenerator):

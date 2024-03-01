@@ -5,8 +5,8 @@ Nonlinear terms as they are found in reaction-diffusion(-advection) equations.
 import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
-from ..spectral import build_laplace_operator, space_indices, spatial_shape
-from .base import BaseNonlinearFun
+from .._spectral import build_laplace_operator, space_indices, spatial_shape
+from ._base import BaseNonlinearFun
 
 
 class GrayScottNonlinearFun(BaseNonlinearFun):

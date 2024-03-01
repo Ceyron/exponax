@@ -4,7 +4,7 @@ import equinox as eqx
 import jax.numpy as jnp
 from jaxtyping import Array, Float, PRNGKeyArray
 
-from .base_ic import BaseIC, BaseRandomICGenerator
+from ._base_ic import BaseIC, BaseRandomICGenerator
 
 
 class MultiChannelIC(eqx.Module):

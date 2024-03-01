@@ -1,12 +1,12 @@
-import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
-from ..base_stepper import BaseStepper
+from .._base_stepper import BaseStepper
+from .._spectral import build_laplace_operator
 from ..nonlin_fun import ConvectionNonlinearFun
 
 
-class GeneralConvectionStepper(BaseStepper):
-    coefficients: list[float]
+class Burgers(BaseStepper):
+    diffusivity: float
     convection_scale: float
     dealiasing_fraction: float
 
@@ -17,7 +17,7 @@ class GeneralConvectionStepper(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        coefficients: list[float] = [0.0, 0.0, 0.01],
+        diffusivity: float = 0.1,
         convection_scale: float = 1.0,
         order=2,
         dealiasing_fraction: float = 2 / 3,
@@ -25,12 +25,10 @@ class GeneralConvectionStepper(BaseStepper):
         circle_radius: float = 1.0,
     ):
         """
-        Isotropic linear operators!
-
-        By default Burgers equation with diffusivity of 0.01
-
+        Convection is always scaled by 0.5, use `convection_scale` to multiply
+        an additional factor.
         """
-        self.coefficients = coefficients
+        self.diffusivity = diffusivity
         self.convection_scale = convection_scale
         self.dealiasing_fraction = dealiasing_fraction
         super().__init__(
@@ -38,7 +36,7 @@ class GeneralConvectionStepper(BaseStepper):
             domain_extent=domain_extent,
             num_points=num_points,
             dt=dt,
-            num_channels=num_spatial_dims,
+            num_channels=num_spatial_dims,  # Number of channels grows with dimension
             order=order,
             n_circle_points=n_circle_points,
             circle_radius=circle_radius,
@@ -48,15 +46,8 @@ class GeneralConvectionStepper(BaseStepper):
         self,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> Complex[Array, "1 ... (N//2)+1"]:
-        linear_operator = sum(
-            jnp.sum(
-                c * (derivative_operator) ** i,
-                axis=0,
-                keepdims=True,
-            )
-            for i, c in enumerate(self.coefficients)
-        )
-        return linear_operator
+        # The linear operator is the same for all D channels
+        return self.diffusivity * build_laplace_operator(derivative_operator)
 
     def _build_nonlinear_fun(
         self,
@@ -69,5 +60,4 @@ class GeneralConvectionStepper(BaseStepper):
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
             scale=self.convection_scale,
-            zero_mode_fix=False,  # Todo: check this
         )

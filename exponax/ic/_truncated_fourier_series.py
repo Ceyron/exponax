@@ -2,14 +2,14 @@ import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import Array, Float, PRNGKeyArray
 
-from ..spectral import (
+from .._spectral import (
     build_scaling_array,
     low_pass_filter_mask,
     space_indices,
     spatial_shape,
     wavenumber_shape,
 )
-from .base_ic import BaseRandomICGenerator
+from ._base_ic import BaseRandomICGenerator
 
 
 class RandomTruncatedFourierSeries(BaseRandomICGenerator):

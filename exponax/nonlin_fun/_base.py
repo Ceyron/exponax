@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import equinox as eqx
 from jaxtyping import Array, Bool, Complex
 
-from ..spectral import low_pass_filter_mask, wavenumber_shape
+from .._spectral import low_pass_filter_mask, wavenumber_shape
 
 
 class BaseNonlinearFun(eqx.Module, ABC):

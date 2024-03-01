@@ -1,7 +1,7 @@
-from .convection import NormalizedConvectionStepper
-from .gradient_norm import NormalizedGradientNormStepper
-from .linear import NormalizedLinearStepper
-from .utils import (
+from ._convection import NormalizedConvectionStepper
+from ._gradient_norm import NormalizedGradientNormStepper
+from ._linear import NormalizedLinearStepper
+from ._utils import (
     denormalize_coefficients,
     denormalize_convection_scale,
     denormalize_gradient_norm_scale,

@@ -2,7 +2,7 @@ import equinox as eqx
 import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
 
-from .spectral import build_derivative_operator, build_laplace_operator, spatial_shape
+from ._spectral import build_derivative_operator, build_laplace_operator, spatial_shape
 
 
 class Poisson(eqx.Module):

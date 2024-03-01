@@ -1,14 +1,14 @@
 import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
-from ..base_stepper import BaseStepper
+from .._base_stepper import BaseStepper
+from .._spectral import build_laplace_operator
 from ..nonlin_fun import (
     BelousovZhabotinskyNonlinearFun,
     CahnHilliardNonlinearFun,
     GrayScottNonlinearFun,
     PolynomialNonlinearFun,
 )
-from ..spectral import build_laplace_operator
 
 
 class SwiftHohenberg(BaseStepper):

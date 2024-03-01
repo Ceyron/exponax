@@ -1,7 +1,7 @@
 import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
-from .base import BaseNonlinearFun
+from ._base import BaseNonlinearFun
 
 
 class ZeroNonlinearFun(BaseNonlinearFun):
