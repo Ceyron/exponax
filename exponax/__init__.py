@@ -1,12 +1,5 @@
-from . import metrics, nonlin_fun, normalized, poisson, stepper
+from . import ic, metrics, nonlin_fun, normalized, poisson, stepper
 from .forced_stepper import ForcedStepper
-from .initial_conditions import (
-    DiffusedNoise,
-    GaussianRandomField,
-    MultiChannelIC,
-    RandomMultiChannelICGenerator,
-    RandomTruncatedFourierSeries,
-)
 from .repeated_stepper import RepeatedStepper
 from .spectral import derivative
 from .utils import (
@@ -22,11 +15,6 @@ from .utils import (
 
 __all__ = [
     "ForcedStepper",
-    "DiffusedNoise",
-    "GaussianRandomField",
-    "MultiChannelIC",
-    "RandomMultiChannelICGenerator",
-    "RandomTruncatedFourierSeries",
     "normalized",
     "poisson",
     "RepeatedStepper",
@@ -42,4 +30,5 @@ __all__ = [
     "wrap_bc",
     "metrics",
     "nonlin_fun",
+    "ic",
 ]

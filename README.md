@@ -17,7 +17,7 @@ ks_stepper = ex.stepper.KuramotoSivashinskyConservative(
     num_points=200, dt=0.1,
 )
 
-u_0 = ex.RandomTruncatedFourierSeries(
+u_0 = ex.ic.RandomTruncatedFourierSeries(
     num_spatial_dims=1, cutoff=5
 )(num_points=200, key=jax.random.PRNGKey(0))
 

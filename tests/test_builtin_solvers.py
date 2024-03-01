@@ -84,7 +84,7 @@ def test_specific_stepper_to_general_linear_stepper(
     num_points = specific_stepper.num_points
     dt = specific_stepper.dt
 
-    u_0 = ex.RandomTruncatedFourierSeries(
+    u_0 = ex.ic.RandomTruncatedFourierSeries(
         num_spatial_dims,
         domain_extent,
         cutoff=5,
@@ -173,7 +173,7 @@ def test_specific_stepper_to_general_convection_stepper(
     num_points = specific_stepper.num_points
     dt = specific_stepper.dt
 
-    u_0 = ex.RandomTruncatedFourierSeries(
+    u_0 = ex.ic.RandomTruncatedFourierSeries(
         num_spatial_dims,
         domain_extent,
         cutoff=5,
@@ -251,7 +251,7 @@ def test_specific_to_general_gradient_norm_stepper(
     num_points = specific_stepper.num_points
     dt = specific_stepper.dt
 
-    u_0 = ex.RandomTruncatedFourierSeries(
+    u_0 = ex.ic.RandomTruncatedFourierSeries(
         num_spatial_dims,
         domain_extent,
         cutoff=5,
@@ -291,7 +291,7 @@ def test_linear_normalized_stepper(coefficients):
     num_points = 50
     dt = 0.1
 
-    u_0 = ex.RandomTruncatedFourierSeries(
+    u_0 = ex.ic.RandomTruncatedFourierSeries(
         num_spatial_dims,
         domain_extent,
         cutoff=5,
