@@ -1,6 +1,7 @@
 from . import _metrics as metrics
 from . import _poisson as poisson
 from . import ic, nonlin_fun, normalized, stepper
+from ._base_stepper import BaseStepper
 from ._forced_stepper import ForcedStepper
 from ._repeated_stepper import RepeatedStepper
 from ._spectral import derivative
@@ -15,6 +16,7 @@ from ._utils import (
 from ._viz import make_animation, make_grouped_animation
 
 __all__ = [
+    "BaseStepper",
     "ForcedStepper",
     "normalized",
     "poisson",
