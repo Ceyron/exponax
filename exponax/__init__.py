@@ -1,3 +1,4 @@
+from . import metrics
 from .forced_stepper import ForcedStepper
 from .initial_conditions import (
     DiffusedNoise,
@@ -104,4 +105,5 @@ __all__ = [
     "normalize_gradient_norm_scale",
     "denormalize_gradient_norm_scale",
     "wrap_bc",
+    "metrics",
 ]
