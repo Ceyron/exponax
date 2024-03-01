@@ -12,7 +12,7 @@ import jax
 import exponax as ex
 import matplotlib.pyplot as plt
 
-ks_stepper = ex.KuramotoSivashinskyConservative(
+ks_stepper = ex.stepper.KuramotoSivashinskyConservative(
     num_spatial_dims=1, domain_extent=100.0,
     num_points=200, dt=0.1,
 )

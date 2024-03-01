@@ -12,37 +12,37 @@ def test_instantiate():
 
     for num_spatial_dims in [1, 2, 3]:
         for simulator in [
-            ex.Advection,
-            ex.Diffusion,
-            ex.AdvectionDiffusion,
-            ex.Dispersion,
-            ex.HyperDiffusion,
-            ex.Burgers,
-            ex.KuramotoSivashinsky,
-            ex.KuramotoSivashinskyConservative,
-            ex.SwiftHohenberg,
-            ex.GrayScott,
-            ex.KortewegDeVries,
-            ex.FisherKPP,
-            ex.AllenCahn,
-            ex.CahnHilliard,
+            ex.stepper.Advection,
+            ex.stepper.Diffusion,
+            ex.stepper.AdvectionDiffusion,
+            ex.stepper.Dispersion,
+            ex.stepper.HyperDiffusion,
+            ex.stepper.Burgers,
+            ex.stepper.KuramotoSivashinsky,
+            ex.stepper.KuramotoSivashinskyConservative,
+            ex.stepper.SwiftHohenberg,
+            ex.stepper.GrayScott,
+            ex.stepper.KortewegDeVries,
+            ex.stepper.FisherKPP,
+            ex.stepper.AllenCahn,
+            ex.stepper.CahnHilliard,
         ]:
             simulator(num_spatial_dims, domain_extent, num_points, dt)
 
     for simulator in [
-        ex.NavierStokesVorticity2d,
-        ex.KolmogorovFlowVorticity2d,
+        ex.stepper.NavierStokesVorticity2d,
+        ex.stepper.KolmogorovFlowVorticity2d,
     ]:
         simulator(domain_extent, num_points, dt)
 
     for num_spatial_dims in [1, 2, 3]:
-        ex.Poisson(num_spatial_dims, domain_extent, num_points)
+        ex.poisson.Poisson(num_spatial_dims, domain_extent, num_points)
 
     for num_spatial_dims in [1, 2, 3]:
         for normalized_simulator in [
-            ex.NormalizedLinearStepper,
-            ex.NormalizedConvectionStepper,
-            ex.NormalizedGradientNormStepper,
+            ex.normalized.NormalizedLinearStepper,
+            ex.normalized.NormalizedConvectionStepper,
+            ex.normalized.NormalizedGradientNormStepper,
         ]:
             normalized_simulator(num_spatial_dims, num_points)
 
@@ -52,23 +52,25 @@ def test_instantiate():
     [
         # Linear problems
         (
-            ex.Advection(1, 3.0, 50, 0.1, velocity=1.0),
+            ex.stepper.Advection(1, 3.0, 50, 0.1, velocity=1.0),
             [0.0, -1.0],
         ),
         (
-            ex.Diffusion(1, 3.0, 50, 0.1, diffusivity=0.01),
+            ex.stepper.Diffusion(1, 3.0, 50, 0.1, diffusivity=0.01),
             [0.0, 0.0, 0.01],
         ),
         (
-            ex.AdvectionDiffusion(1, 3.0, 50, 0.1, velocity=1.0, diffusivity=0.01),
+            ex.stepper.AdvectionDiffusion(
+                1, 3.0, 50, 0.1, velocity=1.0, diffusivity=0.01
+            ),
             [0.0, -1.0, 0.01],
         ),
         (
-            ex.Dispersion(1, 3.0, 50, 0.1, dispersivity=0.0001),
+            ex.stepper.Dispersion(1, 3.0, 50, 0.1, dispersivity=0.0001),
             [0.0, 0.0, 0.0, 0.0001],
         ),
         (
-            ex.HyperDiffusion(1, 3.0, 50, 0.1, hyper_diffusivity=0.00001),
+            ex.stepper.HyperDiffusion(1, 3.0, 50, 0.1, hyper_diffusivity=0.00001),
             [0.0, 0.0, 0.0, 0.0, -0.00001],
         ),
     ],
@@ -88,7 +90,7 @@ def test_specific_stepper_to_general_linear_stepper(
         cutoff=5,
     )(num_points, key=jax.random.PRNGKey(0))
 
-    general_stepper = ex.GeneralLinearStepper(
+    general_stepper = ex.stepper.GeneralLinearStepper(
         num_spatial_dims,
         domain_extent,
         num_points,
@@ -107,45 +109,47 @@ def test_specific_stepper_to_general_linear_stepper(
     [
         # Linear problems
         (
-            ex.Advection(1, 3.0, 50, 0.1, velocity=1.0),
+            ex.stepper.Advection(1, 3.0, 50, 0.1, velocity=1.0),
             0.0,
             [0.0, -1.0],
         ),
         (
-            ex.Diffusion(1, 3.0, 50, 0.1, diffusivity=0.01),
+            ex.stepper.Diffusion(1, 3.0, 50, 0.1, diffusivity=0.01),
             0.0,
             [0.0, 0.0, 0.01],
         ),
         (
-            ex.AdvectionDiffusion(1, 3.0, 50, 0.1, velocity=1.0, diffusivity=0.01),
+            ex.stepper.AdvectionDiffusion(
+                1, 3.0, 50, 0.1, velocity=1.0, diffusivity=0.01
+            ),
             0.0,
             [0.0, -1.0, 0.01],
         ),
         (
-            ex.Dispersion(1, 3.0, 50, 0.1, dispersivity=0.0001),
+            ex.stepper.Dispersion(1, 3.0, 50, 0.1, dispersivity=0.0001),
             0.0,
             [0.0, 0.0, 0.0, 0.0001],
         ),
         (
-            ex.HyperDiffusion(1, 3.0, 50, 0.1, hyper_diffusivity=0.00001),
+            ex.stepper.HyperDiffusion(1, 3.0, 50, 0.1, hyper_diffusivity=0.00001),
             0.0,
             [0.0, 0.0, 0.0, 0.0, -0.00001],
         ),
         # nonlinear problems
         (
-            ex.Burgers(1, 3.0, 50, 0.1, diffusivity=0.05, convection_scale=1.0),
+            ex.stepper.Burgers(1, 3.0, 50, 0.1, diffusivity=0.05, convection_scale=1.0),
             1.0,
             [0.0, 0.0, 0.05],
         ),
         (
-            ex.KortewegDeVries(
+            ex.stepper.KortewegDeVries(
                 1, 3.0, 50, 0.1, pure_dispersivity=1.0, convection_scale=-6.0
             ),
             -6.0,
             [0.0, 0.0, 0.0, -1.0],
         ),
         (
-            ex.KuramotoSivashinskyConservative(
+            ex.stepper.KuramotoSivashinskyConservative(
                 1,
                 3.0,
                 50,
@@ -175,7 +179,7 @@ def test_specific_stepper_to_general_convection_stepper(
         cutoff=5,
     )(num_points, key=jax.random.PRNGKey(0))
 
-    general_stepper = ex.GeneralConvectionStepper(
+    general_stepper = ex.stepper.GeneralConvectionStepper(
         num_spatial_dims,
         domain_extent,
         num_points,
@@ -195,33 +199,35 @@ def test_specific_stepper_to_general_convection_stepper(
     [
         # Linear problems
         (
-            ex.Advection(1, 3.0, 50, 0.1, velocity=1.0),
+            ex.stepper.Advection(1, 3.0, 50, 0.1, velocity=1.0),
             0.0,
             [0.0, -1.0],
         ),
         (
-            ex.Diffusion(1, 3.0, 50, 0.1, diffusivity=0.01),
+            ex.stepper.Diffusion(1, 3.0, 50, 0.1, diffusivity=0.01),
             0.0,
             [0.0, 0.0, 0.01],
         ),
         (
-            ex.AdvectionDiffusion(1, 3.0, 50, 0.1, velocity=1.0, diffusivity=0.01),
+            ex.stepper.AdvectionDiffusion(
+                1, 3.0, 50, 0.1, velocity=1.0, diffusivity=0.01
+            ),
             0.0,
             [0.0, -1.0, 0.01],
         ),
         (
-            ex.Dispersion(1, 3.0, 50, 0.1, dispersivity=0.0001),
+            ex.stepper.Dispersion(1, 3.0, 50, 0.1, dispersivity=0.0001),
             0.0,
             [0.0, 0.0, 0.0, 0.0001],
         ),
         (
-            ex.HyperDiffusion(1, 3.0, 50, 0.1, hyper_diffusivity=0.00001),
+            ex.stepper.HyperDiffusion(1, 3.0, 50, 0.1, hyper_diffusivity=0.00001),
             0.0,
             [0.0, 0.0, 0.0, 0.0, -0.00001],
         ),
         # nonlinear problems
         (
-            ex.KuramotoSivashinsky(
+            ex.stepper.KuramotoSivashinsky(
                 1,
                 3.0,
                 50,
@@ -251,7 +257,7 @@ def test_specific_to_general_gradient_norm_stepper(
         cutoff=5,
     )(num_points, key=jax.random.PRNGKey(0))
 
-    general_stepper = ex.GeneralGradientNormStepper(
+    general_stepper = ex.stepper.GeneralGradientNormStepper(
         num_spatial_dims,
         domain_extent,
         num_points,
@@ -291,17 +297,17 @@ def test_linear_normalized_stepper(coefficients):
         cutoff=5,
     )(num_points, key=jax.random.PRNGKey(0))
 
-    regular_linear_stepper = ex.GeneralLinearStepper(
+    regular_linear_stepper = ex.stepper.GeneralLinearStepper(
         num_spatial_dims,
         domain_extent,
         num_points,
         dt,
         coefficients=coefficients,
     )
-    normalized_linear_stepper = ex.NormalizedLinearStepper(
+    normalized_linear_stepper = ex.normalized.NormalizedLinearStepper(
         num_spatial_dims,
         num_points,
-        normalized_coefficients=ex.normalize_coefficients(
+        normalized_coefficients=ex.normalized.normalize_coefficients(
             domain_extent,
             coefficients,
         ),
@@ -325,7 +331,7 @@ def test_nonlinear_normalized_stepper():
     grid = ex.get_grid(num_spatial_dims, domain_extent, num_points)
     u_0 = jnp.sin(2 * jnp.pi * grid / domain_extent) + 0.3
 
-    regular_burgers_stepper = ex.Burgers(
+    regular_burgers_stepper = ex.stepper.Burgers(
         num_spatial_dims,
         domain_extent,
         num_points,
@@ -333,15 +339,15 @@ def test_nonlinear_normalized_stepper():
         diffusivity=diffusivity,
         convection_scale=convection_scale,
     )
-    normalized_burgers_stepper = ex.NormalizedConvectionStepper(
+    normalized_burgers_stepper = ex.normalized.NormalizedConvectionStepper(
         num_spatial_dims,
         num_points,
         dt=dt,
-        normalized_coefficients=ex.normalize_coefficients(
+        normalized_coefficients=ex.normalized.normalize_coefficients(
             domain_extent,
             [0.0, 0.0, diffusivity],
         ),
-        normalized_convection_scale=ex.normalize_convection_scale(
+        normalized_convection_scale=ex.normalized.normalize_convection_scale(
             domain_extent,
             convection_scale,
         ),

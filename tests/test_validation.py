@@ -25,7 +25,7 @@ def test_advection_1d():
     u_0 = analytical_solution(0.0, grid)
     u_1 = analytical_solution(dt, grid)
 
-    stepper = ex.Advection(
+    stepper = ex.stepper.Advection(
         num_spatial_dims,
         domain_extent,
         num_points,
@@ -53,7 +53,7 @@ def test_diffusion_1d():
     u_0 = analytical_solution(0.0, grid)
     u_1 = analytical_solution(dt, grid)
 
-    stepper = ex.Diffusion(
+    stepper = ex.stepper.Diffusion(
         num_spatial_dims,
         domain_extent,
         num_points,

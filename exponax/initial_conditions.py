@@ -6,7 +6,6 @@ import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import Array, Float, PRNGKeyArray
 
-from .sample_stepper import Diffusion
 from .spectral import (
     build_scaled_wavenumbers,
     build_scaling_array,
@@ -15,6 +14,7 @@ from .spectral import (
     spatial_shape,
     wavenumber_shape,
 )
+from .stepper import Diffusion
 from .utils import get_grid
 
 # --- Base classes ---
