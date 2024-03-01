@@ -3,7 +3,7 @@ import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
 
 from .exponential_integrators import ETDRK0, ETDRK1, ETDRK2, ETDRK3, ETDRK4, BaseETDRK
-from .nonlinear_functions import BaseNonlinearFun
+from .nonlin_fun import BaseNonlinearFun
 from .spectral import (
     build_derivative_operator,
     space_indices,

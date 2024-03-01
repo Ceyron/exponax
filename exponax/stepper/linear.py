@@ -4,7 +4,7 @@ import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
 
 from ..base_stepper import BaseStepper
-from ..nonlinear_functions import ZeroNonlinearFun
+from ..nonlin_fun import ZeroNonlinearFun
 from ..spectral import build_gradient_inner_product_operator, build_laplace_operator
 
 D = TypeVar("D")

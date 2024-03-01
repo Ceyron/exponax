@@ -2,7 +2,7 @@ import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
 from ..base_stepper import BaseStepper
-from ..nonlinear_functions import (
+from ..nonlin_fun import (
     BelousovZhabotinskyNonlinearFun,
     CahnHilliardNonlinearFun,
     GrayScottNonlinearFun,

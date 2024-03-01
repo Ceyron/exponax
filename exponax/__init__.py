@@ -1,4 +1,4 @@
-from . import metrics, normalized, poisson, stepper
+from . import metrics, nonlin_fun, normalized, poisson, stepper
 from .forced_stepper import ForcedStepper
 from .initial_conditions import (
     DiffusedNoise,
@@ -41,4 +41,5 @@ __all__ = [
     "build_ic_set",
     "wrap_bc",
     "metrics",
+    "nonlin_fun",
 ]

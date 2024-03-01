@@ -2,7 +2,7 @@ import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
 from ..base_stepper import BaseStepper
-from ..nonlinear_functions import GradientNormNonlinearFun
+from ..nonlin_fun import GradientNormNonlinearFun
 
 
 class GeneralGradientNormStepper(BaseStepper):

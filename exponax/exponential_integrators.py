@@ -4,7 +4,7 @@ import equinox as eqx
 import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
-from .nonlinear_functions import BaseNonlinearFun
+from .nonlin_fun import BaseNonlinearFun
 
 # E can either be 1 (single channel) or num_channels (multi-channel) for either
 # the same linear operator for each channel or a different linear operator for

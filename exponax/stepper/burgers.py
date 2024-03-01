@@ -1,7 +1,7 @@
 from jaxtyping import Array, Complex
 
 from ..base_stepper import BaseStepper
-from ..nonlinear_functions import ConvectionNonlinearFun
+from ..nonlin_fun import ConvectionNonlinearFun
 from ..spectral import build_laplace_operator
 
 

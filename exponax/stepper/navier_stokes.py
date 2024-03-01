@@ -1,7 +1,7 @@
 from jaxtyping import Array, Complex
 
 from ..base_stepper import BaseStepper
-from ..nonlinear_functions import VorticityConvection2d, VorticityConvection2dKolmogorov
+from ..nonlin_fun import VorticityConvection2d, VorticityConvection2dKolmogorov
 from ..spectral import build_laplace_operator
 
 
