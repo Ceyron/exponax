@@ -2,13 +2,13 @@ import equinox as eqx
 import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
 
-from ._exponential_integrators import ETDRK0, ETDRK1, ETDRK2, ETDRK3, ETDRK4, BaseETDRK
 from ._spectral import (
     build_derivative_operator,
     space_indices,
     spatial_shape,
     wavenumber_shape,
 )
+from .etdrk import ETDRK0, ETDRK1, ETDRK2, ETDRK3, ETDRK4, BaseETDRK
 from .nonlin_fun import BaseNonlinearFun
 
 
