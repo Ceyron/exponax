@@ -7,7 +7,7 @@ import jax.tree_util as jtu
 from jaxtyping import Array, Float, PRNGKeyArray, PyTree
 
 
-def get_grid(
+def make_grid(
     num_spatial_dims: int,
     domain_extent: float,
     num_points: int,

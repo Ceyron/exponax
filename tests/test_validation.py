@@ -21,7 +21,7 @@ def test_advection_1d():
         4 * 2 * jnp.pi * (x - velocity * t) / domain_extent
     )
 
-    grid = ex.get_grid(num_spatial_dims, domain_extent, num_points)
+    grid = ex.make_grid(num_spatial_dims, domain_extent, num_points)
     u_0 = analytical_solution(0.0, grid)
     u_1 = analytical_solution(dt, grid)
 
@@ -49,7 +49,7 @@ def test_diffusion_1d():
         -((4 * 2 * jnp.pi / domain_extent) ** 2) * diffusivity * t
     ) * jnp.sin(4 * 2 * jnp.pi * x / domain_extent)
 
-    grid = ex.get_grid(num_spatial_dims, domain_extent, num_points)
+    grid = ex.make_grid(num_spatial_dims, domain_extent, num_points)
     u_0 = analytical_solution(0.0, grid)
     u_1 = analytical_solution(dt, grid)
 

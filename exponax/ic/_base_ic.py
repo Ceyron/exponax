@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import equinox as eqx
 from jaxtyping import Array, Float, PRNGKeyArray
 
-from .._utils import get_grid
+from .._utils import make_grid
 
 
 class BaseIC(eqx.Module, ABC):
@@ -60,7 +60,7 @@ class BaseRandomICGenerator(eqx.Module):
             - `u`: The initial condition evaluated at the grid points.
         """
         ic_fun = self.gen_ic_fun(num_points, key=key)
-        grid = get_grid(
+        grid = make_grid(
             self.num_spatial_dims,
             self.domain_extent,
             num_points,

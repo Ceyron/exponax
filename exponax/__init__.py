@@ -6,13 +6,13 @@ from ._repeated_stepper import RepeatedStepper
 from ._spectral import derivative
 from ._utils import (
     build_ic_set,
-    get_grid,
+    make_grid,
     repeat,
     rollout,
     stack_sub_trajectories,
     wrap_bc,
 )
-from ._viz import get_animation, get_grouped_animation
+from ._viz import make_animation, make_grouped_animation
 
 __all__ = [
     "ForcedStepper",
@@ -20,9 +20,9 @@ __all__ = [
     "poisson",
     "RepeatedStepper",
     "derivative",
-    "get_grid",
-    "get_animation",
-    "get_grouped_animation",
+    "make_grid",
+    "make_animation",
+    "make_grouped_animation",
     "rollout",
     "repeat",
     "stack_sub_trajectories",

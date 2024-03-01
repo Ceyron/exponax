@@ -328,7 +328,7 @@ def test_nonlinear_normalized_stepper():
     diffusivity = 0.1
     convection_scale = 1.0
 
-    grid = ex.get_grid(num_spatial_dims, domain_extent, num_points)
+    grid = ex.make_grid(num_spatial_dims, domain_extent, num_points)
     u_0 = jnp.sin(2 * jnp.pi * grid / domain_extent) + 0.3
 
     regular_burgers_stepper = ex.stepper.Burgers(

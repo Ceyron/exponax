@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 
-def get_animation(trj, *, vlim=(-1, 1)):
+def make_animation(trj, *, vlim=(-1, 1)):
     fig, ax = plt.subplots()
     im = ax.imshow(
         trj[0].squeeze().T, vmin=vlim[0], vmax=vlim[1], cmap="RdBu_r", origin="lower"
@@ -26,7 +26,7 @@ def get_animation(trj, *, vlim=(-1, 1)):
     return ani
 
 
-def get_grouped_animation(
+def make_grouped_animation(
     trj, *, vlim=(-1, 1), grid=(3, 3), figsize=(10, 10), titles=None
 ):
     """
