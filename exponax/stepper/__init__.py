@@ -14,6 +14,7 @@ from ._linear import (
 )
 from ._navier_stokes import KolmogorovFlowVorticity2d, NavierStokesVorticity2d
 from ._nikolaevskiy import Nikolaevskiy, NikolaevskiyConservative
+from ._polynomial import GeneralPolynomialStepper
 from ._reaction import (
     AllenCahn,
     BelousovZhabotinsky,
@@ -34,6 +35,7 @@ __all__ = [
     "KuramotoSivashinsky",
     "KuramotoSivashinskyConservative",
     "SwiftHohenberg",
+    "GeneralPolynomialStepper",
     "GeneralNonlinearStepper1d",
     "GrayScott",
     "KortewegDeVries",

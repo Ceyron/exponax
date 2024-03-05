@@ -43,6 +43,7 @@ def test_instantiate():
             ex.normalized.NormalizedLinearStepper,
             ex.normalized.NormalizedConvectionStepper,
             ex.normalized.NormalizedGradientNormStepper,
+            ex.normalized.NormalizedPolynomialStepper,
         ]:
             normalized_simulator(num_spatial_dims, num_points)
 
@@ -308,9 +309,9 @@ def test_linear_normalized_stepper(coefficients):
         num_spatial_dims,
         num_points,
         normalized_coefficients=ex.normalized.normalize_coefficients(
-            domain_extent,
-            dt,
             coefficients,
+            domain_extent=domain_extent,
+            dt=dt,
         ),
     )
 
@@ -343,14 +344,14 @@ def test_nonlinear_normalized_stepper():
         num_spatial_dims,
         num_points,
         normalized_coefficients=ex.normalized.normalize_coefficients(
-            domain_extent,
-            dt,
             [0.0, 0.0, diffusivity],
+            domain_extent=domain_extent,
+            dt=dt,
         ),
         normalized_convection_scale=ex.normalized.normalize_convection_scale(
-            domain_extent,
-            dt,
             convection_scale,
+            domain_extent=domain_extent,
+            dt=dt,
         ),
     )
 
