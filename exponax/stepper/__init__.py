@@ -1,5 +1,6 @@
 from ._burgers import Burgers
 from ._convection import GeneralConvectionStepper
+from ._general_nonlinear import GeneralNonlinearStepper1d
 from ._gradient_norm import GeneralGradientNormStepper
 from ._korteveg_de_vries import KortewegDeVries
 from ._kuramoto_sivashinsky import KuramotoSivashinsky, KuramotoSivashinskyConservative
@@ -33,6 +34,7 @@ __all__ = [
     "KuramotoSivashinsky",
     "KuramotoSivashinskyConservative",
     "SwiftHohenberg",
+    "GeneralNonlinearStepper1d",
     "GrayScott",
     "KortewegDeVries",
     "FisherKPP",

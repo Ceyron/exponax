@@ -1,5 +1,6 @@
 from ._base import BaseNonlinearFun
 from ._convection import ConvectionNonlinearFun
+from ._general_nonlinear import GeneralNonlinearFun1d
 from ._gradient_norm import GradientNormNonlinearFun
 from ._polynomial import PolynomialNonlinearFun
 from ._reaction import (
@@ -16,6 +17,7 @@ from ._zero import ZeroNonlinearFun
 __all__ = [
     "BaseNonlinearFun",
     "ConvectionNonlinearFun",
+    "GeneralNonlinearFun1d",
     "GradientNormNonlinearFun",
     "PolynomialNonlinearFun",
     "BelousovZhabotinskyNonlinearFun",

@@ -1,4 +1,5 @@
 from ._convection import NormalizedConvectionStepper
+from ._general_nonlinear import NormlizedGeneralNonlinearStepper1d
 from ._gradient_norm import NormalizedGradientNormStepper
 from ._linear import NormalizedLinearStepper
 from ._utils import (
@@ -12,6 +13,7 @@ from ._utils import (
 
 __all__ = [
     "NormalizedConvectionStepper",
+    "NormlizedGeneralNonlinearStepper1d",
     "NormalizedGradientNormStepper",
     "NormalizedLinearStepper",
     "denormalize_coefficients",
