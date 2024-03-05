@@ -23,7 +23,7 @@ class RepeatedStepper(eqx.Module):
     """
 
     stepper: BaseStepper
-    n_sub_steps: int
+    num_sub_steps: int
 
     def step(
         self,
@@ -33,7 +33,7 @@ class RepeatedStepper(eqx.Module):
         Step the PDE forward in time by self.n_sub_steps time steps given the
         current state `u`.
         """
-        return repeat(self.stepper.step, self.n_sub_steps)(u)
+        return repeat(self.stepper.step, self.num_sub_steps)(u)
 
     def step_fourier(
         self,
@@ -43,7 +43,7 @@ class RepeatedStepper(eqx.Module):
         Step the PDE forward in time by self.n_sub_steps time steps given the
         current state `u_hat` in real-valued Fourier space.
         """
-        return repeat(self.stepper.step_fourier, self.n_sub_steps)(u_hat)
+        return repeat(self.stepper.step_fourier, self.num_sub_steps)(u_hat)
 
     def __call__(
         self,
@@ -53,4 +53,4 @@ class RepeatedStepper(eqx.Module):
         Step the PDE forward in time by self.n_sub_steps time steps given the
         current state `u`.
         """
-        return repeat(self.stepper, self.n_sub_steps)(u)
+        return repeat(self.stepper, self.num_sub_steps)(u)
