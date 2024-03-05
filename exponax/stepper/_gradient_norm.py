@@ -38,7 +38,7 @@ class GeneralGradientNormStepper(BaseStepper):
             domain_extent=domain_extent,
             num_points=num_points,
             dt=dt,
-            num_channels=num_spatial_dims,
+            num_channels=1,
             order=order,
             n_circle_points=n_circle_points,
             circle_radius=circle_radius,
