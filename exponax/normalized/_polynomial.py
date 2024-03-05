@@ -23,7 +23,7 @@ class NormalizedPolynomialStepper(BaseStepper):
         normalized_polynomial_scales: list[float] = [
             0.0,
             0.0,
-            10.0 * 0.001,
+            -10.0 * 0.001,
         ],
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,
