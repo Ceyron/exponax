@@ -2,7 +2,7 @@ from ._burgers import Burgers
 from ._convection import GeneralConvectionStepper
 from ._general_nonlinear import GeneralNonlinearStepper1d
 from ._gradient_norm import GeneralGradientNormStepper
-from ._korteveg_de_vries import KortewegDeVries
+from ._korteweg_de_vries import KortewegDeVries
 from ._kuramoto_sivashinsky import KuramotoSivashinsky, KuramotoSivashinskyConservative
 from ._linear import (
     Advection,
