@@ -139,6 +139,7 @@ class GrayScott(BaseStepper):
 
 
 class FisherKPP(BaseStepper):
+    r: float
     dealiasing_fraction: float
 
     def __init__(
@@ -149,11 +150,13 @@ class FisherKPP(BaseStepper):
         dt: float,
         *,
         order: int = 2,
+        r=1.0,
         dealiasing_fraction: float = 2 / 3,
         n_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         self.dealiasing_fraction = dealiasing_fraction
+        self.r = r
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             domain_extent=domain_extent,
@@ -170,7 +173,7 @@ class FisherKPP(BaseStepper):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> Complex[Array, "1 ... (N//2)+1"]:
         laplace = build_laplace_operator(derivative_operator, order=2)
-        linear_operator = laplace + 1.0
+        linear_operator = laplace + self.r
         return linear_operator
 
     def _build_nonlinear_fun(
@@ -183,7 +186,7 @@ class FisherKPP(BaseStepper):
             num_channels=self.num_channels,
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
-            coefficients=[0.0, 0.0, -1.0],
+            coefficients=[0.0, 0.0, -self.r],
         )
 
 
