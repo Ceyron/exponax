@@ -309,9 +309,9 @@ def test_linear_normalized_stepper(coefficients):
         num_points,
         normalized_coefficients=ex.normalized.normalize_coefficients(
             domain_extent,
+            dt,
             coefficients,
         ),
-        dt=dt,
     )
 
     regular_linear_pred = regular_linear_stepper(u_0)
@@ -342,13 +342,14 @@ def test_nonlinear_normalized_stepper():
     normalized_burgers_stepper = ex.normalized.NormalizedConvectionStepper(
         num_spatial_dims,
         num_points,
-        dt=dt,
         normalized_coefficients=ex.normalized.normalize_coefficients(
             domain_extent,
+            dt,
             [0.0, 0.0, diffusivity],
         ),
         normalized_convection_scale=ex.normalized.normalize_convection_scale(
             domain_extent,
+            dt,
             convection_scale,
         ),
     )

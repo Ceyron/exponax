@@ -3,6 +3,7 @@ import jax.numpy as jnp
 
 def normalize_coefficients(
     domain_extent: float,
+    dt: float,
     coefficients: tuple[float],
 ) -> tuple[float]:
     """
@@ -11,17 +12,19 @@ def normalize_coefficients(
 
     **Arguments:**
     - `domain_extent`: extent of the domain
+    - `dt`: time step
     - `coefficients`: coefficients for the linear operator, `coefficients[i]` is
         the coefficient for the `i`-th derivative
     """
     normalized_coefficients = tuple(
-        c / (domain_extent**i) for i, c in enumerate(coefficients)
+        c * dt / (domain_extent**i) for i, c in enumerate(coefficients)
     )
     return normalized_coefficients
 
 
 def denormalize_coefficients(
     domain_extent: float,
+    dt: float,
     normalized_coefficients: tuple[float],
 ) -> tuple[float]:
     """
@@ -30,43 +33,52 @@ def denormalize_coefficients(
 
     **Arguments:**
     - `domain_extent`: extent of the domain
+    - `dt`: time step
     - `normalized_coefficients`: coefficients for the linear operator,
         `normalized_coefficients[i]` is the coefficient for the `i`-th
         derivative
     """
     coefficients = tuple(
-        c_n * domain_extent**i for i, c_n in enumerate(normalized_coefficients)
+        c_n / dt * domain_extent**i for i, c_n in enumerate(normalized_coefficients)
     )
     return coefficients
 
 
 def normalize_convection_scale(
     domain_extent: float,
+    dt: float,
     convection_scale: float,
 ) -> float:
-    normalized_convection_scale = convection_scale / domain_extent
+    normalized_convection_scale = convection_scale * dt / domain_extent
     return normalized_convection_scale
 
 
 def denormalize_convection_scale(
     domain_extent: float,
+    dt: float,
     normalized_convection_scale: float,
 ) -> float:
-    convection_scale = normalized_convection_scale * domain_extent
+    convection_scale = normalized_convection_scale / dt * domain_extent
     return convection_scale
 
 
 def normalize_gradient_norm_scale(
     domain_extent: float,
+    dt: float,
     gradient_norm_scale: float,
 ):
-    normalized_gradient_norm_scale = gradient_norm_scale / jnp.square(domain_extent)
+    normalized_gradient_norm_scale = (
+        gradient_norm_scale * dt / jnp.square(domain_extent)
+    )
     return normalized_gradient_norm_scale
 
 
 def denormalize_gradient_norm_scale(
     domain_extent: float,
+    dt: float,
     normalized_gradient_norm_scale: float,
 ):
-    gradient_norm_scale = normalized_gradient_norm_scale * jnp.square(domain_extent)
+    gradient_norm_scale = (
+        normalized_gradient_norm_scale / dt * jnp.square(domain_extent)
+    )
     return gradient_norm_scale

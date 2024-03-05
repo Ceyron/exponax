@@ -14,7 +14,6 @@ class NormalizedLinearStepper(BaseStepper):
         num_points: int,
         *,
         normalized_coefficients: list[float] = [0.0, -0.5, 0.01],
-        dt: float = 1.0,
     ):
         """
         By default: advection-diffusion with normalized advection of 0.5, and
@@ -22,14 +21,15 @@ class NormalizedLinearStepper(BaseStepper):
 
         Take care of the signs!
 
-        Normalized coefficients are alpha_i / L^i, where L is the domain extent.
+        Normalized coefficients are alpha_i * dt / L^i, where dt is the time
+        step size and L is the domain extent.
         """
         self.normalized_coefficients = normalized_coefficients
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             domain_extent=1.0,  # Derivative operator is just scaled with 2 * jnp.pi
             num_points=num_points,
-            dt=dt,
+            dt=1.0,
             num_channels=1,
             order=0,
         )
