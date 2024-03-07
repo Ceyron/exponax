@@ -42,6 +42,11 @@ Both the linear and the non-linear operator are real-valued.
 
 * breaks down the diagonalization in Fourier space
 
+### No inhomogeneous coefficients in front of the linear operator (M)
+
+* also breaks down the diagonalization in Fourier space
+* implement a custom nonlinear operator if you need inhomogeneous coefficients
+
 ### Fixed time step (C)
 
 ...
