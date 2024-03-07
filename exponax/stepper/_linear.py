@@ -57,7 +57,7 @@ class Advection(BaseStepper):
 
 
 class Diffusion(BaseStepper):
-    diffusivity: float
+    diffusivity: Float[Array, "D D"]
 
     def __init__(
         self,
@@ -66,8 +66,17 @@ class Diffusion(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        diffusivity: float = 0.01,
+        diffusivity: Union[
+            Float[Array, "D D"],
+            Float[Array, "D"],
+            float,
+        ] = 0.01,
     ):
+        # ToDo: more sophisticated checks here
+        if isinstance(diffusivity, float):
+            diffusivity = jnp.diag(jnp.ones(num_spatial_dims)) * diffusivity
+        elif len(diffusivity.shape) == 1:
+            diffusivity = jnp.diag(diffusivity)
         self.diffusivity = diffusivity
         super().__init__(
             num_spatial_dims=num_spatial_dims,
@@ -82,7 +91,17 @@ class Diffusion(BaseStepper):
         self,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> Complex[Array, "1 ... (N//2)+1"]:
-        return self.diffusivity * build_laplace_operator(derivative_operator)
+        laplace_outer_producct = (
+            derivative_operator[:, None] * derivative_operator[None, :]
+        )
+        linear_operator = jnp.einsum(
+            "ij,ij...->...",
+            self.diffusivity,
+            laplace_outer_producct,
+        )
+        # Add the necessary singleton channel axis
+        linear_operator = linear_operator[None, ...]
+        return linear_operator
 
     def _build_nonlinear_fun(
         self,
