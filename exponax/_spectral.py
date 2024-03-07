@@ -208,23 +208,33 @@ def build_gradient_inner_product_operator(
             f"Expected velocity shape to be {derivative_operator.shape[0]}, got {velocity.shape}."
         )
 
-    # Need to move the channel/dimension axis last to enable autobroadcast over
-    # the arbitrary number of spatial axes, Then we can move this singleton axis
-    # back to the front
-    operator = jnp.swapaxes(
-        jnp.sum(
-            velocity
-            * jnp.swapaxes(
-                derivative_operator**order,
-                0,
-                -1,
-            ),
-            axis=-1,
-            keepdims=True,
-        ),
-        0,
-        -1,
+    operator = jnp.einsum(
+        "i,i...->...",
+        velocity,
+        derivative_operator**order,
     )
+
+    # Need to add singleton channel axis
+    operator = operator[None, ...]
+
+    # Old form below
+    # # Need to move the channel/dimension axis last to enable autobroadcast over
+    # # the arbitrary number of spatial axes, Then we can move this singleton axis
+    # # back to the front
+    # operator = jnp.swapaxes(
+    #     jnp.sum(
+    #         velocity
+    #         * jnp.swapaxes(
+    #             derivative_operator**order,
+    #             0,
+    #             -1,
+    #         ),
+    #         axis=-1,
+    #         keepdims=True,
+    #     ),
+    #     0,
+    #     -1,
+    # )
 
     return operator
 
