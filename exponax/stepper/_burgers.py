@@ -25,9 +25,43 @@ class Burgers(BaseStepper):
         circle_radius: float = 1.0,
     ):
         """
-        Convection is always scaled by 0.5, use `convection_scale` to multiply
-        an additional factor.
+        Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) Burgers equation on
+        periodic boundary conditions.
+
+        In 1d, the Burgers equation is given by
+
+        ```
+            uₜ + b₁ 1/2 (u²)ₓ = ν uₓₓ
+        ```
+
+        with `b₁` the convection coefficient and `ν` the diffusivity. Oftentimes
+        `b₁ = 1`. In 1d, the state `u` has only one channel as such the state is
+        represented by a tensor of shape `(1, num_points)`. For higher
+        dimensions, the channels grow with the dimension, i.e. in 2d the state
+        `u` is represented by a tensor of shape `(2, num_points, num_points)`.
+        The equation in 2d reads using vector format for the two channels
+
+        ```
+            uₜ + b₁ 1/2 ∇ ⋅ (u ⊗ u) = ν Δu
+        ```
+
+        with `∇ ⋅` the divergence operator and `Δ` the Laplacian.
+
+        **Arguments:**
+            - `num_spatial_dims`: The number of spatial dimensions `d`.
+            - `domain_extent`: The size of the domain `L`; in higher dimensions
+                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+            - `num_points`: The number of points `N` used to discretize the
+                domain. This **includes** the left boundary point and
+                **excludes** the right boundary point. In higher dimensions; the
+                number of points in each dimension is the same. Hence, the total
+                number of degrees of freedom is `Nᵈ`.
+            - `dt`: The timestep size `Δt` between two consecutive states.
         """
+        # """
+        # Convection is always scaled by 0.5, use `convection_scale` to multiply
+        # an additional factor.
+        # """
         self.diffusivity = diffusivity
         self.convection_scale = convection_scale
         self.dealiasing_fraction = dealiasing_fraction
