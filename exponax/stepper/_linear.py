@@ -130,7 +130,7 @@ class Diffusion(BaseStepper):
         ```
             uₜ = ν uₓₓ
         ```
-        
+
         with `ν ∈ ℝ` being the diffusivity.
 
         In higher dimensions, the diffusion equation can written using the
@@ -334,7 +334,7 @@ class AdvectionDiffusion(BaseStepper):
         # Add the necessary singleton channel axis
         diffusion_operator = diffusion_operator[None, ...]
 
-        advection_operator = - build_gradient_inner_product_operator(
+        advection_operator = -build_gradient_inner_product_operator(
             derivative_operator, self.velocity, order=1
         )
 
@@ -387,7 +387,7 @@ class Dispersion(BaseStepper):
         In higher dimensions, the dispersion equation can be written as
 
         ```
-            uₜ = 𝒸 ⋅ (∇⊙∇⊙(∇u)) 
+            uₜ = 𝒸 ⋅ (∇⊙∇⊙(∇u))
         ```
 
         or
@@ -396,7 +396,7 @@ class Dispersion(BaseStepper):
             uₜ = 𝒸 ⋅ ∇(Δu)
         ```
 
-        with `𝒸 ∈ ℝᵈ` being the dispersivity vector 
+        with `𝒸 ∈ ℝᵈ` being the dispersivity vector
 
         **Arguments:**
             - `num_spatial_dims`: The number of spatial dimensions `d`.
@@ -483,7 +483,7 @@ class HyperDiffusion(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        hyper_diffusivity: float = 1.0,
+        hyper_diffusivity: float = 0.0001,
         diffuse_on_diffuse: bool = False,
     ):
         """
@@ -530,7 +530,7 @@ class HyperDiffusion(BaseStepper):
             - `dt`: The timestep size `Δt` between two consecutive states.
             - `hyper_diffusivity` (keyword-only): The hyper-diffusivity `ν`.
                 This stepper only supports scalar (=isotropic)
-                hyper-diffusivity. Default: 1.0.
+                hyper-diffusivity. Default: 0.0001.
             - `diffuse_on_diffuse` (keyword-only): If `True`, the second form
                 of the hyper-diffusion equation in higher dimensions is used. As
                 a consequence, there will be mixing in the spatial derivatives.
