@@ -22,6 +22,55 @@ class Advection(BaseStepper):
         *,
         velocity: Union[Float[Array, "D"], float] = 1.0,
     ):
+        """
+        Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) advection equation
+        on periodic boundary conditions.
+
+        In 1d, the advection equation is given by
+
+        ```
+            uₜ + c uₓ = 0
+        ```
+
+        with `c ∈ ℝ` being the velocity/advection speed.
+
+        In higher dimensions, the advection equation can written as the inner
+        product between velocity vector and gradient
+
+        ```
+            uₜ + c ⋅ ∇u = 0
+        ```
+
+        with `c ∈ ℝᵈ` being the velocity/advection vector.
+
+        **Arguments:**
+            - `num_spatial_dims`: The number of spatial dimensions `d`.
+            - `domain_extent`: The size of the domain `L`; in higher dimensions
+                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+            - `num_points`: The number of points `N` used to discretize the
+                domain. This **includes** the left boundary point and
+                **excludes** the right boundary point. In higher dimensions; the
+                number of points in each dimension is the same. Hence, the total
+                number of degrees of freedom is `Nᵈ`.
+            - `dt`: The timestep size `Δt` between two consecutive states.
+            - `velocity` (keyword-only): The advection speed `c`. In higher
+                dimensions, this can be a scalar (=float) or a vector of length
+                `d`. If a scalar is given, the advection speed is assumed to be
+                the same in all spatial dimensions. Default: `1.0`.
+
+        **Notes:**
+            - The stepper is unconditionally stable, not matter the choice of
+                any argument because the equation is solved analytically in
+                Fourier space. **However**, note that initial conditions with
+                modes higher than the Nyquist freuency (`(N//2)+1` with `N`
+                being the `num_points`) lead to spurious oscillations.
+            - Ultimately, only the factor `c Δt / L` affects the characteristic
+                of the dynamics. See also
+                [`exponax.normalized.NormalizedLinearStepper`][] with
+                `normalized_coefficients = [0, alpha_1]` with `alpha_1 =
+                velocity * dt / domain_extent`.q
+        """
+        # TODO: better checks on the desired type of velocity
         if isinstance(velocity, float):
             velocity = jnp.ones(num_spatial_dims) * velocity
         self.velocity = velocity
@@ -72,6 +121,51 @@ class Diffusion(BaseStepper):
             float,
         ] = 0.01,
     ):
+        """
+        Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) diffusion equation
+        on periodic boundary conditions.
+
+        In 1d, the diffusion equation is given by
+
+        ```
+            uₜ = ν uₓₓ
+        ```
+        
+        with `ν ∈ ℝ` being the diffusivity.
+
+        In higher dimensions, the diffusion equation can written using the
+        Laplacian operator.
+
+        ```
+            uₜ = ν Δu
+        ```
+
+        More generally speaking, there can be anistropic diffusivity given by a
+        `A ∈ ℝᵈ ˣ ᵈ` sandwiched between the gradient and divergence operators.
+
+        ```
+            uₜ = ∇ ⋅ (A ∇u)
+        ```
+
+        **Arguments:**
+            - `num_spatial_dims`: The number of spatial dimensions `d`.
+            - `domain_extent`: The size of the domain `L`; in higher dimensions
+                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+            - `num_points`: The number of points `N` used to discretize the
+                domain. This **includes** the left boundary point and
+                **excludes** the right boundary point. In higher dimensions; the
+                number of points in each dimension is the same. Hence, the total
+                number of degrees of freedom is `Nᵈ`.
+            - `dt`: The timestep size `Δt` between two consecutive states.
+            - `diffusivity` (keyword-only): The diffusivity `ν`. In higher
+                dimensions, this can be a scalar (=float), a vector of length
+                `d`, or a matrix of shape `d ˣ d`. If a scalar is given, the
+                diffusivity is assumed to be the same in all spatial dimensions.
+                If a vector (of length `d`) is given, the diffusivity varies
+                across dimensions (=> diagonal diffusion). For a matrix, there
+                is fully anisotropic diffusion. In this case, `A` must be
+                symmetric positive definite (SPD). Default: `0.01`.
+        """
         # ToDo: more sophisticated checks here
         if isinstance(diffusivity, float):
             diffusivity = jnp.diag(jnp.ones(num_spatial_dims)) * diffusivity
