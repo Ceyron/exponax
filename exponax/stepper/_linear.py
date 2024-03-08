@@ -212,7 +212,7 @@ class Diffusion(BaseStepper):
 
 class AdvectionDiffusion(BaseStepper):
     velocity: Float[Array, "D"]
-    diffusivity: float
+    diffusivity: Float[Array, "D D"]
 
     def __init__(
         self,
@@ -222,11 +222,20 @@ class AdvectionDiffusion(BaseStepper):
         dt: float,
         *,
         velocity: Union[Float[Array, "D"], float] = 1.0,
-        diffusivity: float = 0.01,
+        diffusivity: Union[
+            Float[Array, "D D"],
+            Float[Array, "D"],
+            float,
+        ] = 0.01,
     ):
+        # ToDo: more sophisticated checks here
         if isinstance(velocity, float):
             velocity = jnp.ones(num_spatial_dims) * velocity
         self.velocity = velocity
+        if isinstance(diffusivity, float):
+            diffusivity = jnp.diag(jnp.ones(num_spatial_dims)) * diffusivity
+        elif len(diffusivity.shape) == 1:
+            diffusivity = jnp.diag(diffusivity)
         self.diffusivity = diffusivity
         super().__init__(
             num_spatial_dims=num_spatial_dims,
@@ -241,9 +250,24 @@ class AdvectionDiffusion(BaseStepper):
         self,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> Complex[Array, "1 ... (N//2)+1"]:
-        return -build_gradient_inner_product_operator(
+        laplace_outer_producct = (
+            derivative_operator[:, None] * derivative_operator[None, :]
+        )
+        diffusion_operator = jnp.einsum(
+            "ij,ij...->...",
+            self.diffusivity,
+            laplace_outer_producct,
+        )
+        # Add the necessary singleton channel axis
+        diffusion_operator = diffusion_operator[None, ...]
+
+        advection_operator = - build_gradient_inner_product_operator(
             derivative_operator, self.velocity, order=1
-        ) + self.diffusivity * build_laplace_operator(derivative_operator)
+        )
+
+        linear_operator = advection_operator + diffusion_operator
+
+        return linear_operator
 
     def _build_nonlinear_fun(
         self,
