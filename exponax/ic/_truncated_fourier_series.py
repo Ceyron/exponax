@@ -14,7 +14,6 @@ from ._base_ic import BaseRandomICGenerator
 
 class RandomTruncatedFourierSeries(BaseRandomICGenerator):
     num_spatial_dims: int
-    domain_extent: float
     cutoff: int
     amplitude_range: tuple[int, int]
     angle_range: tuple[int, int]
@@ -23,7 +22,6 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
     def __init__(
         self,
         num_spatial_dims: int,
-        domain_extent: float = 1.0,
         *,
         cutoff: int = 10,
         amplitude_range: tuple[int, int] = (-1.0, 1.0),
@@ -31,7 +29,6 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
         offset_range: tuple[int, int] = (0.0, 0.0),  # no offset by default
     ):
         self.num_spatial_dims = num_spatial_dims
-        self.domain_extent = domain_extent
 
         self.cutoff = cutoff
         self.amplitude_range = amplitude_range

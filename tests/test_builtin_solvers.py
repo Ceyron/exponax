@@ -87,7 +87,6 @@ def test_specific_stepper_to_general_linear_stepper(
 
     u_0 = ex.ic.RandomTruncatedFourierSeries(
         num_spatial_dims,
-        domain_extent,
         cutoff=5,
     )(num_points, key=jax.random.PRNGKey(0))
 
@@ -176,7 +175,6 @@ def test_specific_stepper_to_general_convection_stepper(
 
     u_0 = ex.ic.RandomTruncatedFourierSeries(
         num_spatial_dims,
-        domain_extent,
         cutoff=5,
     )(num_points, key=jax.random.PRNGKey(0))
 
@@ -254,7 +252,6 @@ def test_specific_to_general_gradient_norm_stepper(
 
     u_0 = ex.ic.RandomTruncatedFourierSeries(
         num_spatial_dims,
-        domain_extent,
         cutoff=5,
     )(num_points, key=jax.random.PRNGKey(0))
 
@@ -294,7 +291,6 @@ def test_linear_normalized_stepper(coefficients):
 
     u_0 = ex.ic.RandomTruncatedFourierSeries(
         num_spatial_dims,
-        domain_extent,
         cutoff=5,
     )(num_points, key=jax.random.PRNGKey(0))
 

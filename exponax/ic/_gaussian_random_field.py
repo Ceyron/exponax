@@ -20,8 +20,8 @@ class GaussianRandomField(BaseRandomICGenerator):
     def __init__(
         self,
         num_spatial_dims: int,
-        domain_extent: float = 1.0,
         *,
+        domain_extent: float = 1.0,
         powerlaw_exponent: float = 3.0,
         normalize: bool = True,
     ):

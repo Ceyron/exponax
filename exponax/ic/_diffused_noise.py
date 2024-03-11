@@ -16,8 +16,8 @@ class DiffusedNoise(BaseRandomICGenerator):
     def __init__(
         self,
         num_spatial_dims: int,
-        domain_extent: float = 1.0,
         *,
+        domain_extent: float = 1.0,
         intensity=0.001,
         zero_mean: bool = False,
     ):

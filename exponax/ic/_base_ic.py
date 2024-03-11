@@ -23,7 +23,6 @@ class BaseIC(eqx.Module, ABC):
 
 class BaseRandomICGenerator(eqx.Module):
     num_spatial_dims: int
-    domain_extent: float
     indexing: str = "ij"
 
     def gen_ic_fun(self, num_points: int, *, key: PRNGKeyArray) -> BaseIC:
