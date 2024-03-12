@@ -5,19 +5,21 @@ from .._spectral import build_laplace_operator
 from ..nonlin_fun import VorticityConvection2d, VorticityConvection2dKolmogorov
 
 
-class NavierStokesVorticity2d(BaseStepper):
+class NavierStokesVorticity(BaseStepper):
     diffusivity: float
+    vorticity_convection_scale: float
     drag: float
     dealiasing_fraction: float
 
     def __init__(
         self,
-        # Does not require D argument as it is fixed to 2
+        num_spatial_dims: int,
         domain_extent: float,
         num_points: int,
         dt: float,
         *,
         diffusivity: float = 0.01,
+        vorticity_convection_scale: float = 1.0,
         drag: float = 0.0,
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,
@@ -25,10 +27,11 @@ class NavierStokesVorticity2d(BaseStepper):
         circle_radius: float = 1.0,
     ):
         self.diffusivity = diffusivity
+        self.vorticity_convection_scale = vorticity_convection_scale
         self.drag = drag
         self.dealiasing_fraction = dealiasing_fraction
         super().__init__(
-            num_spatial_dims=2,
+            num_spatial_dims=num_spatial_dims,
             domain_extent=domain_extent,
             num_points=num_points,
             dt=dt,
@@ -54,13 +57,15 @@ class NavierStokesVorticity2d(BaseStepper):
             num_spatial_dims=self.num_spatial_dims,
             num_points=self.num_points,
             num_channels=self.num_channels,
+            convection_scale=self.vorticity_convection_scale,
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
         )
 
 
-class KolmogorovFlowVorticity2d(BaseStepper):
+class KolmogorovFlowVorticity(BaseStepper):
     diffusivity: float
+    convection_scale: float
     drag: float
     injection_mode: int
     injection_scale: float
@@ -68,12 +73,13 @@ class KolmogorovFlowVorticity2d(BaseStepper):
 
     def __init__(
         self,
-        # Does not require D argument as it is fixed to 2
+        num_spatial_dims: int,
         domain_extent: float,
         num_points: int,
         dt: float,
         *,
         diffusivity: float = 0.001,
+        convection_scale: float = 1.0,
         drag: float = -0.1,
         injection_mode: int = 4,
         injection_scale: float = 1.0,
@@ -82,13 +88,16 @@ class KolmogorovFlowVorticity2d(BaseStepper):
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
+        if num_spatial_dims != 2:
+            raise ValueError(f"Expected num_spatial_dims = 2, got {num_spatial_dims}.")
         self.diffusivity = diffusivity
+        self.convection_scale = convection_scale
         self.drag = drag
         self.injection_mode = injection_mode
         self.injection_scale = injection_scale
         self.dealiasing_fraction = dealiasing_fraction
         super().__init__(
-            num_spatial_dims=2,
+            num_spatial_dims=num_spatial_dims,
             domain_extent=domain_extent,
             num_points=num_points,
             dt=dt,
@@ -114,6 +123,7 @@ class KolmogorovFlowVorticity2d(BaseStepper):
             num_spatial_dims=self.num_spatial_dims,
             num_points=self.num_points,
             num_channels=self.num_channels,
+            convection_scale=self.convection_scale,
             injection_mode=self.injection_mode,
             injection_scale=self.injection_scale,
             derivative_operator=derivative_operator,

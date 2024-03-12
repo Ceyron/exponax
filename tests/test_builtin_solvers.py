@@ -30,10 +30,10 @@ def test_instantiate():
             simulator(num_spatial_dims, domain_extent, num_points, dt)
 
     for simulator in [
-        ex.stepper.NavierStokesVorticity2d,
-        ex.stepper.KolmogorovFlowVorticity2d,
+        ex.stepper.NavierStokesVorticity,
+        ex.stepper.KolmogorovFlowVorticity,
     ]:
-        simulator(domain_extent, num_points, dt)
+        simulator(2, domain_extent, num_points, dt)
 
     for num_spatial_dims in [1, 2, 3]:
         ex.poisson.Poisson(num_spatial_dims, domain_extent, num_points)

@@ -12,7 +12,7 @@ from ._linear import (
     GeneralLinearStepper,
     HyperDiffusion,
 )
-from ._navier_stokes import KolmogorovFlowVorticity2d, NavierStokesVorticity2d
+from ._navier_stokes import KolmogorovFlowVorticity, NavierStokesVorticity
 from ._nikolaevskiy import Nikolaevskiy, NikolaevskiyConservative
 from ._polynomial import GeneralPolynomialStepper
 from ._reaction import (
@@ -47,6 +47,6 @@ __all__ = [
     "GeneralGradientNormStepper",
     "Nikolaevskiy",
     "NikolaevskiyConservative",
-    "NavierStokesVorticity2d",
-    "KolmogorovFlowVorticity2d",
+    "NavierStokesVorticity",
+    "KolmogorovFlowVorticity",
 ]
