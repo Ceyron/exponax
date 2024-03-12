@@ -25,7 +25,7 @@ class Nikolaevskiy(BaseStepper):
         sixth_order_diffusivity: float = 1.0,
         dealiasing_fraction: float = 2 / 3,
         order: int = 2,
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         self.gradient_norm_scale = gradient_norm_scale
@@ -40,7 +40,7 @@ class Nikolaevskiy(BaseStepper):
             dt=dt,
             num_channels=1,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 
@@ -93,7 +93,7 @@ class NikolaevskiyConservative(BaseStepper):
         sixth_order_diffusivity: float = 1.0,
         dealiasing_fraction: float = 2 / 3,
         order: int = 2,
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         self.convection_scale = convection_scale
@@ -108,7 +108,7 @@ class NikolaevskiyConservative(BaseStepper):
             dt=dt,
             num_channels=num_spatial_dims,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 

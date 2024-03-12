@@ -21,7 +21,7 @@ class NavierStokesVorticity2d(BaseStepper):
         drag: float = 0.0,
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         self.diffusivity = diffusivity
@@ -34,7 +34,7 @@ class NavierStokesVorticity2d(BaseStepper):
             dt=dt,
             num_channels=1,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 
@@ -79,7 +79,7 @@ class KolmogorovFlowVorticity2d(BaseStepper):
         injection_scale: float = 1.0,
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         self.diffusivity = diffusivity
@@ -94,7 +94,7 @@ class KolmogorovFlowVorticity2d(BaseStepper):
             dt=dt,
             num_channels=1,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 

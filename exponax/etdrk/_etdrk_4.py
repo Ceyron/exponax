@@ -22,7 +22,7 @@ class ETDRK4(BaseETDRK):
         linear_operator: Complex[Array, "E ... (N//2)+1"],
         nonlinear_fun: BaseNonlinearFun,
         *,
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         super().__init__(dt, linear_operator)
@@ -30,7 +30,7 @@ class ETDRK4(BaseETDRK):
         self._half_exp_term = jnp.exp(0.5 * dt * linear_operator)
 
         LR = (
-            circle_radius * roots_of_unity(n_circle_points)
+            circle_radius * roots_of_unity(num_circle_points)
             + linear_operator[..., jnp.newaxis] * dt
         )
 

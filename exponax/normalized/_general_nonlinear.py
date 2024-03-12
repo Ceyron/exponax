@@ -19,7 +19,7 @@ class NormlizedGeneralNonlinearStepper1d(BaseStepper):
         normalized_coefficients_nonlinear: list[float] = [0.0, -1.0 * 0.1, 0.0],
         order=2,
         dealiasing_fraction: float = 2 / 3,
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         """
@@ -45,7 +45,7 @@ class NormlizedGeneralNonlinearStepper1d(BaseStepper):
             dt=1.0,
             num_channels=1,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 

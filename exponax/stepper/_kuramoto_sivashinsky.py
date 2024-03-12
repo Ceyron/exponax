@@ -23,7 +23,7 @@ class KuramotoSivashinsky(BaseStepper):
         fourth_order_diffusivity: float = 1.0,
         dealiasing_fraction: float = 2 / 3,
         order: int = 2,
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         """
@@ -43,7 +43,7 @@ class KuramotoSivashinsky(BaseStepper):
             dt=dt,
             num_channels=1,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 
@@ -91,7 +91,7 @@ class KuramotoSivashinskyConservative(BaseStepper):
         fourth_order_diffusivity: float = 1.0,
         dealiasing_fraction: float = 2 / 3,
         order: int = 2,
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         """
@@ -110,7 +110,7 @@ class KuramotoSivashinskyConservative(BaseStepper):
             dt=dt,
             num_channels=num_spatial_dims,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 

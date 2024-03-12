@@ -31,7 +31,7 @@ class BaseStepper(eqx.Module):
         *,
         num_channels: int,
         order: int,
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         self.num_spatial_dims = num_spatial_dims
@@ -71,7 +71,7 @@ class BaseStepper(eqx.Module):
                 dt,
                 linear_operator,
                 nonlinear_fun,
-                n_circle_points=n_circle_points,
+                num_circle_points=num_circle_points,
                 circle_radius=circle_radius,
             )
         elif order == 2:
@@ -79,7 +79,7 @@ class BaseStepper(eqx.Module):
                 dt,
                 linear_operator,
                 nonlinear_fun,
-                n_circle_points=n_circle_points,
+                num_circle_points=num_circle_points,
                 circle_radius=circle_radius,
             )
         elif order == 3:
@@ -87,7 +87,7 @@ class BaseStepper(eqx.Module):
                 dt,
                 linear_operator,
                 nonlinear_fun,
-                n_circle_points=n_circle_points,
+                num_circle_points=num_circle_points,
                 circle_radius=circle_radius,
             )
         elif order == 4:
@@ -95,7 +95,7 @@ class BaseStepper(eqx.Module):
                 dt,
                 linear_operator,
                 nonlinear_fun,
-                n_circle_points=n_circle_points,
+                num_circle_points=num_circle_points,
                 circle_radius=circle_radius,
             )
         else:

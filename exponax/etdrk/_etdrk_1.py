@@ -16,14 +16,14 @@ class ETDRK1(BaseETDRK):
         linear_operator: Complex[Array, "E ... (N//2)+1"],
         nonlinear_fun: BaseNonlinearFun,
         *,
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         super().__init__(dt, linear_operator)
         self._nonlinear_fun = nonlinear_fun
 
         LR = (
-            circle_radius * roots_of_unity(n_circle_points)
+            circle_radius * roots_of_unity(num_circle_points)
             + linear_operator[..., jnp.newaxis] * dt
         )
 

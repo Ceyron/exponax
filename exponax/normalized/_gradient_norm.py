@@ -25,7 +25,7 @@ class NormalizedGradientNormStepper(BaseStepper):
         normalized_gradient_norm_scale: float = 1.0 * 0.1 / (60.0**2),
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         """
@@ -45,7 +45,7 @@ class NormalizedGradientNormStepper(BaseStepper):
             dt=1.0,
             num_channels=1,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 

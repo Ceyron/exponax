@@ -21,7 +21,7 @@ class GeneralConvectionStepper(BaseStepper):
         convection_scale: float = 1.0,
         order=2,
         dealiasing_fraction: float = 2 / 3,
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         """
@@ -40,7 +40,7 @@ class GeneralConvectionStepper(BaseStepper):
             dt=dt,
             num_channels=num_spatial_dims,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 

@@ -28,7 +28,7 @@ class SwiftHohenberg(BaseStepper):
         order: int = 2,
         dealiasing_fraction: float = 1
         / 2,  # Needs lower value due to cubic nonlinearity
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         self.g = g
@@ -41,7 +41,7 @@ class SwiftHohenberg(BaseStepper):
             dt=dt,
             num_channels=1,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 
@@ -88,7 +88,7 @@ class GrayScott(BaseStepper):
         order: int = 2,
         dealiasing_fraction: float = 1
         / 2,  # Needs lower value due to cubic nonlinearity
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         self.epsilon_1 = epsilon_1
@@ -103,7 +103,7 @@ class GrayScott(BaseStepper):
             dt=dt,
             num_channels=2,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 
@@ -152,7 +152,7 @@ class FisherKPP(BaseStepper):
         order: int = 2,
         r=1.0,
         dealiasing_fraction: float = 2 / 3,
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         self.dealiasing_fraction = dealiasing_fraction
@@ -164,7 +164,7 @@ class FisherKPP(BaseStepper):
             dt=dt,
             num_channels=1,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 
@@ -203,7 +203,7 @@ class AllenCahn(BaseStepper):
         order: int = 2,
         dealiasing_fraction: float = 1
         / 2,  # Needs lower value due to cubic nonlinearity
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         self.dealiasing_fraction = dealiasing_fraction
@@ -214,7 +214,7 @@ class AllenCahn(BaseStepper):
             dt=dt,
             num_channels=1,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 
@@ -255,7 +255,7 @@ class CahnHilliard(BaseStepper):
         order: int = 2,
         dealiasing_fraction: float = 1
         / 2,  # Needs lower value due to cubic nonlinearity
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         self.hyper_diffusivity = hyper_diffusivity
@@ -267,7 +267,7 @@ class CahnHilliard(BaseStepper):
             dt=dt,
             num_channels=1,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 
@@ -308,7 +308,7 @@ class BelousovZhabotinsky(BaseStepper):
         order: int = 2,
         dealiasing_fraction: float = 1
         / 2,  # Needs lower value due to cubic nonlinearity
-        n_circle_points: int = 16,
+        num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         self.diffusivities = diffusivities
@@ -320,7 +320,7 @@ class BelousovZhabotinsky(BaseStepper):
             dt=dt,
             num_channels=3,
             order=order,
-            n_circle_points=n_circle_points,
+            num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
 
