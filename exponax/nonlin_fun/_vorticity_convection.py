@@ -6,6 +6,7 @@ from ._base import BaseNonlinearFun
 
 
 class VorticityConvection2d(BaseNonlinearFun):
+    convection_scale: float
     inv_laplacian: Complex[Array, "1 ... (N//2)+1"]
 
     def __init__(
@@ -14,6 +15,7 @@ class VorticityConvection2d(BaseNonlinearFun):
         num_points: int,
         num_channels: int,
         *,
+        convection_scale: float = 1.0,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
         dealiasing_fraction: float,
     ):
@@ -29,6 +31,8 @@ class VorticityConvection2d(BaseNonlinearFun):
             derivative_operator=derivative_operator,
             dealiasing_fraction=dealiasing_fraction,
         )
+
+        self.convection_scale = convection_scale
 
         laplacian = build_laplace_operator(derivative_operator, order=2)
 
@@ -70,7 +74,7 @@ class VorticityConvection2d(BaseNonlinearFun):
         # convection_hat = self.dealiasing_mask * convection_hat
 
         # Requires minus to move term to the rhs
-        return -convection_hat
+        return -self.convection_scale * convection_hat
 
 
 class VorticityConvection2dKolmogorov(VorticityConvection2d):
@@ -82,6 +86,7 @@ class VorticityConvection2dKolmogorov(VorticityConvection2d):
         num_points: int,
         num_channels: int,
         *,
+        convection_scale: float = 1.0,
         injection_mode: int = 4,
         injection_scale: float = 1.0,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
@@ -91,6 +96,7 @@ class VorticityConvection2dKolmogorov(VorticityConvection2d):
             num_spatial_dims,
             num_points,
             num_channels,
+            convection_scale=convection_scale,
             derivative_operator=derivative_operator,
             dealiasing_fraction=dealiasing_fraction,
         )

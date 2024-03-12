@@ -13,6 +13,7 @@ from ._utils import (
     normalize_gradient_norm_scale,
     normalize_polynomial_scales,
 )
+from ._vorticity_convection import NormalizedVorticityConvection
 
 __all__ = [
     "NormalizedConvectionStepper",
@@ -20,6 +21,7 @@ __all__ = [
     "NormalizedGradientNormStepper",
     "NormalizedLinearStepper",
     "NormalizedPolynomialStepper",
+    "NormalizedVorticityConvection",
     "denormalize_coefficients",
     "denormalize_convection_scale",
     "denormalize_gradient_norm_scale",
