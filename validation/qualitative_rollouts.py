@@ -154,8 +154,80 @@ CONFIGURATIONS_1D = [
 CONFIGURATIONS_2D = [
     # Linear
     (
-        ex.stepper.Advection(2, 3.0, 110, 0.1, velocity=jnp.array([0.3, -0.5])),
+        ex.stepper.Advection(2, 3.0, 75, 0.1, velocity=jnp.array([0.3, -0.5])),
         "advection",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.Diffusion(2, 3.0, 75, 0.1, diffusivity=0.01),
+        "diffusion",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.Diffusion(2, 3.0, 75, 0.1, diffusivity=jnp.array([0.01, 0.05])),
+        "diffusion_diagonal",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.Diffusion(
+            2, 3.0, 75, 0.1, diffusivity=jnp.array([[0.02, 0.01], [0.01, 0.05]])
+        ),
+        "diffusion_anisotropic",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.AdvectionDiffusion(
+            2, 3.0, 75, 0.1, diffusivity=0.01, velocity=jnp.array([0.3, -0.5])
+        ),
+        "advection_diffusion",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.Dispersion(2, 3.0, 75, 0.1, dispersivity=0.01),
+        "dispersion",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=3),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.Dispersion(
+            2, 3.0, 75, 0.1, dispersivity=0.01, advect_on_diffusion=True
+        ),
+        "dispersion_advect_on_diffuse",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=3),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.HyperDiffusion(2, 3.0, 75, 0.1, hyper_diffusivity=0.0001),
+        "hyper_diffusion",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.HyperDiffusion(
+            2, 3.0, 75, 0.1, hyper_diffusivity=0.0001, diffuse_on_diffuse=True
+        ),
+        "hyper_diffusion_diffuse_on_diffuse",
         ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
         0,
         30,
