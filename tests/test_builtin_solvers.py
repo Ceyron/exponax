@@ -53,6 +53,9 @@ def test_instantiate():
         ]:
             normalized_simulator(num_spatial_dims, num_points)
 
+    for simulator in [ex.normalized.NormalizedVorticityConvection]:
+        simulator(2, num_points)
+
 
 @pytest.mark.parametrize(
     "specific_stepper,general_stepper_coefficients",
