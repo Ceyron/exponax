@@ -22,8 +22,31 @@ class RepeatedStepper(eqx.Module):
         - `n_sub_steps`: The number of substeps to perform.
     """
 
+    num_spatial_dims: int
+    domain_extent: float
+    num_points: int
+    num_channels: int
+    dt: float
+    dx: float
+
     stepper: BaseStepper
     num_sub_steps: int
+
+    def __init__(
+        self,
+        stepper: BaseStepper,
+        n_sub_steps: int,
+    ):
+        self.stepper = stepper
+        self.num_sub_steps = n_sub_steps
+
+        self.dt = stepper.dt * n_sub_steps
+
+        self.num_spatial_dims = stepper.num_spatial_dims
+        self.domain_extent = stepper.domain_extent
+        self.num_points = stepper.num_points
+        self.num_channels = stepper.num_channels
+        self.dx = stepper.dx
 
     def step(
         self,
