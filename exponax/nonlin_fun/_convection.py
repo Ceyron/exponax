@@ -1,6 +1,5 @@
-import jax
 import jax.numpy as jnp
-from jaxtyping import Array, Complex, Float
+from jaxtyping import Array, Complex
 
 from .._spectral import space_indices, spatial_shape
 from ._base import BaseNonlinearFun
@@ -8,7 +7,6 @@ from ._base import BaseNonlinearFun
 
 class ConvectionNonlinearFun(BaseNonlinearFun):
     scale: float
-    zero_mode_fix: bool
 
     def __init__(
         self,
@@ -19,13 +17,11 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
         dealiasing_fraction: float,
         scale: float = 1.0,
-        zero_mode_fix: bool = False,
     ):
         """
         Uses by default a scaling of 0.5 to take into account the conservative evaluation
         """
         self.scale = scale
-        self.zero_mode_fix = zero_mode_fix
         super().__init__(
             num_spatial_dims,
             num_points,
@@ -33,12 +29,6 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
             derivative_operator=derivative_operator,
             dealiasing_fraction=dealiasing_fraction,
         )
-
-    def zero_fix(
-        self,
-        f: Float[Array, "... N"],
-    ):
-        return f - jnp.mean(f)
 
     def evaluate(
         self,
@@ -51,10 +41,6 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
             axes=space_indices(self.num_spatial_dims),
         )
         u_outer_product = u[:, None] * u[None, :]
-
-        if self.zero_mode_fix:
-            # Maybe there is more efficient way
-            u_outer_product = jax.vmap(self.zero_fix)(u_outer_product)
 
         u_outer_product_hat = jnp.fft.rfftn(
             u_outer_product, axes=space_indices(self.num_spatial_dims)
