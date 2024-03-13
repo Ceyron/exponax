@@ -30,9 +30,6 @@ class CahnHilliardNonlinearFun(BaseNonlinearFun):
         u = self.ifft(self.dealias(u_hat))
         u_power = u[0] ** 3
         u_power_hat = self.fft(u_power)
-        u_power_laplace_hat = (
-            build_laplace_operator(self.derivative_operator, order=2) * u_power_hat
-        )
         u_power_laplace_hat = self.laplace_operator * u_power_hat
         return u_power_laplace_hat
 
