@@ -20,12 +20,18 @@ def test_instantiate():
             ex.stepper.Burgers,
             ex.stepper.KuramotoSivashinsky,
             ex.stepper.KuramotoSivashinskyConservative,
-            ex.stepper.SwiftHohenberg,
-            ex.stepper.GrayScott,
             ex.stepper.KortewegDeVries,
-            ex.stepper.FisherKPP,
-            ex.stepper.AllenCahn,
-            ex.stepper.CahnHilliard,
+        ]:
+            simulator(num_spatial_dims, domain_extent, num_points, dt)
+
+    for num_spatial_dims in [1, 2, 3]:
+        for simulator in [
+            ex.reaction.FisherKPP,
+            ex.reaction.AllenCahn,
+            ex.reaction.CahnHilliard,
+            ex.reaction.SwiftHohenberg,
+            ex.reaction.BelousovZhabotinsky,
+            ex.reaction.GrayScott,
         ]:
             simulator(num_spatial_dims, domain_extent, num_points, dt)
 

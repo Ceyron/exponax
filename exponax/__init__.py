@@ -1,6 +1,6 @@
 from . import _metrics as metrics
 from . import _poisson as poisson
-from . import etdrk, ic, nonlin_fun, normalized, stepper
+from . import etdrk, ic, nonlin_fun, normalized, reaction, stepper
 from ._base_stepper import BaseStepper
 from ._forced_stepper import ForcedStepper
 from ._repeated_stepper import RepeatedStepper
@@ -35,4 +35,5 @@ __all__ = [
     "nonlin_fun",
     "ic",
     "etdrk",
+    "reaction",
 ]

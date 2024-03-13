@@ -2,7 +2,6 @@ from ._burgers import Burgers
 from ._convection import GeneralConvectionStepper
 from ._general_nonlinear import GeneralNonlinearStepper1d
 from ._gradient_norm import GeneralGradientNormStepper
-from ._korteweg_de_vries import KortewegDeVries
 from ._kuramoto_sivashinsky import KuramotoSivashinsky, KuramotoSivashinskyConservative
 from ._linear import (
     Advection,
@@ -15,18 +14,9 @@ from ._linear import (
 from ._navier_stokes import KolmogorovFlowVorticity, NavierStokesVorticity
 from ._nikolaevskiy import Nikolaevskiy, NikolaevskiyConservative
 from ._polynomial import GeneralPolynomialStepper
-from ._reaction import (
-    AllenCahn,
-    BelousovZhabotinsky,
-    CahnHilliard,
-    FisherKPP,
-    GrayScott,
-    SwiftHohenberg,
-)
 
 __all__ = [
     "Advection",
-    "BelousovZhabotinsky",
     "Diffusion",
     "AdvectionDiffusion",
     "Dispersion",
@@ -34,14 +24,8 @@ __all__ = [
     "Burgers",
     "KuramotoSivashinsky",
     "KuramotoSivashinskyConservative",
-    "SwiftHohenberg",
     "GeneralPolynomialStepper",
     "GeneralNonlinearStepper1d",
-    "GrayScott",
-    "KortewegDeVries",
-    "FisherKPP",
-    "AllenCahn",
-    "CahnHilliard",
     "GeneralLinearStepper",
     "GeneralConvectionStepper",
     "GeneralGradientNormStepper",
