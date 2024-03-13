@@ -244,6 +244,40 @@ CONFIGURATIONS_2D = [
         100,
         (-2.5, 2.5),
     ),
+    (
+        ex.RepeatedStepper(
+            ex.stepper.NavierStokesVorticity(
+                2,
+                1.0,
+                48,
+                0.1 / 10,
+                diffusivity=0.0003,
+            ),
+            10,
+        ),
+        "ns_vorticity",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+        0,
+        100,
+        (-5.0, 5.0),
+    ),
+    (
+        ex.RepeatedStepper(
+            ex.stepper.KolmogorovFlowVorticity(
+                2,
+                2 * jnp.pi,
+                72,
+                1.0 / 50,
+                diffusivity=0.001,
+            ),
+            50,
+        ),
+        "kolmogorov_vorticity",
+        ex.ic.DiffusedNoise(2, zero_mean=True),
+        200,
+        100,
+        (-5.0, 5.0),
+    ),
     # Reaction
     (
         ex.reaction.CahnHilliard(2, 128, 300, 0.01, hyper_diffusivity=1.2),
