@@ -45,7 +45,99 @@ CONFIGURATIONS_1D = [
         100,
         (-1.0, 1.0),
     ),
+    (
+        ex.stepper.Dispersion(1, 3.0, 110, 0.01, dispersivity=0.01),
+        "dispersion",
+        ex.ic.RandomTruncatedFourierSeries(1, cutoff=3),
+        0,
+        100,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.HyperDiffusion(1, 3.0, 110, 0.01, hyper_diffusivity=0.001),
+        "hyper_diffusion",
+        ex.ic.RandomTruncatedFourierSeries(1, cutoff=5),
+        0,
+        100,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.GeneralLinearStepper(
+            1,
+            3.0,
+            110,
+            0.01,
+            coefficients=[0.0, 0.0, 0.1, 0.0001],
+        ),
+        "dispersion_diffusion",
+        ex.ic.RandomTruncatedFourierSeries(1, cutoff=5),
+        0,
+        100,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.GeneralLinearStepper(
+            1,
+            3.0,
+            110,
+            0.01,
+            coefficients=[0.0, 0.0, 0.0, 0.0001, -0.001],
+        ),
+        "dispersion_hyper_diffusion",
+        ex.ic.RandomTruncatedFourierSeries(1, cutoff=5),
+        0,
+        100,
+        (-1.0, 1.0),
+    ),
     # Nonlinear
+    (
+        ex.stepper.Burgers(1, 3.0, 110, 0.01, diffusivity=0.01),
+        "burgers",
+        ex.ic.RandomTruncatedFourierSeries(1, cutoff=5),
+        0,
+        100,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.KortewegDeVries(1, 20.0, 110, 0.01),
+        "kdv",
+        ex.ic.RandomTruncatedFourierSeries(1, cutoff=5),
+        0,
+        100,
+        (-2.0, 2.0),
+    ),
+    (
+        ex.stepper.KuramotoSivashinsky(1, 60.0, 110, 0.5),
+        "ks",
+        ex.ic.RandomTruncatedFourierSeries(1, cutoff=3),
+        500,
+        200,
+        (-6.5, 6.5),
+    ),
+    (
+        ex.stepper.KuramotoSivashinskyConservative(1, 60.0, 110, 0.5),
+        "ks_conservative",
+        ex.ic.RandomTruncatedFourierSeries(1, cutoff=3),
+        500,
+        200,
+        (-2.5, 2.5),
+    ),
+    (
+        ex.stepper.Nikolaevskiy(1, 60.0, 110, 0.5),
+        "niko",
+        ex.ic.RandomTruncatedFourierSeries(1, cutoff=3),
+        500,
+        200,
+        (-6.5, 6.5),
+    ),
+    (
+        ex.stepper.NikolaevskiyConservative(1, 60.0, 110, 0.5),
+        "niko_conservative",
+        ex.ic.RandomTruncatedFourierSeries(1, cutoff=3),
+        500,
+        200,
+        (-2.5, 2.5),
+    ),
     # Reaction
     (
         ex.reaction.FisherKPP(1, 10.0, 256, 0.001, r=10.0),
@@ -83,7 +175,7 @@ CONFIGURATIONS_2D = [
             ]
         ),
         0,
-        30,
+        100,
         (-1.0, 1.0),
     ),
     (
@@ -94,7 +186,7 @@ CONFIGURATIONS_2D = [
             (-1.0, 1.0),
         ),
         0,
-        30,
+        100,
         (-1.0, 1.0),
     ),
     (
@@ -110,7 +202,7 @@ CONFIGURATIONS_2D = [
             ]
         ),
         0,
-        30,
+        100,
         (-1.0, 1.0),
     ),
     (
@@ -121,7 +213,7 @@ CONFIGURATIONS_2D = [
             (-1.0, 1.0),
         ),
         0,
-        30,
+        100,
         (-1.0, 1.0),
     ),
     (
@@ -129,8 +221,53 @@ CONFIGURATIONS_2D = [
         "ks",
         ex.ic.RandomTruncatedFourierSeries(2, cutoff=3),
         500,
-        30,
+        100,
         (-6.5, 6.5),
+    ),
+    (
+        ex.stepper.KuramotoSivashinskyConservative(2, 30.0, 60, 0.1),
+        "ks_conservative",
+        ex.ic.RandomMultiChannelICGenerator(
+            2 * [ex.ic.RandomTruncatedFourierSeries(2, cutoff=3)]
+        ),
+        500,
+        100,
+        (-2.5, 2.5),
+    ),
+    (
+        ex.stepper.KuramotoSivashinskyConservative(
+            2, 30.0, 60, 0.01, single_channel=True
+        ),
+        "ks_conservative_single_channel",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=3),
+        500,
+        100,
+        (-2.5, 2.5),
+    ),
+    # Reaction
+    (
+        ex.reaction.CahnHilliard(2, 128, 300, 0.01, hyper_diffusivity=1.2),
+        "cahn_hilliard",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=10),
+        0,
+        100,
+        (-10.0, 10.0),
+    ),
+    (
+        ex.reaction.GrayScott(2, 2.0, 60, 0.1),
+        "gray_scott",
+        ex.ic.RandomMultiChannelICGenerator(
+            2
+            * [
+                ex.ic.ClampingICGenerator(
+                    ex.ic.RandomTruncatedFourierSeries(2, cutoff=2),
+                    (0.0, 1.0),
+                )
+            ]
+        ),
+        0,
+        100,
+        (0.0, 1.0),
     ),
 ]
 
@@ -147,6 +284,8 @@ for stepper_1d, name, ic_distribution, warmup_steps, steps, vlim in CONFIGURATIO
     ic = ic_distribution(stepper_1d.num_points, key=ic_key)
     ic = ex.repeat(stepper_1d, warmup_steps)(ic)
     trj = ex.rollout(stepper_1d, steps, include_init=True)(ic)
+    jnp.save(img_folder / f"{name}_1d.npy", trj)
+
     num_channels = stepper_1d.num_channels
     fig, ax_s = plt.subplots(num_channels, 1, figsize=(8, 4 * num_channels))
     if num_channels == 1:
@@ -181,6 +320,8 @@ for stepper_2d, name, ic_distribution, warmup_steps, steps, vlim in CONFIGURATIO
     ic = ic_distribution(stepper_2d.num_points, key=ic_key)
     ic = ex.repeat(stepper_2d, warmup_steps)(ic)
     trj = ex.rollout(stepper_2d, steps, include_init=True)(ic)
+    jnp.save(img_folder / f"{name}_2d.npy", trj)
+
     num_channels = stepper_2d.num_channels
     fig, ax_s = plt.subplots(1, num_channels, figsize=(5 * num_channels, 5))
     if num_channels == 1:
@@ -214,6 +355,7 @@ for stepper_2d, name, ic_distribution, warmup_steps, steps, vlim in CONFIGURATIO
     ani = FuncAnimation(fig, animate, frames=trj.shape[0], interval=100, blit=False)
 
     ani.save(img_folder / f"{name}_2d.mp4")
+    del ani
 
     p_meter_2d.update(1)
 
