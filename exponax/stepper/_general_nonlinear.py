@@ -5,7 +5,7 @@ from .._base_stepper import BaseStepper
 from ..nonlin_fun import GeneralNonlinearFun
 
 
-class GeneralNonlinearStepper1d(BaseStepper):
+class GeneralNonlinearStepper(BaseStepper):
     coefficients_linear: list[float]
     coefficients_nonlinear: list[float]
     dealiasing_fraction: float

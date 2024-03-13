@@ -1,6 +1,6 @@
 from ._burgers import Burgers
 from ._convection import GeneralConvectionStepper
-from ._general_nonlinear import GeneralNonlinearStepper1d
+from ._general_nonlinear import GeneralNonlinearStepper
 from ._gradient_norm import GeneralGradientNormStepper
 from ._korteweg_de_vries import KortewegDeVries
 from ._kuramoto_sivashinsky import KuramotoSivashinsky, KuramotoSivashinskyConservative
@@ -27,7 +27,7 @@ __all__ = [
     "KuramotoSivashinsky",
     "KuramotoSivashinskyConservative",
     "GeneralPolynomialStepper",
-    "GeneralNonlinearStepper1d",
+    "GeneralNonlinearStepper",
     "GeneralLinearStepper",
     "GeneralConvectionStepper",
     "GeneralGradientNormStepper",
