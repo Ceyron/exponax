@@ -9,6 +9,7 @@ class Burgers(BaseStepper):
     diffusivity: float
     convection_scale: float
     dealiasing_fraction: float
+    single_channel: bool
 
     def __init__(
         self,
@@ -19,6 +20,7 @@ class Burgers(BaseStepper):
         *,
         diffusivity: float = 0.1,
         convection_scale: float = 1.0,
+        single_channel: bool = False,
         order=2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,
@@ -64,13 +66,21 @@ class Burgers(BaseStepper):
         # """
         self.diffusivity = diffusivity
         self.convection_scale = convection_scale
+        self.single_channel = single_channel
         self.dealiasing_fraction = dealiasing_fraction
+
+        if single_channel:
+            num_channels = 1
+        else:
+            # number of channels grow with the spatial dimension
+            num_channels = num_spatial_dims
+
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             domain_extent=domain_extent,
             num_points=num_points,
             dt=dt,
-            num_channels=num_spatial_dims,  # Number of channels grows with dimension
+            num_channels=num_channels,
             order=order,
             num_circle_points=num_circle_points,
             circle_radius=circle_radius,
@@ -93,4 +103,5 @@ class Burgers(BaseStepper):
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
             scale=self.convection_scale,
+            single_channel=self.single_channel,
         )

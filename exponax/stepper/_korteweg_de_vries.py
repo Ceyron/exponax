@@ -16,6 +16,7 @@ class KortewegDeVries(BaseStepper):
     advect_over_diffuse_dispersivity: Float[Array, "D"]
     diffusivity: float
     dealiasing_fraction: float
+    single_channel: bool
 
     def __init__(
         self,
@@ -26,6 +27,7 @@ class KortewegDeVries(BaseStepper):
         *,
         convection_scale: float = -6.0,
         pure_dispersivity: Union[Float[Array, "D"], float] = 1.0,
+        single_channel: bool = False,
         advect_over_diffuse_dispersivity: Union[Float[Array, "D"], float] = 0.0,
         diffusivity: float = 0.0,
         order: int = 2,
@@ -43,13 +45,21 @@ class KortewegDeVries(BaseStepper):
         self.pure_dispersivity = pure_dispersivity
         self.advect_over_diffuse_dispersivity = advect_over_diffuse_dispersivity
         self.diffusivity = diffusivity
+        self.single_channel = single_channel
         self.dealiasing_fraction = dealiasing_fraction
+
+        if single_channel:
+            num_channels = 1
+        else:
+            # number of channels grow with the spatial dimension
+            num_channels = num_spatial_dims
+
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             domain_extent=domain_extent,
             num_points=num_points,
             dt=dt,
-            num_channels=num_spatial_dims,
+            num_channels=num_channels,
             order=order,
             num_circle_points=num_circle_points,
             circle_radius=circle_radius,
@@ -82,4 +92,5 @@ class KortewegDeVries(BaseStepper):
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
             scale=self.convection_scale,
+            single_channel=self.single_channel,
         )
