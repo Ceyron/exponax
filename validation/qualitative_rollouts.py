@@ -245,6 +245,32 @@ CONFIGURATIONS_2D = [
         (-2.5, 2.5),
     ),
     (
+        ex.stepper.Nikolaevskiy(2, 30.0, 60, 0.1),
+        "niko",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=3),
+        500,
+        100,
+        (-6.5, 6.5),
+    ),
+    (
+        ex.stepper.NikolaevskiyConservative(2, 30.0, 60, 0.1),
+        "niko_conservative",
+        ex.ic.RandomMultiChannelICGenerator(
+            2 * [ex.ic.RandomTruncatedFourierSeries(2, cutoff=3)]
+        ),
+        500,
+        100,
+        (-2.5, 2.5),
+    ),
+    (
+        ex.stepper.NikolaevskiyConservative(2, 30.0, 60, 0.01, single_channel=True),
+        "niko_conservative_single_channel",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=3),
+        500,
+        100,
+        (-2.5, 2.5),
+    ),
+    (
         ex.RepeatedStepper(
             ex.stepper.NavierStokesVorticity(
                 2,
@@ -302,6 +328,14 @@ CONFIGURATIONS_2D = [
         0,
         100,
         (0.0, 1.0),
+    ),
+    (
+        ex.reaction.SwiftHohenberg(2, 20.0 * jnp.pi, 100, 0.01),
+        "swift_hohenberg",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+        0,
+        100,
+        (-5.0, 5.0),
     ),
 ]
 
