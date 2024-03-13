@@ -59,42 +59,6 @@ class VorticityConvection2d(BaseNonlinearFun):
 
         return -self.convection_scale * convection_hat
 
-    # def evaluate(
-    #     self, u_hat: Complex[Array, "1 ... (N//2)+1"]
-    # ) -> Complex[Array, "1 ... (N//2)+1"]:
-    #     vorticity_hat = u_hat
-    #     stream_function_hat = self.inv_laplacian * vorticity_hat
-
-    #     u_hat = +self.derivative_operator[1:2] * stream_function_hat
-    #     v_hat = -self.derivative_operator[0:1] * stream_function_hat
-    #     del_vorticity_del_x_hat = self.derivative_operator[0:1] * vorticity_hat
-    #     del_vorticity_del_y_hat = self.derivative_operator[1:2] * vorticity_hat
-
-    #     u = jnp.fft.irfft2(
-    #         u_hat * self.dealiasing_mask, s=(self.num_points, self.num_points)
-    #     )
-    #     v = jnp.fft.irfft2(
-    #         v_hat * self.dealiasing_mask, s=(self.num_points, self.num_points)
-    #     )
-    #     del_vorticity_del_x = jnp.fft.irfft2(
-    #         del_vorticity_del_x_hat * self.dealiasing_mask,
-    #         s=(self.num_points, self.num_points),
-    #     )
-    #     del_vorticity_del_y = jnp.fft.irfft2(
-    #         del_vorticity_del_y_hat * self.dealiasing_mask,
-    #         s=(self.num_points, self.num_points),
-    #     )
-
-    #     convection = u * del_vorticity_del_x + v * del_vorticity_del_y
-
-    #     convection_hat = jnp.fft.rfft2(convection)
-
-    #     # Do we need another dealiasing mask here?
-    #     # convection_hat = self.dealiasing_mask * convection_hat
-
-    #     # Requires minus to move term to the rhs
-    #     return -self.convection_scale * convection_hat
-
 
 class VorticityConvection2dKolmogorov(VorticityConvection2d):
     injection: Complex[Array, "1 ... (N//2)+1"]

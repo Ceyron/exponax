@@ -53,11 +53,6 @@ class GradientNormNonlinearFun(BaseNonlinearFun):
             u_gradient_norm_squared = jax.vmap(self.zero_fix)(u_gradient_norm_squared)
 
         u_gradient_norm_squared_hat = 0.5 * self.fft(u_gradient_norm_squared)
-        # if self.zero_mode_fix:
-        #     # Fix the mean mode
-        #     u_gradient_norm_squared_hat = u_gradient_norm_squared_hat.at[..., 0].set(
-        #         u_hat[..., 0]
-        #     )
 
         # Requires minus to move term to the rhs
         return -self.scale * u_gradient_norm_squared_hat
