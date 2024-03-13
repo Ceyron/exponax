@@ -6,7 +6,7 @@ from ..nonlin_fun import ConvectionNonlinearFun
 
 
 class NormalizedConvectionStepper(BaseStepper):
-    normalized_coefficients: list[float]
+    normalized_coefficients: tuple[float, ...]
     normalized_convection_scale: float
     dealiasing_fraction: float
 
@@ -15,7 +15,7 @@ class NormalizedConvectionStepper(BaseStepper):
         num_spatial_dims: int,
         num_points: int,
         *,
-        normalized_coefficients: list[float] = [0.0, 0.0, 0.01 * 0.1],
+        normalized_coefficients: tuple[float, ...] = (0.0, 0.0, 0.01 * 0.1),
         normalized_convection_scale: float = 1.0 * 0.1,
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,

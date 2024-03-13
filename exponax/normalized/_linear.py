@@ -6,14 +6,14 @@ from ..nonlin_fun import ZeroNonlinearFun
 
 
 class NormalizedLinearStepper(BaseStepper):
-    normalized_coefficients: list[float]
+    normalized_coefficients: tuple[float, ...]
 
     def __init__(
         self,
         num_spatial_dims: int,
         num_points: int,
         *,
-        normalized_coefficients: list[float] = [0.0, -0.5, 0.01],
+        normalized_coefficients: tuple[float, ...] = (0.0, -0.5, 0.01),
     ):
         """
         By default: advection-diffusion with normalized advection of 0.5, and

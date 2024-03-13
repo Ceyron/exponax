@@ -8,7 +8,7 @@ class PolynomialNonlinearFun(BaseNonlinearFun):
     Channel-separate evaluation; and no mixed terms.
     """
 
-    coefficients: list[float]  # Starting from order 0
+    coefficients: tuple[float, ...]  # Starting from order 0
 
     def __init__(
         self,
@@ -16,7 +16,7 @@ class PolynomialNonlinearFun(BaseNonlinearFun):
         num_points: int,
         *,
         dealiasing_fraction: float,
-        coefficients: list[float],
+        coefficients: tuple[float, ...],
     ):
         """
         Coefficient list starts from order 0.

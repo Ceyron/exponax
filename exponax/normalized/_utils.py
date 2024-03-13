@@ -2,11 +2,11 @@ import jax.numpy as jnp
 
 
 def normalize_coefficients(
-    coefficients: tuple[float],
+    coefficients: tuple[float, ...],
     *,
     domain_extent: float,
     dt: float,
-) -> tuple[float]:
+) -> tuple[float, ...]:
     """
     Normalize the coefficients to a linear time stepper to be used with the
     normalized linear stepper.
@@ -24,11 +24,11 @@ def normalize_coefficients(
 
 
 def denormalize_coefficients(
-    normalized_coefficients: tuple[float],
+    normalized_coefficients: tuple[float, ...],
     *,
     domain_extent: float,
     dt: float,
-) -> tuple[float]:
+) -> tuple[float, ...]:
     """
     Denormalize the coefficients as they were used in the normalized linear to
     then be used again in a regular linear stepper.
@@ -112,11 +112,11 @@ def normalize_polynomial_scales(
 
 
 def denormalize_polynomial_scales(
-    normalized_polynomial_scales: tuple[float],
+    normalized_polynomial_scales: tuple[float, ...],
     *,
     domain_extent: float = None,
     dt: float,
-) -> tuple[float]:
+) -> tuple[float, ...]:
     """
     Denormalize the polynomial scales as they were used in the normalized
     polynomial to then be used again in a regular polynomial stepper.

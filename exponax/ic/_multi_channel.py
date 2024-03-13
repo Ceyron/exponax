@@ -1,5 +1,3 @@
-from typing import List
-
 import equinox as eqx
 import jax
 import jax.numpy as jnp
@@ -9,7 +7,7 @@ from ._base_ic import BaseIC, BaseRandomICGenerator
 
 
 class MultiChannelIC(eqx.Module):
-    initial_conditions: List[BaseIC]
+    initial_conditions: tuple[BaseIC, ...]
 
     def __call__(self, x: Float[Array, "D ... N"]) -> Float[Array, "C ... N"]:
         """
@@ -25,7 +23,7 @@ class MultiChannelIC(eqx.Module):
 
 
 class RandomMultiChannelICGenerator(eqx.Module):
-    ic_generators: List[BaseRandomICGenerator]
+    ic_generators: tuple[BaseRandomICGenerator, ...]
 
     def gen_ic_fun(self, num_points: int, *, key: PRNGKeyArray) -> MultiChannelIC:
         ic_funs = [

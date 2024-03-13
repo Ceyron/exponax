@@ -6,8 +6,8 @@ from ..nonlin_fun import PolynomialNonlinearFun
 
 
 class GeneralPolynomialStepper(BaseStepper):
-    coefficients: list[float]
-    polynomial_scales: list[float]
+    coefficients: tuple[float, ...]
+    polynomial_scales: tuple[float, ...]
     dealiasing_fraction: float
 
     def __init__(
@@ -17,8 +17,8 @@ class GeneralPolynomialStepper(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        coefficients: list[float] = [10.0, 0.0, 0.01],
-        polynomial_scales: list[float] = [0.0, 0.0, 10.0],
+        coefficients: tuple[float, ...] = (10.0, 0.0, 0.01),
+        polynomial_scales: tuple[float, ...] = (0.0, 0.0, 10.0),
         order=2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,

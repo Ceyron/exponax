@@ -6,8 +6,8 @@ from ..nonlin_fun import PolynomialNonlinearFun
 
 
 class NormalizedPolynomialStepper(BaseStepper):
-    normalized_coefficients: list[float]
-    normalized_polynomial_scales: list[float]
+    normalized_coefficients: tuple[float, ...]
+    normalized_polynomial_scales: tuple[float, ...]
     dealiasing_fraction: float
 
     def __init__(
@@ -15,16 +15,16 @@ class NormalizedPolynomialStepper(BaseStepper):
         num_spatial_dims: int,
         num_points: int,
         *,
-        normalized_coefficients: list[float] = [
+        normalized_coefficients: tuple[float, ...] = (
             10.0 * 0.001 / (10.0**0),
             0.0,
             1.0 * 0.001 / (10.0**2),
-        ],
-        normalized_polynomial_scales: list[float] = [
+        ),
+        normalized_polynomial_scales: tuple[float, ...] = (
             0.0,
             0.0,
             -10.0 * 0.001,
-        ],
+        ),
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,

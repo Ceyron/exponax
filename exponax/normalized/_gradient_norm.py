@@ -6,7 +6,7 @@ from ..nonlin_fun import GradientNormNonlinearFun
 
 
 class NormalizedGradientNormStepper(BaseStepper):
-    normalized_coefficients: list[float]
+    normalized_coefficients: tuple[float, ...]
     normalized_gradient_norm_scale: float
     dealiasing_fraction: float
 
@@ -15,13 +15,13 @@ class NormalizedGradientNormStepper(BaseStepper):
         num_spatial_dims: int,
         num_points: int,
         *,
-        normalized_coefficients: list[float] = [
+        normalized_coefficients: tuple[float, ...] = (
             0.0,
             0.0,
             -1.0 * 0.1 / (60.0**2),
             0.0,
             -1.0 * 0.1 / (60.0**4),
-        ],
+        ),
         normalized_gradient_norm_scale: float = 1.0 * 0.1 / (60.0**2),
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,

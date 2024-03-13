@@ -573,7 +573,7 @@ class HyperDiffusion(BaseStepper):
 
 
 class GeneralLinearStepper(BaseStepper):
-    coefficients: list[float]
+    coefficients: tuple[float, ...]
 
     def __init__(
         self,
@@ -582,7 +582,7 @@ class GeneralLinearStepper(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        coefficients: list[float] = [0.0, -0.1, 0.01],
+        coefficients: tuple[float, ...] = (0.0, -0.1, 0.01),
     ):
         """
         General timestepper for a d-dimensional (`d ∈ {1, 2, 3}`) linear

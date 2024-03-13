@@ -6,8 +6,8 @@ from ..nonlin_fun import GeneralNonlinearFun
 
 
 class NormlizedGeneralNonlinearStepper1d(BaseStepper):
-    normalized_coefficients_linear: list[float]
-    normalized_coefficients_nonlinear: list[float]
+    normalized_coefficients_linear: tuple[float, ...]
+    normalized_coefficients_nonlinear: tuple[float, ...]
     dealiasing_fraction: float
 
     def __init__(
@@ -15,8 +15,8 @@ class NormlizedGeneralNonlinearStepper1d(BaseStepper):
         num_spatial_dims: int,
         num_points: int,
         *,
-        normalized_coefficients_linear: list[float] = [0.0, 0.0, 0.01 * 0.1],
-        normalized_coefficients_nonlinear: list[float] = [0.0, -1.0 * 0.1, 0.0],
+        normalized_coefficients_linear: tuple[float, ...] = (0.0, 0.0, 0.01 * 0.1),
+        normalized_coefficients_nonlinear: tuple[float, ...] = (0.0, -1.0 * 0.1, 0.0),
         order=2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,

@@ -6,8 +6,8 @@ from ..nonlin_fun import GeneralNonlinearFun
 
 
 class GeneralNonlinearStepper(BaseStepper):
-    coefficients_linear: list[float]
-    coefficients_nonlinear: list[float]
+    coefficients_linear: tuple[float, ...]
+    coefficients_nonlinear: tuple[float, 3]
     dealiasing_fraction: float
 
     def __init__(
@@ -17,8 +17,8 @@ class GeneralNonlinearStepper(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        coefficients_linear: list[float] = [0.0, 0.0, 0.01],
-        coefficients_nonlinear: list[float] = [0.0, -1.0, 0.0],
+        coefficients_linear: tuple[float, ...] = (0.0, 0.0, 0.01),
+        coefficients_nonlinear: tuple[float, 3] = (0.0, -1.0, 0.0),
         order=2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,

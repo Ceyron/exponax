@@ -18,7 +18,7 @@ class GeneralNonlinearFun(BaseNonlinearFun):
         *,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
         dealiasing_fraction: float,
-        scale_list: list[float] = [0.0, -1.0, 0.0],
+        scale_list: tuple[float, ...] = [0.0, -1.0, 0.0],
         zero_mode_fix: bool = True,
     ):
         """

@@ -6,7 +6,7 @@ from ..nonlin_fun import GradientNormNonlinearFun
 
 
 class GeneralGradientNormStepper(BaseStepper):
-    coefficients: list[float]
+    coefficients: tuple[float, ...]
     gradient_norm_scale: float
     dealiasing_fraction: float
 
@@ -17,7 +17,7 @@ class GeneralGradientNormStepper(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        coefficients: list[float] = [0.0, 0.0, -1.0, 0.0, -1.0],
+        coefficients: tuple[float, ...] = (0.0, 0.0, -1.0, 0.0, -1.0),
         gradient_norm_scale: float = 1.0,
         order=2,
         dealiasing_fraction: float = 2 / 3,
