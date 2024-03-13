@@ -1,14 +1,14 @@
 from jaxtyping import Array, Complex
 
 from ._base import BaseNonlinearFun
+from ._convection import ConvectionNonlinearFun
 from ._gradient_norm import GradientNormNonlinearFun
 from ._polynomial import PolynomialNonlinearFun
-from ._single_channel_convection import SingleChannelConvectionNonlinearFun
 
 
 class GeneralNonlinearFun(BaseNonlinearFun):
     square_nonlinear_fun: PolynomialNonlinearFun
-    convection_nonlinear_fun: SingleChannelConvectionNonlinearFun
+    convection_nonlinear_fun: ConvectionNonlinearFun
     gradient_norm_nonlinear_fun: GradientNormNonlinearFun
 
     def __init__(
@@ -35,13 +35,14 @@ class GeneralNonlinearFun(BaseNonlinearFun):
             dealiasing_fraction=dealiasing_fraction,
             coefficients=[0.0, 0.0, scale_list[0]],
         )
-        self.convection_nonlinear_fun = SingleChannelConvectionNonlinearFun(
+        self.convection_nonlinear_fun = ConvectionNonlinearFun(
             num_spatial_dims,
             num_points,
             derivative_operator=derivative_operator,
             dealiasing_fraction=dealiasing_fraction,
             # Minus required because it internally has another minus
             scale=-scale_list[1],
+            single_channel=True,
         )
         self.gradient_norm_nonlinear_fun = GradientNormNonlinearFun(
             num_spatial_dims,
