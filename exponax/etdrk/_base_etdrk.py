@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 import equinox as eqx
 import jax.numpy as jnp
 from jaxtyping import Array, Complex
@@ -10,7 +12,7 @@ from jaxtyping import Array, Complex
 # example if we solved the wave equation or the sine-Gordon equation).
 
 
-class BaseETDRK(eqx.Module):
+class BaseETDRK(eqx.Module, ABC):
     dt: float
     _exp_term: Complex[Array, "E ... (N//2)+1"]
 
@@ -22,6 +24,7 @@ class BaseETDRK(eqx.Module):
         self.dt = dt
         self._exp_term = jnp.exp(self.dt * linear_operator)
 
+    @abstractmethod
     def step_fourier(
         self,
         u_hat: Complex[Array, "C ... (N//2)+1"],
@@ -29,4 +32,4 @@ class BaseETDRK(eqx.Module):
         """
         Advance the state in Fourier space.
         """
-        raise NotImplementedError("Must be implemented by subclass")
+        pass

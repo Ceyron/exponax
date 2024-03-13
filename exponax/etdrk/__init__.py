@@ -1,3 +1,8 @@
+"""
+Exponential Time Differencing Runge-Kutta (ETDRK) methods for solving
+(stiff) semi-linear PDEs.
+"""
+
 from ._base_etdrk import BaseETDRK
 from ._etdrk_0 import ETDRK0
 from ._etdrk_1 import ETDRK1
