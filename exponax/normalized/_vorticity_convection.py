@@ -70,18 +70,16 @@ class NormalizedVorticityConvection(BaseStepper):
     ) -> VorticityConvection2d:
         if self.normalized_injection_scale == 0.0:
             return VorticityConvection2d(
-                num_spatial_dims=self.num_spatial_dims,
-                num_points=self.num_points,
-                num_channels=self.num_channels,
+                self.num_spatial_dims,
+                self.num_points,
                 convection_scale=self.normalized_vorticity_convection_scale,
                 derivative_operator=derivative_operator,
                 dealiasing_fraction=self.dealiasing_fraction,
             )
         else:
             return VorticityConvection2dKolmogorov(
-                num_spatial_dims=self.num_spatial_dims,
-                num_points=self.num_points,
-                num_channels=self.num_channels,
+                self.num_spatial_dims,
+                self.num_points,
                 convection_scale=self.normalized_vorticity_convection_scale,
                 derivative_operator=derivative_operator,
                 dealiasing_fraction=self.dealiasing_fraction,

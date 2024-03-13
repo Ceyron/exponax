@@ -77,9 +77,8 @@ class KortewegDeVries(BaseStepper):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> ConvectionNonlinearFun:
         return ConvectionNonlinearFun(
-            num_spatial_dims=self.num_spatial_dims,
-            num_points=self.num_points,
-            num_channels=self.num_channels,
+            self.num_spatial_dims,
+            self.num_points,
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
             scale=self.convection_scale,

@@ -49,6 +49,4 @@ class NormalizedLinearStepper(BaseStepper):
         return ZeroNonlinearFun(
             num_spatial_dims=self.num_spatial_dims,
             num_points=self.num_points,
-            num_channels=self.num_channels,
-            derivative_operator=derivative_operator,
         )

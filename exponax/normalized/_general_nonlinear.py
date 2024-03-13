@@ -2,7 +2,7 @@ import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
 from .._base_stepper import BaseStepper
-from ..nonlin_fun import GeneralNonlinearFun1d
+from ..nonlin_fun import GeneralNonlinearFun
 
 
 class NormlizedGeneralNonlinearStepper1d(BaseStepper):
@@ -26,10 +26,6 @@ class NormlizedGeneralNonlinearStepper1d(BaseStepper):
         By default Burgers.
         """
 
-        if num_spatial_dims != 1:
-            raise ValueError(
-                "The number of spatial dimensions must be 1 because of ambiguity in channel growth"
-            )
         if len(normalized_coefficients_nonlinear) != 3:
             raise ValueError(
                 "The nonlinear coefficients list must have exactly 3 elements"
@@ -63,11 +59,10 @@ class NormlizedGeneralNonlinearStepper1d(BaseStepper):
     def _build_nonlinear_fun(
         self,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
-    ) -> GeneralNonlinearFun1d:
-        return GeneralNonlinearFun1d(
-            num_spatial_dims=self.num_spatial_dims,
-            num_points=self.num_points,
-            num_channels=self.num_channels,
+    ) -> GeneralNonlinearFun:
+        return GeneralNonlinearFun(
+            self.num_spatial_dims,
+            self.num_points,
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
             scale_list=self.normalized_coefficients_nonlinear,

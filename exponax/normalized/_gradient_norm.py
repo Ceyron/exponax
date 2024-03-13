@@ -64,7 +64,6 @@ class NormalizedGradientNormStepper(BaseStepper):
         return GradientNormNonlinearFun(
             num_spatial_dims=self.num_spatial_dims,
             num_points=self.num_points,
-            num_channels=self.num_channels,
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
             scale=self.normalized_gradient_norm_scale,

@@ -67,10 +67,8 @@ class NormalizedPolynomialStepper(BaseStepper):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> PolynomialNonlinearFun:
         return PolynomialNonlinearFun(
-            num_spatial_dims=self.num_spatial_dims,
-            num_points=self.num_points,
-            num_channels=self.num_channels,
-            derivative_operator=derivative_operator,
+            self.num_spatial_dims,
+            self.num_points,
             coefficients=self.normalized_polynomial_scales,
             dealiasing_fraction=self.dealiasing_fraction,
         )

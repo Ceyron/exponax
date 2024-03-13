@@ -58,9 +58,8 @@ class NormalizedConvectionStepper(BaseStepper):
 
     def _build_nonlinear_fun(self, derivative_operator: Array):
         return ConvectionNonlinearFun(
-            num_spatial_dims=self.num_spatial_dims,
-            num_points=self.num_points,
-            num_channels=self.num_channels,
+            self.num_spatial_dims,
+            self.num_points,
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
             scale=self.normalized_convection_scale,

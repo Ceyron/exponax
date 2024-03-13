@@ -2,7 +2,7 @@ import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
 from .._base_stepper import BaseStepper
-from .._spectral import build_laplace_operator, space_indices, spatial_shape
+from .._spectral import build_laplace_operator
 from ..nonlin_fun import BaseNonlinearFun
 
 
@@ -15,31 +15,23 @@ class BelousovZhabotinskyNonlinearFun(BaseNonlinearFun):
         self,
         num_spatial_dims: int,
         num_points: int,
-        num_channels: int,
         *,
-        derivative_operator: Complex[Array, "D ... (N//2)+1"],
         dealiasing_fraction: float,
     ):
-        if num_channels != 3:
-            raise ValueError(f"Expected num_channels = 3, got {num_channels}.")
         super().__init__(
             num_spatial_dims,
             num_points,
-            num_channels,
-            derivative_operator=derivative_operator,
             dealiasing_fraction=dealiasing_fraction,
         )
 
-    def evaluate(
+    def __call__(
         self,
         u_hat: Complex[Array, "C ... (N//2)+1"],
     ) -> Complex[Array, "C ... (N//2)+1"]:
-        u_hat_dealiased = self.dealiasing_mask * u_hat
-        u = jnp.fft.irfftn(
-            u_hat_dealiased,
-            s=spatial_shape(self.num_spatial_dims, self.num_points),
-            axes=space_indices(self.num_spatial_dims),
-        )
+        num_channels = u_hat.shape[0]
+        if num_channels != 3:
+            raise ValueError("num_channels must be 3")
+        u = self.ifft(self.dealias(u_hat))
         u_power = jnp.stack(
             [
                 u[0] + u[1] - u[0] * u[1] - u[0] ** 2,
@@ -47,7 +39,7 @@ class BelousovZhabotinskyNonlinearFun(BaseNonlinearFun):
                 u[0] - u[2],
             ]
         )
-        u_power_hat = jnp.fft.rfftn(u_power, axes=space_indices(self.num_spatial_dims))
+        u_power_hat = self.fft(u_power)
         return u_power_hat
 
 
@@ -101,9 +93,7 @@ class BelousovZhabotinsky(BaseStepper):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> BelousovZhabotinskyNonlinearFun:
         return BelousovZhabotinskyNonlinearFun(
-            num_spatial_dims=self.num_spatial_dims,
-            num_points=self.num_points,
-            num_channels=self.num_channels,
-            derivative_operator=derivative_operator,
+            self.num_spatial_dims,
+            self.num_points,
             dealiasing_fraction=self.dealiasing_fraction,
         )

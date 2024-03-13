@@ -46,10 +46,8 @@ class AllenCahn(BaseStepper):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> PolynomialNonlinearFun:
         return PolynomialNonlinearFun(
-            num_spatial_dims=self.num_spatial_dims,
-            num_points=self.num_points,
-            num_channels=self.num_channels,
-            derivative_operator=derivative_operator,
+            self.num_spatial_dims,
+            self.num_points,
             dealiasing_fraction=self.dealiasing_fraction,
             coefficients=[0.0, 0.0, 0.0, -1.0],
         )

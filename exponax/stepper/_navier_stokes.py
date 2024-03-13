@@ -26,6 +26,9 @@ class NavierStokesVorticity(BaseStepper):
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
+        if num_spatial_dims != 2:
+            raise ValueError(f"Expected num_spatial_dims = 2, got {num_spatial_dims}.")
+
         self.diffusivity = diffusivity
         self.vorticity_convection_scale = vorticity_convection_scale
         self.drag = drag
@@ -54,9 +57,8 @@ class NavierStokesVorticity(BaseStepper):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> VorticityConvection2d:
         return VorticityConvection2d(
-            num_spatial_dims=self.num_spatial_dims,
-            num_points=self.num_points,
-            num_channels=self.num_channels,
+            self.num_spatial_dims,
+            self.num_points,
             convection_scale=self.vorticity_convection_scale,
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
@@ -120,9 +122,8 @@ class KolmogorovFlowVorticity(BaseStepper):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> VorticityConvection2dKolmogorov:
         return VorticityConvection2dKolmogorov(
-            num_spatial_dims=self.num_spatial_dims,
-            num_points=self.num_points,
-            num_channels=self.num_channels,
+            self.num_spatial_dims,
+            self.num_points,
             convection_scale=self.convection_scale,
             injection_mode=self.injection_mode,
             injection_scale=self.injection_scale,
