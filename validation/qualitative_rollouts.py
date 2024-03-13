@@ -7,7 +7,9 @@ import sys
 from pathlib import Path
 
 import jax
+import jax.numpy as jnp
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 from tqdm import tqdm
 
 sys.path.append(".")
@@ -16,6 +18,7 @@ import exponax as ex  # noqa: E402
 ic_key = jax.random.PRNGKey(0)
 
 CONFIGURATIONS_1D = [
+    # Linear
     (
         ex.stepper.Advection(1, 3.0, 110, 0.01, velocity=0.3),
         "advection",
@@ -30,22 +33,53 @@ CONFIGURATIONS_1D = [
         100,
         (-1.0, 1.0),
     ),
+    (
+        ex.stepper.AdvectionDiffusion(
+            1, 3.0, 110, 0.01, diffusivity=0.01, velocity=0.3
+        ),
+        "advection_diffusion",
+        ex.ic.RandomTruncatedFourierSeries(1, cutoff=5),
+        100,
+        (-1.0, 1.0),
+    ),
+    # Nonlinear
+    # Reaction
+    (
+        ex.reaction.FisherKPP(1, 10.0, 256, 0.001, r=10.0),
+        "fisher_kpp",
+        ex.ic.ClampingICGenerator(
+            ex.ic.RandomTruncatedFourierSeries(1, cutoff=5), (0.0, 1.0)
+        ),
+        300,
+        (-1.0, 1.0),
+    ),
 ]
 
-p_meter = tqdm(CONFIGURATIONS_1D, desc="", total=len(CONFIGURATIONS_1D))
+CONFIGURATIONS_2D = [
+    # Linear
+    (
+        ex.stepper.Advection(2, 3.0, 110, 0.1, velocity=jnp.array([0.3, -0.5])),
+        "advection",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+        30,
+        (-1.0, 1.0),
+    ),
+]
+
 dir_path = Path(os.path.dirname(os.path.realpath(__file__)))
 img_folder = dir_path / Path("qualitative_rollouts")
 img_folder.mkdir(exist_ok=True)
 
 
+p_meter_1d = tqdm(CONFIGURATIONS_1D, desc="", total=len(CONFIGURATIONS_1D))
 # 1d problems (produce spatio-temporal plots)
 for stepper_1d, name, ic_distribution, steps, vlim in CONFIGURATIONS_1D:
-    p_meter.set_description(f"1d {name}")
+    p_meter_1d.set_description(f"1d {name}")
 
     ic = ic_distribution(stepper_1d.num_points, key=ic_key)
     trj = ex.rollout(stepper_1d, steps, include_init=True)(ic)
     num_channels = stepper_1d.num_channels
-    fig, ax_s = plt.subplots(num_channels, 1, figsize=(5, 5 * num_channels))
+    fig, ax_s = plt.subplots(num_channels, 1, figsize=(8, 4 * num_channels))
     if num_channels == 1:
         ax_s = [
             ax_s,
@@ -66,4 +100,47 @@ for stepper_1d, name, ic_distribution, steps, vlim in CONFIGURATIONS_1D:
     fig.savefig(img_folder / f"{name}_1d.png")
     plt.close(fig)
 
-    p_meter.update(1)
+    p_meter_1d.update(1)
+
+p_meter_2d = tqdm(CONFIGURATIONS_2D, desc="", total=len(CONFIGURATIONS_2D))
+# 2d problems (produce animations)
+for stepper_2d, name, ic_distribution, steps, vlim in CONFIGURATIONS_2D:
+    p_meter_2d.set_description(f"2d {name}")
+
+    ic = ic_distribution(stepper_2d.num_points, key=ic_key)
+    trj = ex.rollout(stepper_2d, steps, include_init=True)(ic)
+    num_channels = stepper_2d.num_channels
+    fig, ax_s = plt.subplots(1, num_channels, figsize=(5 * num_channels, 5))
+    if num_channels == 1:
+        ax_s = [
+            ax_s,
+        ]
+    im_s = []
+    for i, ax in enumerate(ax_s):
+        im = ax.imshow(
+            trj[0, i, :, :].T,
+            aspect="auto",
+            origin="lower",
+            vmin=vlim[0],
+            vmax=vlim[1],
+            cmap="RdBu_r",
+        )
+        im_s.append(im)
+        ax.set_title(f"{name} channel {i}")
+        ax.set_xlabel("time")
+        ax.set_ylabel("space")
+    fig.suptitle(f"{name} 2d, t_i = 0")
+
+    def animate(i):
+        for j, im in enumerate(im_s):
+            im.set_data(trj[i, j, :, :].T)
+        fig.suptitle(f"{name} 2d, t_i = {i:04d}")
+        return im_s
+
+    plt.close(fig)
+
+    ani = FuncAnimation(fig, animate, frames=trj.shape[0], interval=100, blit=False)
+
+    ani.save(img_folder / f"{name}_2d.mp4")
+
+    p_meter_2d.update(1)
