@@ -7,6 +7,7 @@ from ._base import BaseNonlinearFun
 
 class VorticityConvection2d(BaseNonlinearFun):
     convection_scale: float
+    derivative_operator: Complex[Array, "D ... (N//2)+1"]
     inv_laplacian: Complex[Array, "1 ... (N//2)+1"]
 
     def __init__(
@@ -28,6 +29,7 @@ class VorticityConvection2d(BaseNonlinearFun):
         )
 
         self.convection_scale = convection_scale
+        self.derivative_operator = derivative_operator
 
         laplacian = build_laplace_operator(derivative_operator, order=2)
 
@@ -127,5 +129,5 @@ class VorticityConvection2dKolmogorov(VorticityConvection2d):
     def __call__(
         self, u_hat: Complex[Array, "1 ... (N//2)+1"]
     ) -> Complex[Array, "1 ... (N//2)+1"]:
-        neg_convection_hat = super()(u_hat)
+        neg_convection_hat = super().__call__(u_hat)
         return neg_convection_hat + self.injection
