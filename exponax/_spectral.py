@@ -131,6 +131,53 @@ def derivative(
     return field_der
 
 
+def make_incompressible(
+    field: Float[Array, "D ... N"],
+    *,
+    indexing: str = "ij",
+):
+    channel_shape = field.shape[0]
+    spatial_shape = field.shape[1:]
+    num_spatial_dims = len(spatial_shape)
+    if channel_shape != num_spatial_dims:
+        raise ValueError(
+            f"Expected the number of channels to be {num_spatial_dims}, got {channel_shape}."
+        )
+    num_points = spatial_shape[0]
+
+    derivative_operator = build_derivative_operator(
+        num_spatial_dims, 1.0, num_points, indexing=indexing
+    )  # domain_extent does not matter because it will cancel out
+
+    incompressible_field_hat = jnp.fft.rfftn(
+        field, axes=space_indices(num_spatial_dims)
+    )
+
+    divergence = jnp.sum(
+        derivative_operator * incompressible_field_hat, axis=0, keepdims=True
+    )
+
+    laplace_operator = build_laplace_operator(derivative_operator)
+
+    inv_laplace_operator = jnp.where(
+        laplace_operator == 0,
+        1.0,
+        1.0 / laplace_operator,
+    )
+
+    pseudo_pressure = -inv_laplace_operator * divergence
+
+    pseudo_pressure_garadient = derivative_operator * pseudo_pressure
+
+    incompressible_field_hat = incompressible_field_hat - pseudo_pressure_garadient
+
+    incompressible_field = jnp.fft.irfftn(
+        incompressible_field_hat, s=spatial_shape, axes=space_indices(num_spatial_dims)
+    )
+
+    return incompressible_field
+
+
 def build_derivative_operator(
     num_spatial_dims: int,
     domain_extent: float,
