@@ -23,6 +23,7 @@ CONFIGURATIONS_1D = [
         ex.stepper.Advection(1, 3.0, 110, 0.01, velocity=0.3),
         "advection",
         ex.ic.RandomTruncatedFourierSeries(1, cutoff=5),
+        0,
         100,
         (-1.0, 1.0),
     ),
@@ -30,6 +31,7 @@ CONFIGURATIONS_1D = [
         ex.stepper.Diffusion(1, 3.0, 110, 0.01, diffusivity=0.01),
         "diffusion",
         ex.ic.RandomTruncatedFourierSeries(1, cutoff=5),
+        0,
         100,
         (-1.0, 1.0),
     ),
@@ -39,6 +41,7 @@ CONFIGURATIONS_1D = [
         ),
         "advection_diffusion",
         ex.ic.RandomTruncatedFourierSeries(1, cutoff=5),
+        0,
         100,
         (-1.0, 1.0),
     ),
@@ -50,6 +53,7 @@ CONFIGURATIONS_1D = [
         ex.ic.ClampingICGenerator(
             ex.ic.RandomTruncatedFourierSeries(1, cutoff=5), (0.0, 1.0)
         ),
+        0,
         300,
         (-1.0, 1.0),
     ),
@@ -61,8 +65,72 @@ CONFIGURATIONS_2D = [
         ex.stepper.Advection(2, 3.0, 110, 0.1, velocity=jnp.array([0.3, -0.5])),
         "advection",
         ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+        0,
         30,
         (-1.0, 1.0),
+    ),
+    # Nonlinear
+    (
+        ex.stepper.Burgers(2, 3.0, 65, 0.05, diffusivity=0.02),
+        "burgers",
+        ex.ic.RandomMultiChannelICGenerator(
+            2
+            * [
+                ex.ic.ClampingICGenerator(
+                    ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+                    (-1.0, 1.0),
+                ),
+            ]
+        ),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.Burgers(2, 3.0, 65, 0.05, diffusivity=0.02, single_channel=True),
+        "burgers_single_channel",
+        ex.ic.ClampingICGenerator(
+            ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+            (-1.0, 1.0),
+        ),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.KortewegDeVries(2, 20.0, 65, dt=0.01),
+        "kdv",
+        ex.ic.RandomMultiChannelICGenerator(
+            2
+            * [
+                ex.ic.ClampingICGenerator(
+                    ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+                    (-1.0, 1.0),
+                ),
+            ]
+        ),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.KortewegDeVries(2, 20.0, 65, dt=0.01, single_channel=True),
+        "kdv_single_channel",
+        ex.ic.ClampingICGenerator(
+            ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+            (-1.0, 1.0),
+        ),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.KuramotoSivashinsky(2, 30.0, 60, 0.1),
+        "ks",
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=3),
+        500,
+        30,
+        (-6.5, 6.5),
     ),
 ]
 
@@ -73,10 +141,11 @@ img_folder.mkdir(exist_ok=True)
 
 p_meter_1d = tqdm(CONFIGURATIONS_1D, desc="", total=len(CONFIGURATIONS_1D))
 # 1d problems (produce spatio-temporal plots)
-for stepper_1d, name, ic_distribution, steps, vlim in CONFIGURATIONS_1D:
+for stepper_1d, name, ic_distribution, warmup_steps, steps, vlim in CONFIGURATIONS_1D:
     p_meter_1d.set_description(f"1d {name}")
 
     ic = ic_distribution(stepper_1d.num_points, key=ic_key)
+    ic = ex.repeat(stepper_1d, warmup_steps)(ic)
     trj = ex.rollout(stepper_1d, steps, include_init=True)(ic)
     num_channels = stepper_1d.num_channels
     fig, ax_s = plt.subplots(num_channels, 1, figsize=(8, 4 * num_channels))
@@ -102,12 +171,15 @@ for stepper_1d, name, ic_distribution, steps, vlim in CONFIGURATIONS_1D:
 
     p_meter_1d.update(1)
 
+p_meter_1d.close()
+
 p_meter_2d = tqdm(CONFIGURATIONS_2D, desc="", total=len(CONFIGURATIONS_2D))
 # 2d problems (produce animations)
-for stepper_2d, name, ic_distribution, steps, vlim in CONFIGURATIONS_2D:
+for stepper_2d, name, ic_distribution, warmup_steps, steps, vlim in CONFIGURATIONS_2D:
     p_meter_2d.set_description(f"2d {name}")
 
     ic = ic_distribution(stepper_2d.num_points, key=ic_key)
+    ic = ex.repeat(stepper_2d, warmup_steps)(ic)
     trj = ex.rollout(stepper_2d, steps, include_init=True)(ic)
     num_channels = stepper_2d.num_channels
     fig, ax_s = plt.subplots(1, num_channels, figsize=(5 * num_channels, 5))
@@ -144,3 +216,5 @@ for stepper_2d, name, ic_distribution, steps, vlim in CONFIGURATIONS_2D:
     ani.save(img_folder / f"{name}_2d.mp4")
 
     p_meter_2d.update(1)
+
+p_meter_2d.close()
