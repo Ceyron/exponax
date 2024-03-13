@@ -32,7 +32,6 @@ class GeneralNonlinearFun(BaseNonlinearFun):
         self.square_nonlinear_fun = PolynomialNonlinearFun(
             num_spatial_dims,
             num_points,
-            derivative_operator=derivative_operator,
             dealiasing_fraction=dealiasing_fraction,
             coefficients=[0.0, 0.0, scale_list[0]],
         )
