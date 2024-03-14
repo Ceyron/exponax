@@ -5,7 +5,7 @@ from .._base_stepper import BaseStepper
 from ..nonlin_fun import GeneralNonlinearFun
 
 
-class NormlizedGeneralNonlinearStepper1d(BaseStepper):
+class NormlizedGeneralNonlinearStepper(BaseStepper):
     normalized_coefficients_linear: tuple[float, ...]
     normalized_coefficients_nonlinear: tuple[float, ...]
     dealiasing_fraction: float
