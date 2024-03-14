@@ -21,6 +21,11 @@ def test_instantiate():
             ex.stepper.KuramotoSivashinsky,
             ex.stepper.KuramotoSivashinskyConservative,
             ex.stepper.KortewegDeVries,
+            ex.stepper.GeneralConvectionStepper,
+            ex.stepper.GeneralGradientNormStepper,
+            ex.stepper.GeneralLinearStepper,
+            ex.stepper.GeneralNonlinearStepper,
+            ex.stepper.GeneralPolynomialStepper,
         ]:
             simulator(num_spatial_dims, domain_extent, num_points, dt)
 
@@ -50,6 +55,7 @@ def test_instantiate():
             ex.normalized.NormalizedConvectionStepper,
             ex.normalized.NormalizedGradientNormStepper,
             ex.normalized.NormalizedPolynomialStepper,
+            ex.normalized.NormlizedGeneralNonlinearStepper,
         ]:
             normalized_simulator(num_spatial_dims, num_points)
 
