@@ -15,7 +15,8 @@ class GaussianRandomField(BaseRandomICGenerator):
     num_spatial_dims: int
     domain_extent: float
     powerlaw_exponent: float
-    normalize: bool
+    zero_mean: bool
+    max_one: bool
 
     def __init__(
         self,
@@ -23,7 +24,8 @@ class GaussianRandomField(BaseRandomICGenerator):
         *,
         domain_extent: float = 1.0,
         powerlaw_exponent: float = 3.0,
-        normalize: bool = True,
+        zero_mean: bool = True,
+        max_one: bool = False,
     ):
         """
         Randomly generated initial condition consisting of a Gaussian random field.
@@ -31,7 +33,8 @@ class GaussianRandomField(BaseRandomICGenerator):
         self.num_spatial_dims = num_spatial_dims
         self.domain_extent = domain_extent
         self.powerlaw_exponent = powerlaw_exponent
-        self.normalize = normalize
+        self.zero_mean = zero_mean
+        self.max_one = max_one
 
     def __call__(
         self, num_points: int, *, key: PRNGKeyArray
@@ -62,8 +65,10 @@ class GaussianRandomField(BaseRandomICGenerator):
             axes=space_indices(self.num_spatial_dims),
         )
 
-        if self.normalize:
+        if self.zero_mean:
             ic = ic - jnp.mean(ic)
-            ic = ic / jnp.std(ic)
+
+        if self.max_one:
+            ic = ic / jnp.max(jnp.abs(ic))
 
         return ic

@@ -18,6 +18,7 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
     amplitude_range: tuple[int, int]
     angle_range: tuple[int, int]
     offset_range: tuple[int, int]
+    max_one: bool
 
     def __init__(
         self,
@@ -27,6 +28,7 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
         amplitude_range: tuple[int, int] = (-1.0, 1.0),
         angle_range: tuple[int, int] = (0.0, 2.0 * jnp.pi),
         offset_range: tuple[int, int] = (0.0, 0.0),  # no offset by default
+        max_one: bool = False,
     ):
         self.num_spatial_dims = num_spatial_dims
 
@@ -34,6 +36,7 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
         self.amplitude_range = amplitude_range
         self.angle_range = angle_range
         self.offset_range = offset_range
+        self.max_one = max_one
 
     def __call__(
         self, num_points: int, *, key: PRNGKeyArray
@@ -81,5 +84,8 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
             s=spatial_shape(self.num_spatial_dims, num_points),
             axes=space_indices(self.num_spatial_dims),
         )
+
+        if self.max_one:
+            u /= jnp.max(jnp.abs(u))
 
         return u

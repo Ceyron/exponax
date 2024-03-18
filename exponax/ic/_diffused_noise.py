@@ -12,6 +12,7 @@ class DiffusedNoise(BaseRandomICGenerator):
     domain_extent: float
     intensity: float
     zero_mean: bool
+    max_one: bool
 
     def __init__(
         self,
@@ -19,7 +20,8 @@ class DiffusedNoise(BaseRandomICGenerator):
         *,
         domain_extent: float = 1.0,
         intensity=0.001,
-        zero_mean: bool = False,
+        zero_mean: bool = True,
+        max_one: bool = False,
     ):
         """
         Randomly generated initial condition consisting of a diffused noise field.
@@ -37,6 +39,7 @@ class DiffusedNoise(BaseRandomICGenerator):
         self.domain_extent = domain_extent
         self.intensity = intensity
         self.zero_mean = zero_mean
+        self.max_one = max_one
 
     def __call__(
         self, num_points: int, *, key: PRNGKeyArray
@@ -55,5 +58,8 @@ class DiffusedNoise(BaseRandomICGenerator):
 
         if self.zero_mean:
             ic = ic - jnp.mean(ic)
+
+        if self.max_one:
+            ic = ic / jnp.max(ic)
 
         return ic
