@@ -50,6 +50,12 @@ class Burgers(BaseStepper):
 
         with `∇ ⋅` the divergence operator and `Δ` the Laplacian.
 
+        The expected temporal behavior is that the initial condition becomes
+        "sharper"; in 1d positive values move to the right and negative values
+        to the left. Smooth shocks develop that propagate at speed depending on
+        the height difference. Ultimately, the solution decays to a constant
+        state.
+
         **Arguments:**
             - `num_spatial_dims`: The number of spatial dimensions `d`.
             - `domain_extent`: The size of the domain `L`; in higher dimensions
