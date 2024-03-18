@@ -297,7 +297,7 @@ CONFIGURATIONS_2D = [
         (-6.5, 6.5),
     ),
     (
-        ex.stepper.KuramotoSivashinskyConservative(2, 30.0, 60, 0.1),
+        ex.stepper.KuramotoSivashinskyConservative(2, 60.0, 60, 0.1),
         "ks_conservative",
         ex.ic.RandomMultiChannelICGenerator(
             2 * [ex.ic.RandomTruncatedFourierSeries(2, cutoff=3)]
@@ -308,7 +308,7 @@ CONFIGURATIONS_2D = [
     ),
     (
         ex.stepper.KuramotoSivashinskyConservative(
-            2, 30.0, 60, 0.01, single_channel=True
+            2, 60.0, 60, 0.01, single_channel=True
         ),
         "ks_conservative_single_channel",
         ex.ic.RandomTruncatedFourierSeries(2, cutoff=3),
@@ -325,7 +325,7 @@ CONFIGURATIONS_2D = [
         (-6.5, 6.5),
     ),
     (
-        ex.stepper.NikolaevskiyConservative(2, 30.0, 60, 0.1),
+        ex.stepper.NikolaevskiyConservative(2, 60.0, 60, 0.1),
         "niko_conservative",
         ex.ic.RandomMultiChannelICGenerator(
             2 * [ex.ic.RandomTruncatedFourierSeries(2, cutoff=3)]
@@ -335,7 +335,7 @@ CONFIGURATIONS_2D = [
         (-2.5, 2.5),
     ),
     (
-        ex.stepper.NikolaevskiyConservative(2, 30.0, 60, 0.01, single_channel=True),
+        ex.stepper.NikolaevskiyConservative(2, 60.0, 60, 0.01, single_channel=True),
         "niko_conservative_single_channel",
         ex.ic.RandomTruncatedFourierSeries(2, cutoff=3),
         500,
@@ -378,7 +378,7 @@ CONFIGURATIONS_2D = [
     ),
     # Reaction
     (
-        ex.reaction.CahnHilliard(2, 128, 300, 0.01, hyper_diffusivity=1.2),
+        ex.reaction.CahnHilliard(2, 128, 300, 0.001, hyper_diffusivity=1.2),
         "cahn_hilliard",
         ex.ic.RandomTruncatedFourierSeries(2, cutoff=10),
         0,
