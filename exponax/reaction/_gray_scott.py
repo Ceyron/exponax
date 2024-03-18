@@ -69,6 +69,15 @@ class GrayScott(BaseStepper):
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
+        """
+        See also this papers:
+        https://www.ljll.fr/hecht/ftp/ff++/2015-cimpa-IIT/edp-tuto/Pearson.pdf
+
+        There the two parameters are called F and k, named feed rate and kill
+        rate. The arguments to this equation are such that b=F and d=F+k. The
+        paper used the domain extent of 2.5. The epsilon values (=the two
+        diffusivities) are the same.
+        """
         self.epsilon_1 = epsilon_1
         self.epsilon_2 = epsilon_2
         self.b = b
