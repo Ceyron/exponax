@@ -4,6 +4,7 @@ from jaxtyping import Array, Float, PRNGKeyArray
 
 from .._spectral import (
     build_scaled_wavenumbers,
+    build_scaling_array,
     space_indices,
     spatial_shape,
     wavenumber_shape,
@@ -65,6 +66,8 @@ class GaussianRandomField(BaseRandomICGenerator):
         )
 
         noise = noise * amplitude
+
+        noise = noise * build_scaling_array(self.num_spatial_dims, num_points)
 
         ic = jnp.fft.irfftn(
             noise,
