@@ -53,8 +53,9 @@ class GeneralConvectionStepper(BaseStepper):
         kept to constant 1 no matter the number of spatial dimensions.
 
         Depending on the collection of linear coefficients can be represented,
-        for example: - Burgers equation with `a = (0, 0, 0.01)` - KdV equation
-        with `a = (0, 0, 0, 0.01)`
+        for example:
+            - Burgers equation with `a = (0, 0, 0.01)` with `len(a) = 3`
+            - KdV equation with `a = (0, 0, 0, 0.01)` with `len(a) = 4`
 
         **Arguments:**
             - `num_spatial_dims`: The number of spatial dimensions `d`.
@@ -71,8 +72,8 @@ class GeneralConvectionStepper(BaseStepper):
                 represents the highest occuring derivative. The default value
                 `(0.0, 0.0, 0.01)` corresponds to the Burgers equation (because
                 of the diffusion)
-            - `convection_scale` (keyword-only): The scale `b₁` of the convection
-                term. Default is `1.0`.
+            - `convection_scale` (keyword-only): The scale `b₁` of the
+                convection term. Default is `1.0`.
             - `single_channel`: Whether to use the single channel mode in higher
                 dimensions. In this case the the convection is `b₁ (∇ ⋅ 1)(u²)`.
                 In this case, the state always has a single channel, no matter
