@@ -26,6 +26,83 @@ class NavierStokesVorticity(BaseStepper):
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
+        """
+        Timestepper for the 2d Navier-Stokes equation on periodic boundary
+        conditions in streamfunction-vorticity formulation. The equation reads
+
+        ```
+            uₜ + b ([1, -1]ᵀ ⊙ ∇(Δ⁻¹u)) ⋅ ∇u = λu + ν Δu
+        ```
+
+        with `u` the vorticity. On the right-hand side the first term is a drag
+        with coefficient `λ` and the second term is a diffusion with coefficient
+        `ν`. The operation on the left-hand-side `([1, -1]ᵀ ⊙ ∇(Δ⁻¹u)) ⋅ ∇u` is
+        the "vorticity" convection which is scale by `b`. It consists of the
+        solution to the Poisson problem via the inverse Laplacian `Δ⁻¹` and the
+        gradient `∇` of the streamfunction. The term `[1, -1]ᵀ ⊙` negates the
+        second component of the gradient.
+
+        We can map the vorticity to a (two-channel) velocity field by `∇
+        (Δ⁻¹u)`.
+
+        The expected temporal behavior is that the initial vorticity field
+        continues to swirl but decays over time.
+
+        Let `U = ‖∇ (Δ⁻¹u)‖` denote the magnitude of the velocity field, then
+        the Reynolds number of the problem is `Re = U L / ν` with `L` the
+        `domain_extent`.
+
+        **Arguments:**
+            - `num_spatial_dims`: The number of spatial dimensions `d`.
+            - `domain_extent`: The size of the domain `L`; in higher dimensions
+                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+            - `num_points`: The number of points `N` used to discretize the
+                domain. This **includes** the left boundary point and
+                **excludes** the right boundary point. In higher dimensions; the
+                number of points in each dimension is the same. Hence, the total
+                number of degrees of freedom is `Nᵈ`.
+            - `dt`: The timestep size `Δt` between two consecutive states.
+            - `diffusivity`: The diffusivity coefficient `ν`. This affects the
+                Reynolds number. The lower the diffusivity, the "more
+                turbulent". Default is `0.01`.
+            - `vorticity_convection_scale`: The scaling factor for the vorticity
+                convection term. Default is `1.0`.
+            - `drag`: The drag coefficient `λ`. Default is `0.0`.
+            - `order`: The order of the Exponential Time Differencing Runge
+                Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0`
+                only solves the linear part of the equation. Use higher values
+                for higher accuracy and stability. The default choice of `2` is
+                a good compromise for single precision floats.
+            - `dealiasing_fraction`: The fraction of the wavenumbers to keep
+                before evaluating the nonlinearity. The default 2/3 corresponds
+                to Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2.
+                Default: 2/3.
+            - `num_circle_points`: How many points to use in the complex contour
+                integral method to compute the coefficients of the exponential
+                time differencing Runge Kutta method. Default: 16.
+            - `circle_radius`: The radius of the contour used to compute the
+                coefficients of the exponential time differencing Runge Kutta
+                method. Default: 1.0.
+
+        **Notes:**
+            - The Reynolds number is measure of whether the problem is dominated
+                by diffusive or convective effects. The higher the Reynolds
+                number, the stronger the effect of the convective. Since this
+                term is the nonlinear one, the higher the Reynolds number, the
+                worse the ETDRK methods become in comparison to other
+                approaches. That is because those methods are better for
+                semi-linear PDEs in which the difficult part is the linear one.
+            - The higher the Reynolds number, the smaller the timestep size must
+                be to ensure stability.
+
+        **Good Values:**
+            - `domain_extent = 1`, `num_points=50`, `dt=0.01`,
+                `diffusivity=0.0003`, together with an initial condition in
+                which only the first few wavenumbers are excited gives a nice
+                decaying turbulence demo.
+            - Use the repeated stepper to perform 10 substeps to have faster
+                dynamics.
+        """
         if num_spatial_dims != 2:
             raise ValueError(f"Expected num_spatial_dims = 2, got {num_spatial_dims}.")
 
