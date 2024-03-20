@@ -19,6 +19,32 @@ class VorticityConvection2d(BaseNonlinearFun):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
         dealiasing_fraction: float,
     ):
+        """
+        Performs a pseudo-spectral evaluation of the nonlinear vorticity
+        convection, e.g., found in the 2d Navier-Stokes equations in
+        streamfunction-vorticity formulation. In state space, it reads
+
+        ```
+            𝒩(ω) = b ([1, -1]ᵀ ⊙ ∇(Δ⁻¹u)) ⋅ ∇u
+        ```
+
+        with `b` the convection scale, `⊙` the Hadamard product, `∇` the
+        derivative operator, `Δ⁻¹` the inverse Laplacian, and `u` the vorticity.
+
+        **Arguments:**
+            - `num_spatial_dims`: The number of spatial dimensions `d`.
+            - `num_points`: The number of points `N` used to discretize the
+                domain. This **includes** the left boundary point and **excludes**
+                the right boundary point. In higher dimensions; the number of
+                points in each dimension is the same.
+            - `convection_scale`: The scale `b` of the convection term. Defaults to
+                `1.0`.
+            - `derivative_operator`: A complex array of shape `(d, ..., N//2+1)` that
+                represents the derivative operator in Fourier space.
+            - `dealiasing_fraction`: The fraction of the highest resolved modes that
+                are not aliased. Defaults to `2/3` which corresponds to Orszag's 2/3
+                rule.
+        """
         if num_spatial_dims != 2:
             raise ValueError(f"Expected num_spatial_dims = 2, got {num_spatial_dims}.")
 
