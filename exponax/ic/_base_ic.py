@@ -58,7 +58,7 @@ class BaseRandomICGenerator(eqx.Module):
         **Returns**:
             - `u`: The initial condition evaluated at the grid points.
         """
-        ic_fun = self.gen_ic_fun(num_points, key=key)
+        ic_fun = self.gen_ic_fun(key=key)
         grid = make_grid(
             self.num_spatial_dims,
             self.domain_extent,
