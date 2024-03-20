@@ -6,22 +6,6 @@ from ._utils import repeat
 
 
 class RepeatedStepper(eqx.Module):
-    """
-    Sugarcoat the utility function `repeat` in a callable PyTree for easy
-    composition with other equinox modules.
-
-    One intended usage is to get "more accurate" or "more stable" time steppers
-    that perform substeps.
-
-    The effective time step is `self.stepper.dt * self.n_sub_steps`. In order to
-    get a time step of X with Y substeps, first instantiate a stepper with a
-    time step of X/Y and then wrap it in a RepeatedStepper with n_sub_steps=Y.
-
-    **Arguments:**
-        - `stepper`: The stepper to repeat.
-        - `n_sub_steps`: The number of substeps to perform.
-    """
-
     num_spatial_dims: int
     domain_extent: float
     num_points: int
@@ -37,6 +21,21 @@ class RepeatedStepper(eqx.Module):
         stepper: BaseStepper,
         n_sub_steps: int,
     ):
+        """
+        Sugarcoat the utility function `repeat` in a callable PyTree for easy
+        composition with other equinox modules.
+
+        One intended usage is to get "more accurate" or "more stable" time steppers
+        that perform substeps.
+
+        The effective time step is `self.stepper.dt * self.n_sub_steps`. In order to
+        get a time step of X with Y substeps, first instantiate a stepper with a
+        time step of X/Y and then wrap it in a RepeatedStepper with n_sub_steps=Y.
+
+        **Arguments:**
+            - `stepper`: The stepper to repeat.
+            - `n_sub_steps`: The number of substeps to perform.
+        """
         self.stepper = stepper
         self.num_sub_steps = n_sub_steps
 
