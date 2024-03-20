@@ -25,7 +25,7 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
         self,
         num_spatial_dims: int,
         *,
-        cutoff: int = 10,
+        cutoff: int = 5,
         amplitude_range: tuple[int, int] = (-1.0, 1.0),
         angle_range: tuple[int, int] = (0.0, 2.0 * jnp.pi),
         offset_range: tuple[int, int] = (0.0, 0.0),  # no offset by default
