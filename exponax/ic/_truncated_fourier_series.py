@@ -18,6 +18,7 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
     amplitude_range: tuple[int, int]
     angle_range: tuple[int, int]
     offset_range: tuple[int, int]
+    std_one: bool
     max_one: bool
 
     def __init__(
@@ -28,14 +29,20 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
         amplitude_range: tuple[int, int] = (-1.0, 1.0),
         angle_range: tuple[int, int] = (0.0, 2.0 * jnp.pi),
         offset_range: tuple[int, int] = (0.0, 0.0),  # no offset by default
+        std_one: bool = False,
         max_one: bool = False,
     ):
+        if offset_range == (0.0, 0.0) and std_one:
+            raise ValueError("Cannot have non-zero offset and `std_one=True`.")
+        if std_one and max_one:
+            raise ValueError("Cannot have `std_one=True` and `max_one=True`.")
         self.num_spatial_dims = num_spatial_dims
 
         self.cutoff = cutoff
         self.amplitude_range = amplitude_range
         self.angle_range = angle_range
         self.offset_range = offset_range
+        self.std_one = std_one
         self.max_one = max_one
 
     def __call__(
@@ -84,6 +91,9 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
             s=spatial_shape(self.num_spatial_dims, num_points),
             axes=space_indices(self.num_spatial_dims),
         )
+
+        if self.std_one:
+            u = u / jnp.std(u)
 
         if self.max_one:
             u /= jnp.max(jnp.abs(u))

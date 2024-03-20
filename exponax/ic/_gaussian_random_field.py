@@ -16,6 +16,7 @@ class GaussianRandomField(BaseRandomICGenerator):
     domain_extent: float
     powerlaw_exponent: float
     zero_mean: bool
+    std_one: bool
     max_one: bool
 
     def __init__(
@@ -25,15 +26,21 @@ class GaussianRandomField(BaseRandomICGenerator):
         domain_extent: float = 1.0,
         powerlaw_exponent: float = 3.0,
         zero_mean: bool = True,
+        std_one: bool = False,
         max_one: bool = False,
     ):
         """
         Randomly generated initial condition consisting of a Gaussian random field.
         """
+        if not zero_mean and std_one:
+            raise ValueError("Cannot have `zero_mean=False` and `std_one=True`.")
+        if std_one and max_one:
+            raise ValueError("Cannot have `std_one=True` and `max_one=True`.")
         self.num_spatial_dims = num_spatial_dims
         self.domain_extent = domain_extent
         self.powerlaw_exponent = powerlaw_exponent
         self.zero_mean = zero_mean
+        self.std_one = std_one
         self.max_one = max_one
 
     def __call__(
@@ -67,6 +74,9 @@ class GaussianRandomField(BaseRandomICGenerator):
 
         if self.zero_mean:
             ic = ic - jnp.mean(ic)
+
+        if self.std_one:
+            ic = ic / jnp.std(ic)
 
         if self.max_one:
             ic = ic / jnp.max(jnp.abs(ic))
