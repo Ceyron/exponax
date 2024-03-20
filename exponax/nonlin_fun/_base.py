@@ -54,16 +54,6 @@ class BaseNonlinearFun(eqx.Module, ABC):
             axes=space_indices(self.num_spatial_dims),
         )
 
-    # @abstractmethod
-    # def evaluate(
-    #     self,
-    #     u_hat: Complex[Array, "C ... (N//2)+1"],
-    # ) -> Complex[Array, "C ... (N//2)+1"]:
-    #     """
-    #     Evaluate all potential nonlinearities "pseudo-spectrally", account for dealiasing.
-    #     """
-    #     raise NotImplementedError("Must be implemented by subclass")
-
     @abstractmethod
     def __call__(
         self,
@@ -72,13 +62,4 @@ class BaseNonlinearFun(eqx.Module, ABC):
         """
         Evaluate all potential nonlinearities "pseudo-spectrally", account for dealiasing.
         """
-        # expected_shape = (self.num_channels,) + wavenumber_shape(
-        #     self.num_spatial_dims, self.num_points
-        # )
-        # if u_hat.shape != expected_shape:
-        #     raise ValueError(
-        #         f"Expected shape {expected_shape}, got {u_hat.shape}. For batched operation use `jax.vmap` on this function."
-        #     )
-
-        # return self.evaluate(u_hat)
         pass
