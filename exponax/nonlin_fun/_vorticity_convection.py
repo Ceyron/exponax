@@ -57,6 +57,7 @@ class VorticityConvection2d(BaseNonlinearFun):
 
         convection_hat = self.fft(convection)
 
+        # Need minus to bring term to the right-hand side
         return -self.convection_scale * convection_hat
 
 
