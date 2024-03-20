@@ -30,7 +30,6 @@ class BaseRandomICGenerator(eqx.Module):
         Generate an initial condition function.
 
         **Arguments**:
-            - `num_points`: The number of grid points in each dimension.
             - `key`: A jax random key.
 
         **Returns**:
