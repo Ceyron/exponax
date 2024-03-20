@@ -11,6 +11,14 @@ class ClampingICGenerator(BaseRandomICGenerator):
     def __init__(
         self, ic_gen: BaseRandomICGenerator, limits: tuple[float, float] = (0, 1)
     ):
+        """
+        A generator based on another generator that clamps the output to a given
+        range.
+
+        **Arguments**:
+            - `ic_gen`: The initial condition generator to clamp.
+            - `limits`: The lower and upper limits of the clamping range.
+        """
         self.ic_gen = ic_gen
         self.limits = limits
         self.num_spatial_dims = ic_gen.num_spatial_dims
