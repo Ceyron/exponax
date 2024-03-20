@@ -25,10 +25,64 @@ class GeneralGradientNormStepper(BaseStepper):
         circle_radius: float = 1.0,
     ):
         """
-        Isotropic linear operators!
+        Timestepper for d-dimensional (`d ∈ {1, 2, 3}`) semi-linear PDEs
+        consisting of a gradient norm nonlinearity and an arbitrary combination
+        of (isotropic) linear operators.
 
-        By default KS equation (in combustion science format)
+        In 1d, the equation is given by
 
+        ```
+            uₜ + b₂ 1/2 (uₓ)² = sum_j a_j uₓˢ
+        ```
+
+        with `b₂` the gradient norm coefficient and `a_j` the coefficients of
+        the linear operators. `uₓˢ` denotes the s-th derivative of `u` with
+        respect to `x`. Oftentimes `b₂ = 1`.
+
+        The number of channels is always one, no matter the number of spatial
+        dimensions. The higher dimensional equation reads
+
+        ```
+            uₜ + b₂ 1/2 ‖ ∇u ‖₂² = sum_j a_j (1⋅∇ʲ)u
+        ```
+
+        The default configuration coincides with a Kuramoto-Sivashinsky equation
+        in combustion format. Note that this requires negative values (because
+        the KS usually defines their linear operators on the left hand side of
+        the equation)
+
+        **Arguments:**
+            - `num_spatial_dims`: The number of spatial dimensions `d`.
+            - `domain_extent`: The size of the domain `L`; in higher dimensions
+                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+            - `num_points`: The number of points `N` used to discretize the
+                domain. This **includes** the left boundary point and
+                **excludes** the right boundary point. In higher dimensions; the
+                number of points in each dimension is the same. Hence, the total
+                number of degrees of freedom is `Nᵈ`.
+            - `dt`: The timestep size `Δt` between two consecutive states.
+            - `coefficients` (keyword-only): The list of coefficients `a_j`
+                corresponding to the derivatives. The length of this tuple
+                represents the highest occuring derivative. The default value
+                `(0.0, 0.0, -1.0, 0.0, -1.0)` corresponds to the Kuramoto-
+                Sivashinsky equation in combustion format.
+            - `gradient_norm_scale` (keyword-only): The scale of the gradient
+                norm term `b₂`. Default: 1.0.
+            - `order`: The order of the Exponential Time Differencing Runge
+                Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0`
+                only solves the linear part of the equation. Use higher values
+                for higher accuracy and stability. The default choice of `2` is
+                a good compromise for single precision floats.
+            - `dealiasing_fraction`: The fraction of the wavenumbers to keep
+                before evaluating the nonlinearity. The default 2/3 corresponds
+                to Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2.
+                Default: 2/3.
+            - `num_circle_points`: How many points to use in the complex contour
+                integral method to compute the coefficients of the exponential
+                time differencing Runge Kutta method. Default: 16.
+            - `circle_radius`: The radius of the contour used to compute the
+                coefficients of the exponential time differencing Runge Kutta
+                method. Default: 1.0.
         """
         self.coefficients = coefficients
         self.gradient_norm_scale = gradient_norm_scale
