@@ -44,9 +44,9 @@ def build_wavenumbers(
 
 
 def build_scaled_wavenumbers(
-    D: int,
-    L: float,
-    N: int,
+    num_spatial_dims: int,
+    domain_extent: float,
+    num_points: int,
     *,
     indexing: str = "ij",
 ) -> Float[Array, "D ... (N//2)+1"]:
@@ -56,9 +56,9 @@ def build_scaled_wavenumbers(
     `jax.numpy.fft.rfftn`. Scaling is done by `2 * pi / L`.
 
     **Arguments:**
-        - `D`: The number of spatial dimensions.
-        - `L`: The domain extent.
-        - `N`: The number of points in each spatial dimension.
+        - `num_spatial_dims`: The number of spatial dimensions.
+        - `domain_extent`: The domain extent.
+        - `num_points`: The number of points in each spatial dimension.
         - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
           Either `"ij"` or `"xy"`. Default is `"ij"`.
 
@@ -66,8 +66,8 @@ def build_scaled_wavenumbers(
         - `wavenumbers`: An array of wavenumber integer coordinates, shape
             `(D, ..., (N//2)+1)`.
     """
-    scale = 2 * jnp.pi / L
-    wavenumbers = build_wavenumbers(D, N, indexing=indexing)
+    scale = 2 * jnp.pi / domain_extent
+    wavenumbers = build_wavenumbers(num_spatial_dims, num_points, indexing=indexing)
     return scale * wavenumbers
 
 
