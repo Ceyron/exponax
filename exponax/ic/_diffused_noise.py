@@ -24,16 +24,22 @@ class DiffusedNoise(BaseRandomICGenerator):
         max_one: bool = False,
     ):
         """
-        Randomly generated initial condition consisting of a diffused noise field.
+        Randomly generated initial condition consisting of a diffused noise
+        field.
 
-        Arguments are drawn from uniform distributions.
+        The original noise is drawn in state space with a uniform normal
+        distribution.
 
         **Arguments**:
-            - `D`: The dimension of the domain.
-            - `L`: The length of the domain.
-            - `N`: The number of grid points in each dimension.
-            - `intensity`: The diffusivity.
-            - `zero_mean`: Whether to subtract the mean.
+            - `num_spatial_dims`: The number of spatial dimensions `d`.
+            - `domain_extent`: The extent of the domain. Defaults to `1.0`. This
+                indirectly affects the intensity of the noise. It is best to
+                keep it at `1.0` and just adjust the `intensity` instead.
+            - `intensity`: The intensity of the noise. Defaults to `0.001`.
+            - `zero_mean`: Whether to zero the mean of the noise. Defaults to
+                `True`.
+            - `max_one`: Whether to normalize the noise to the maximum absolute
+                value of one. Defaults to `False`.
         """
         self.num_spatial_dims = num_spatial_dims
         self.domain_extent = domain_extent
