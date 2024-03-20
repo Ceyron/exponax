@@ -15,6 +15,7 @@ from ._discontinuities import Discontinuities, RandomDiscontinuities
 from ._gaussian_random_field import GaussianRandomField
 from ._multi_channel import MultiChannelIC, RandomMultiChannelICGenerator
 from ._scaled import ScaledIC, ScaledICGenerator
+from ._sine_waves_1d import RandomSineWaves1d, SineWaves1d
 from ._truncated_fourier_series import RandomTruncatedFourierSeries
 
 __all__ = [
@@ -30,4 +31,6 @@ __all__ = [
     "RandomTruncatedFourierSeries",
     "ScaledIC",
     "ScaledICGenerator",
+    "SineWaves1d",
+    "RandomSineWaves1d",
 ]
