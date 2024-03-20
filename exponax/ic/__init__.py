@@ -14,6 +14,7 @@ from ._diffused_noise import DiffusedNoise
 from ._discontinuities import Discontinuities, RandomDiscontinuities
 from ._gaussian_random_field import GaussianRandomField
 from ._multi_channel import MultiChannelIC, RandomMultiChannelICGenerator
+from ._scaled import ScaledIC, ScaledICGenerator
 from ._truncated_fourier_series import RandomTruncatedFourierSeries
 
 __all__ = [
@@ -27,4 +28,6 @@ __all__ = [
     "RandomDiscontinuities",
     "RandomMultiChannelICGenerator",
     "RandomTruncatedFourierSeries",
+    "ScaledIC",
+    "ScaledICGenerator",
 ]
