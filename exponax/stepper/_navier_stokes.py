@@ -167,6 +167,75 @@ class KolmogorovFlowVorticity(BaseStepper):
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
+        """
+        Timestepper for the 2d Kolmogorov flow equation on periodic boundary
+        conditions in streamfunction-vorticity formulation. The equation reads
+
+        ```
+            uₜ + b ([1, -1]ᵀ ⊙ ∇(Δ⁻¹u)) ⋅ ∇u = λu + ν Δu + f
+        ```
+
+        For a detailed description of the terms, see the documentation of the
+        `NavierStokesVorticity` stepper. The only difference is the additional
+        forcing term `f` which injects new energy into the system. For a
+        Kolmogorov flow **in primary variables**, it has the form
+
+        ```
+            f₀ = γ sin(k (2π/L) x₁)
+
+            f₁ = 0
+        ```
+
+        In words, only the first channel is forced at a specific wavenumber over
+        the second axis. Since this stepper considers the
+        streamfunction-vorticity formulation, we take its curl to get
+
+        ```
+            f = -k (2π/L) γ cos(k (2π/L) x₁)
+        ```
+
+        The expected temporal behavior is that the initial vorticity field first
+        is excited into a noisy striped pattern. This pattern breaks up and a
+        turbulent spatio-temporal chaos emerges.
+
+        A negative drag coefficient `λ` is needed to remove some of the energy
+        piling up in low modes.
+
+        **Arguments:**
+            - `num_spatial_dims`: The number of spatial dimensions `d`.
+            - `domain_extent`: The size of the domain `L`; in higher dimensions
+                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+            - `num_points`: The number of points `N` used to discretize the
+                domain. This **includes** the left boundary point and
+                **excludes** the right boundary point. In higher dimensions; the
+                number of points in each dimension is the same. Hence, the total
+                number of degrees of freedom is `Nᵈ`.
+            - `dt`: The timestep size `Δt` between two consecutive states.
+            - `diffusivity`: The diffusivity coefficient `ν`. This affects the
+                Reynolds number. The lower the diffusivity, the "more
+                turbulent". Default is `0.001`.
+            - `convection_scale`: The scaling factor for the vorticity
+                convection term. Default is `1.0`.
+            - `drag`: The drag coefficient `λ`. Default is `-0.1`.
+            - `injection_mode`: The mode of the injection. Default is `4`.
+            - `injection_scale`: The scaling factor for the injection. Default is
+                `1.0`.
+            - `order`: The order of the Exponential Time Differencing Runge
+                Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0`
+                only solves the linear part of the equation. Use higher values
+                for higher accuracy and stability. The default choice of `2` is
+                a good compromise for single precision floats.
+            - `dealiasing_fraction`: The fraction of the wavenumbers to keep
+                before evaluating the nonlinearity. The default 2/3 corresponds
+                to Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2.
+                Default: 2/3.
+            - `num_circle_points`: How many points to use in the complex contour
+                integral method to compute the coefficients of the exponential
+                time differencing Runge Kutta method. Default: 16.
+            - `circle_radius`: The radius of the contour used to compute the
+                coefficients of the exponential time differencing Runge Kutta
+                method. Default: 1.0.
+        """
         if num_spatial_dims != 2:
             raise ValueError(f"Expected num_spatial_dims = 2, got {num_spatial_dims}.")
         self.diffusivity = diffusivity
