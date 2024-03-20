@@ -11,6 +11,7 @@ To create a multi-channel IC, e.g., for the Burgers equation, use the
 from ._base_ic import BaseIC, BaseRandomICGenerator
 from ._clamping import ClampingICGenerator
 from ._diffused_noise import DiffusedNoise
+from ._discontinuities import Discontinuities, RandomDiscontinuities
 from ._gaussian_random_field import GaussianRandomField
 from ._multi_channel import MultiChannelIC, RandomMultiChannelICGenerator
 from ._truncated_fourier_series import RandomTruncatedFourierSeries
@@ -19,9 +20,11 @@ __all__ = [
     "BaseIC",
     "BaseRandomICGenerator",
     "ClampingICGenerator",
+    "Discontinuities",
     "DiffusedNoise",
     "GaussianRandomField",
     "MultiChannelIC",
+    "RandomDiscontinuities",
     "RandomMultiChannelICGenerator",
     "RandomTruncatedFourierSeries",
 ]
