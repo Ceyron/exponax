@@ -60,6 +60,6 @@ class DiffusedNoise(BaseRandomICGenerator):
             ic = ic - jnp.mean(ic)
 
         if self.max_one:
-            ic = ic / jnp.max(ic)
+            ic = ic / jnp.max(jnp.abs(ic))
 
         return ic
