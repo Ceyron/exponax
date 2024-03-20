@@ -9,6 +9,15 @@ from ._base_ic import BaseIC, BaseRandomICGenerator
 class MultiChannelIC(eqx.Module):
     initial_conditions: tuple[BaseIC, ...]
 
+    def __init__(self, initial_conditions: tuple[BaseIC, ...]):
+        """
+        A multi-channel initial condition.
+
+        **Arguments**:
+            - `initial_conditions`: A tuple of initial conditions.
+        """
+        self.initial_conditions = initial_conditions
+
     def __call__(self, x: Float[Array, "D ... N"]) -> Float[Array, "C ... N"]:
         """
         Evaluate the initial condition.
@@ -24,6 +33,15 @@ class MultiChannelIC(eqx.Module):
 
 class RandomMultiChannelICGenerator(eqx.Module):
     ic_generators: tuple[BaseRandomICGenerator, ...]
+
+    def __init__(self, ic_generators: tuple[BaseRandomICGenerator, ...]):
+        """
+        A multi-channel random initial condition generator.
+
+        **Arguments**:
+            - `ic_generators`: A tuple of initial condition generators.
+        """
+        self.ic_generators = ic_generators
 
     def gen_ic_fun(self, num_points: int, *, key: PRNGKeyArray) -> MultiChannelIC:
         ic_funs = [
