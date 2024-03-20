@@ -4,10 +4,6 @@ from ._base import BaseNonlinearFun
 
 
 class PolynomialNonlinearFun(BaseNonlinearFun):
-    """
-    Channel-separate evaluation; and no mixed terms.
-    """
-
     coefficients: tuple[float, ...]  # Starting from order 0
 
     def __init__(
@@ -19,7 +15,44 @@ class PolynomialNonlinearFun(BaseNonlinearFun):
         coefficients: tuple[float, ...],
     ):
         """
-        Coefficient list starts from order 0.
+        Performs a pseudo-spectral evaluation of an (unmixed) polynomial
+        nonlineariy, e.g., as they are found in reaction-diffusion systems
+        (e.g., FisherKPP). In state space, this reads
+
+        ```
+            𝒩(u) = ∑ₖ cₖ uᵏ
+        ```
+
+        with `cₖ` the coefficient of the `k`-th order term. Note that there is
+        no channe mixing. For example, `u₀² u₁` cannot be represented.
+
+        This format works in any number of dimensions.
+
+        **Arguments:**
+            - `num_spatial_dims`: The number of spatial dimensions `d`.
+            - `num_points`: The number of points `N` used to discretize the
+                domain. This **includes** the left boundary point and
+                **excludes** the right boundary point. In higher dimensions; the
+                number of points in each dimension is the same.
+            - `dealiasing_fraction`: The fraction of the highest resolved modes
+                that are not aliased. Defaults to `2/3` which corresponds to
+                Orszag's 2/3 rule which is sufficient for up to quadratic
+                nonlinearities. Higher order nonlinearities might require a
+                higher dealiasing fraction.
+            - `coefficients`: The coefficients of the polynomial terms. The
+                coefficients are expected to be given in the order of increasing
+                order. The list starts with the zeroth order. For example for a
+                purely quadratic nonlinearity, the coefficients are `(0.0, 0.0,
+                1.0)`.
+
+        **Notes:**
+            - A zeroth-order term is independent of `u` and essentially acts as
+                a constant forcing term.
+            - A first-order term is linear and could also be represented in the
+                linear part of the timestepper where it would be represented
+                analytically.
+            - As such it is often the case, that the coefficients tuple starts
+                with two zeros.
         """
         super().__init__(
             num_spatial_dims,
