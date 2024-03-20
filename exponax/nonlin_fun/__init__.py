@@ -1,3 +1,6 @@
+"""
+Collection of nonlinear functions for ETDRK mehtods.
+"""
 from ._base import BaseNonlinearFun
 from ._convection import ConvectionNonlinearFun
 from ._general_nonlinear import GeneralNonlinearFun
