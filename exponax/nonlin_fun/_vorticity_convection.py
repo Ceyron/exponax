@@ -109,6 +109,8 @@ class VorticityConvection2dKolmogorov(VorticityConvection2d):
             dealiasing_fraction=dealiasing_fraction,
         )
 
+        # TODO: shouldn't this be scaled differently sine we are in the
+        # streamfunction-vorticity formulation?
         wavenumbers = build_wavenumbers(num_spatial_dims, num_points)
         injection_mask = (wavenumbers[0] == 0) & (wavenumbers[1] == injection_mode)
         self.injection = jnp.where(
