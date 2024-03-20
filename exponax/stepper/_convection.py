@@ -27,10 +27,71 @@ class GeneralConvectionStepper(BaseStepper):
         circle_radius: float = 1.0,
     ):
         """
-        Isotropic linear operators!
+        Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) semi-linear PDEs
+        consisting of a convection nonlinearity and an arbitrary combination of
+        (isotropic) linear derivatives.
 
-        By default Burgers equation with diffusivity of 0.01
+        In 1d, the equation is given by
 
+        ```
+            uₜ + b₁ 1/2 (u²)ₓ = sum_j a_j uₓˢ
+
+        ```
+
+        with `b₁` the convection coefficient and `a_j` the coefficients of the
+        linear operators. `uₓˢ` denotes the s-th derivative of `u` with respect
+        to `x`. Oftentimes `b₁ = 1`.
+
+        In the default configuration, the number of channel grows with the
+        number of spatial dimensions. The higher dimensional equation reads
+
+        ```
+            uₜ + b₁ 1/2 ∇ ⋅ (u ⊗ u) = sum_j a_j (1⋅∇ʲ)u
+        ```
+
+        Alternatively, with `single_channel=True`, the number of channels can be
+        kept to constant 1 no matter the number of spatial dimensions.
+
+        Depending on the collection of linear coefficients can be represented,
+        for example: - Burgers equation with `a = (0, 0, 0.01)` - KdV equation
+        with `a = (0, 0, 0, 0.01)`
+
+        **Arguments:**
+            - `num_spatial_dims`: The number of spatial dimensions `d`.
+            - `domain_extent`: The size of the domain `L`; in higher dimensions
+                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+            - `num_points`: The number of points `N` used to discretize the
+                domain. This **includes** the left boundary point and
+                **excludes** the right boundary point. In higher dimensions; the
+                number of points in each dimension is the same. Hence, the total
+                number of degrees of freedom is `Nᵈ`.
+            - `dt`: The timestep size `Δt` between two consecutive states.
+            - `coefficients` (keyword-only): The list of coefficients `a_j`
+                corresponding to the derivatives. The length of this tuple
+                represents the highest occuring derivative. The default value
+                `(0.0, 0.0, 0.01)` corresponds to the Burgers equation (because
+                of the diffusion)
+            - `convection_scale` (keyword-only): The scale `b₁` of the convection
+                term. Default is `1.0`.
+            - `single_channel`: Whether to use the single channel mode in higher
+                dimensions. In this case the the convection is `b₁ (∇ ⋅ 1)(u²)`.
+                In this case, the state always has a single channel, no matter
+                the spatial dimension. Default: False.
+            - `order`: The order of the Exponential Time Differencing Runge
+                Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0`
+                only solves the linear part of the equation. Use higher values
+                for higher accuracy and stability. The default choice of `2` is
+                a good compromise for single precision floats.
+            - `dealiasing_fraction`: The fraction of the wavenumbers to keep
+                before evaluating the nonlinearity. The default 2/3 corresponds
+                to Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2.
+                Default: 2/3.
+            - `num_circle_points`: How many points to use in the complex contour
+                integral method to compute the coefficients of the exponential
+                time differencing Runge Kutta method. Default: 16.
+            - `circle_radius`: The radius of the contour used to compute the
+                coefficients of the exponential time differencing Runge Kutta
+                method. Default: 1.0.
         """
         self.coefficients = coefficients
         self.convection_scale = convection_scale
