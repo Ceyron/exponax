@@ -123,7 +123,8 @@ class KortewegDeVries(BaseStepper):
                 shift `a`.
             - For a nice simulation with an initial condition that breaks into
                 solitons choose `domain_extent=20.0` and an initial condition
-                with the first 5-10 modes.
+                with the first 5-10 modes. Set dt=0.01, num points in the range
+                of 50-200 are sufficient.
         """
         self.convection_scale = convection_scale
         self.dispersivity = dispersivity
