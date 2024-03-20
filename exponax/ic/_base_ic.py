@@ -25,7 +25,7 @@ class BaseRandomICGenerator(eqx.Module):
     num_spatial_dims: int
     indexing: str = "ij"
 
-    def gen_ic_fun(self, num_points: int, *, key: PRNGKeyArray) -> BaseIC:
+    def gen_ic_fun(self, *, key: PRNGKeyArray) -> BaseIC:
         """
         Generate an initial condition function.
 

@@ -43,9 +43,9 @@ class RandomMultiChannelICGenerator(eqx.Module):
         """
         self.ic_generators = ic_generators
 
-    def gen_ic_fun(self, num_points: int, *, key: PRNGKeyArray) -> MultiChannelIC:
+    def gen_ic_fun(self, *, key: PRNGKeyArray) -> MultiChannelIC:
         ic_funs = [
-            ic_gen.gen_ic_fun(num_points, key=k)
+            ic_gen.gen_ic_fun(key=k)
             for (ic_gen, k) in zip(
                 self.ic_generators,
                 jax.random.split(key, len(self.ic_generators)),
