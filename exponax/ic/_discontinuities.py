@@ -7,6 +7,11 @@ from ._base_ic import BaseIC, BaseRandomICGenerator
 
 
 class Discontinuity(eqx.Module):
+    """
+    A state described by a discontinuity with a constant value within the
+    hypercube defined by the lower and upper limits.
+    """
+
     lower_limits: tuple[float, ...]
     upper_limits: tuple[float, ...]
     value: float
@@ -33,6 +38,19 @@ class Discontinuities(BaseIC):
         std_one: bool = False,
         max_one: bool = False,
     ):
+        """
+        A state described by a collection of discontinuities.
+
+        **Arguments**:
+            - `discontinuity_list`: A tuple of discontinuities.
+            - `zero_mean`: Whether the state should have zero mean.
+            - `std_one`: Whether to normalize the state to have a standard
+                deviation of one. Defaults to `False`. Only works if the offset
+                is zero.
+            - `max_one`: Whether to normalize the state to have the maximum
+                absolute value of one. Defaults to `False`. Only one of
+                `std_one` and `max_one` can be `True`.
+        """
         if not zero_mean and std_one:
             raise ValueError("Cannot have `zero_mean=False` and `std_one=True`.")
         if std_one and max_one:
@@ -79,6 +97,23 @@ class RandomDiscontinuities(BaseRandomICGenerator):
         std_one: bool = False,
         max_one: bool = False,
     ):
+        """
+        Random generator for initial states described by a collection of
+        discontinuities.
+
+        **Arguments**:
+            - `num_spatial_dims`: The number of spatial dimensions.
+            - `domain_extent`: The extent of the domain in each spatial direction.
+            - `num_discontinuities`: The number of discontinuities.
+            - `value_range`: The range of values for the discontinuities.
+            - `zero_mean`: Whether the state should have zero mean.
+            - `std_one`: Whether to normalize the state to have a standard
+                deviation of one. Defaults to `False`. Only works if the offset
+                is zero.
+            - `max_one`: Whether to normalize the state to have the maximum
+                absolute value of one. Defaults to `False`. Only one of
+                `std_one` and `max_one` can be `True`.
+        """
         if not zero_mean and std_one:
             raise ValueError("Cannot have `zero_mean=False` and `std_one=True`.")
         if std_one and max_one:
