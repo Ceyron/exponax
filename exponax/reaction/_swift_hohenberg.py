@@ -6,8 +6,9 @@ from ..nonlin_fun import PolynomialNonlinearFun
 
 
 class SwiftHohenberg(BaseStepper):
-    g: float
-    r: float
+    reactivity: float
+    critical_number: float
+    polynomial_coefficients: tuple[float, ...]
     dealiasing_fraction: float
 
     def __init__(
@@ -17,16 +18,18 @@ class SwiftHohenberg(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        g: float = 1.0,
-        r: float = 0.7,
+        reactivity: float = 0.7,
+        critical_number: float = 1.0,
+        polynomial_coefficients: tuple[float, ...] = (0.0, 0.0, 1.0, -1.0),
         order: int = 2,
-        dealiasing_fraction: float = 1
-        / 2,  # Needs lower value due to cubic nonlinearity
+        # Needs lower value due to cubic nonlinearity
+        dealiasing_fraction: float = 1 / 2,
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
-        self.g = g
-        self.r = r
+        self.reactivity = reactivity
+        self.critical_number = critical_number
+        self.polynomial_coefficients = polynomial_coefficients
         self.dealiasing_fraction = dealiasing_fraction
         super().__init__(
             num_spatial_dims=num_spatial_dims,
@@ -44,7 +47,7 @@ class SwiftHohenberg(BaseStepper):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> Complex[Array, "1 ... (N//2)+1"]:
         laplace = build_laplace_operator(derivative_operator, order=2)
-        linear_operator = self.r - (1 + laplace) ** 2
+        linear_operator = self.reactivity - (self.critical_number + laplace) ** 2
         return linear_operator
 
     def _build_nonlinear_fun(
@@ -55,5 +58,5 @@ class SwiftHohenberg(BaseStepper):
             self.num_spatial_dims,
             self.num_points,
             dealiasing_fraction=self.dealiasing_fraction,
-            coefficients=[0.0, 0.0, self.g, -1.0],
+            coefficients=self.polynomial_coefficients,
         )
