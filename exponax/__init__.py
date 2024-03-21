@@ -18,6 +18,7 @@ from ._viz import (
     make_grouped_animation,
     plot_multiple_spatio_temporal,
     plot_spatio_temporal,
+    plot_state_1d,
 )
 
 __all__ = [
@@ -31,6 +32,7 @@ __all__ = [
     "make_grid",
     "make_animation",
     "make_grouped_animation",
+    "plot_state_1d",
     "plot_spatio_temporal",
     "plot_multiple_spatio_temporal",
     "rollout",

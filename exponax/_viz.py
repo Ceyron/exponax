@@ -2,13 +2,50 @@
 Utilities for visualization.
 """
 
+from typing import TypeVar
+
 import jax
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
 from jaxtyping import Array, Float
 from matplotlib.animation import FuncAnimation
 
-from ._utils import wrap_bc
+from ._utils import make_grid, wrap_bc
+
+N = TypeVar("N")
+
+
+def plot_state_1d(
+    state: Float[Array, "N"],
+    *,
+    vlim: tuple[float, float] = (-1.0, 1.0),
+    domain_extent: float = None,
+    ax=None,
+    **kwargs,
+):
+    if state.ndim != 1:
+        raise ValueError(
+            "state must be a one-axis array. Extract the channel you want to plot."
+        )
+
+    state_wrapped = wrap_bc(state[None])[0]
+
+    num_points = state.shape[0]
+
+    if domain_extent is None:
+        # One more because we wrapped the BC
+        domain_extent = num_points
+
+    grid = make_grid(1, domain_extent, num_points, full=True)
+
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    p = ax.plot(grid[0], state_wrapped, **kwargs)
+    ax.set_ylim(vlim)
+    ax.grid()
+
+    return p
 
 
 def plot_spatio_temporal(
@@ -31,7 +68,8 @@ def plot_spatio_temporal(
     if domain_extent is not None:
         space_range = (0, domain_extent)
     else:
-        space_range = (0, trj_wrapped.shape[1] - 1)
+        # One more because we wrapped the BC
+        space_range = (0, trj_wrapped.shape[1])
 
     if dt is not None:
         time_range = (0, dt * trj_wrapped.shape[0])
