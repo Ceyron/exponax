@@ -6,6 +6,7 @@ from ..nonlin_fun import BaseNonlinearFun
 
 
 class CahnHilliardNonlinearFun(BaseNonlinearFun):
+    scale: float
     laplace_operator: Complex[Array, "1 ... (N//2)+1"]
 
     def __init__(
@@ -14,6 +15,7 @@ class CahnHilliardNonlinearFun(BaseNonlinearFun):
         num_points: int,
         *,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
+        scale: float,
         dealiasing_fraction: float,
     ):
         super().__init__(
@@ -22,6 +24,7 @@ class CahnHilliardNonlinearFun(BaseNonlinearFun):
             dealiasing_fraction=dealiasing_fraction,
         )
         self.laplace_operator = build_laplace_operator(derivative_operator)
+        self.scale = scale
 
     def __call__(
         self,
@@ -31,11 +34,14 @@ class CahnHilliardNonlinearFun(BaseNonlinearFun):
         u_power = u[0] ** 3
         u_power_hat = self.fft(u_power)
         u_power_laplace_hat = self.laplace_operator * u_power_hat
-        return u_power_laplace_hat
+        return u_power_laplace_hat * self.scale
 
 
 class CahnHilliard(BaseStepper):
-    hyper_diffusivity: float
+    diffusivity: float
+    gamma: float
+    first_order_coefficient: float
+    third_order_coefficient: float
     dealiasing_fraction: float
 
     def __init__(
@@ -45,14 +51,20 @@ class CahnHilliard(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        hyper_diffusivity: float = 0.2,
+        diffusivity: float = 1e-2,
+        gamma: float = 1e-3,
+        first_order_coefficient: float = -1.0,
+        third_order_coefficient: float = 1.0,
         order: int = 2,
-        dealiasing_fraction: float = 1
-        / 2,  # Needs lower value due to cubic nonlinearity
+        # Needs lower value due to cubic nonlinearity
+        dealiasing_fraction: float = 1 / 2,
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
-        self.hyper_diffusivity = hyper_diffusivity
+        self.diffusivity = diffusivity
+        self.gamma = gamma
+        self.first_order_coefficient = first_order_coefficient
+        self.third_order_coefficient = third_order_coefficient
         self.dealiasing_fraction = dealiasing_fraction
         super().__init__(
             num_spatial_dims=num_spatial_dims,
@@ -70,8 +82,11 @@ class CahnHilliard(BaseStepper):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> Complex[Array, "1 ... (N//2)+1"]:
         laplace = build_laplace_operator(derivative_operator, order=2)
-        bi_laplace = build_laplace_operator(derivative_operator, order=4)
-        linear_operator = -self.hyper_diffusivity * bi_laplace - laplace
+        linear_operator = (
+            self.diffusivity
+            * laplace
+            * (self.first_order_coefficient - self.gamma * laplace)
+        )
         return linear_operator
 
     def _build_nonlinear_fun(
@@ -83,4 +98,5 @@ class CahnHilliard(BaseStepper):
             self.num_points,
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
+            scale=self.diffusivity * self.third_order_coefficient,
         )
