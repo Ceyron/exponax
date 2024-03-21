@@ -17,7 +17,7 @@ class FisherKPP(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        diffusivity: float = 0.1,
+        diffusivity: float = 0.01,
         reactivity=1.0,
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,
