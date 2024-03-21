@@ -6,6 +6,7 @@ from ..nonlin_fun import PolynomialNonlinearFun
 
 
 class FisherKPP(BaseStepper):
+    diffusivity: float
     reactivity: float
     dealiasing_fraction: float
 
@@ -16,13 +17,15 @@ class FisherKPP(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        order: int = 2,
+        diffusivity: float = 0.1,
         reactivity=1.0,
+        order: int = 2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         self.dealiasing_fraction = dealiasing_fraction
+        self.diffusivity = diffusivity
         self.reactivity = reactivity
         super().__init__(
             num_spatial_dims=num_spatial_dims,
@@ -40,7 +43,7 @@ class FisherKPP(BaseStepper):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> Complex[Array, "1 ... (N//2)+1"]:
         laplace = build_laplace_operator(derivative_operator, order=2)
-        linear_operator = laplace + self.reactivity
+        linear_operator = self.diffusivity * laplace + self.reactivity
         return linear_operator
 
     def _build_nonlinear_fun(
