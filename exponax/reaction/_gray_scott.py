@@ -70,7 +70,72 @@ class GrayScott(BaseStepper):
         circle_radius: float = 1.0,
     ):
         """
-        See also this papers:
+        Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) Gray-Scott reaction
+        diffusion equation on periodic boundary conditions. This
+        reaction-diffusion models the interaction of two chemical species u & v.
+
+        In 1d, the Gray-Scott equation is given by
+
+        ```
+            uₜ = ν₁ uₓₓ + f(1 - u) - u v²
+
+            vₜ = ν₂ vₓₓ - (f + k) v + u v²
+        ```
+
+        with `ν₁` and `ν₂` the diffusivities, `f` the feed rate, and `k` the
+        kill rate. No matter the spatial dimension, this dynamics always has two
+        channels, refering to the two chemical species. In higher dimensions,
+        the equations read
+
+        ```
+            uₜ = ν₁ Δu + f(1 - u) - u v²
+
+            vₜ = ν₂ Δv - (f + k) v + u v²
+        ```
+
+        with `Δ` the Laplacian.
+
+        The Gray-Scott equation is known to produce a variety of patterns, such
+        as spots, stripes, and spirals. The expected temporal behavior is highly
+        dependent on the values of the feed and kill rates, see also this paper:
+        https://www.ljll.fr/hecht/ftp/ff++/2015-cimpa-IIT/edp-tuto/Pearson.pdf
+
+        IMPORTANT: Both channels are expected to have values in the range `[0,
+        1]`.
+
+        **Arguments**:
+            - `num_spatial_dims`: The number of spatial dimensions `d`.
+            - `domain_extent`: The size of the domain `L`; in higher dimensions
+                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+            - `num_points`: The number of points `N` used to discretize the
+                domain. This **includes** the left boundary point and
+                **excludes** the right boundary point. In higher dimensions; the
+                number of points in each dimension is the same. Hence, the total
+                number of degrees of freedom is `Nᵈ`.
+            - `dt`: The timestep size `Δt` between two consecutive states.
+            - `diffusivity_1`: The diffusivity `ν₁` of the first species.
+              Default
+                is `2e-5`.
+            - `diffusivity_2`: The diffusivity `ν₂` of the second species.
+              Default
+                is `1e-5`.
+            - `feed_rate`: The feed rate `f`. Default is `0.04`.
+            - `kill_rate`: The kill rate `k`. Default is `0.06`.
+            - `order`: The order of the Exponential Time Differencing Runge
+                Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0`
+                only solves the linear part of the equation. Use higher values
+                for higher accuracy and stability. The default choice of `2` is
+                a good compromise for single precision floats.
+            - `dealiasing_fraction`: The fraction of the wavenumbers to keep
+                before evaluating the nonlinearity. Default: 1/2.
+            - `num_circle_points`: How many points to use in the complex contour
+                integral method to compute the coefficients of the exponential
+                time differencing Runge Kutta method. Default: 16.
+            - `circle_radius`: The radius of the contour used to compute the
+                coefficients of the exponential time differencing Runge Kutta
+                method. Default: 1.0.
+
+        TODO: Translate the different configurations of
         https://www.ljll.fr/hecht/ftp/ff++/2015-cimpa-IIT/edp-tuto/Pearson.pdf
         """
         self.diffusivity_1 = diffusivity_1
