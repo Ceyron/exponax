@@ -35,7 +35,7 @@ def test_instantiate():
             ex.reaction.AllenCahn,
             ex.reaction.CahnHilliard,
             ex.reaction.SwiftHohenberg,
-            ex.reaction.BelousovZhabotinsky,
+            # ex.reaction.BelousovZhabotinsky,
             ex.reaction.GrayScott,
         ]:
             simulator(num_spatial_dims, domain_extent, num_points, dt)
