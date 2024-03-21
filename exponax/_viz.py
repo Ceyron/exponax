@@ -16,21 +16,20 @@ N = TypeVar("N")
 
 
 def plot_state_1d(
-    state: Float[Array, "N"],
+    state: Float[Array, "B N"],
     *,
     vlim: tuple[float, float] = (-1.0, 1.0),
     domain_extent: float = None,
+    labels: list[str] = None,
     ax=None,
     **kwargs,
 ):
-    if state.ndim != 1:
-        raise ValueError(
-            "state must be a one-axis array. Extract the channel you want to plot."
-        )
+    if state.ndim != 2:
+        raise ValueError("state must be a two-axis array.")
 
-    state_wrapped = wrap_bc(state[None])[0]
+    state_wrapped = wrap_bc(state)
 
-    num_points = state.shape[0]
+    num_points = state.shape[-1]
 
     if domain_extent is None:
         # One more because we wrapped the BC
@@ -41,40 +40,43 @@ def plot_state_1d(
     if ax is None:
         fig, ax = plt.subplots()
 
-    p = ax.plot(grid[0], state_wrapped, **kwargs)
+    p = ax.plot(grid[0], state_wrapped.T, label=labels, **kwargs)
     ax.set_ylim(vlim)
     ax.grid()
+    if labels is not None:
+        ax.legend()
 
     return p
 
 
-def plot_multiple_state_1d(
-    states: Float[Array, "B N"],
-    *,
-    vlim: tuple[float, float] = (-1.0, 1.0),
-    labels: list[str] = None,
-    domain_extent: float = None,
-):
-    if states.ndim != 2:
-        raise ValueError(
-            "states must be a two-axis array. Extract the channel you want to plot."
-        )
+# def plot_multiple_state_1d(
+#     states: Float[Array, "B N"],
+#     *,
+#     vlim: tuple[float, float] = (-1.0, 1.0),
+#     labels: list[str] = None,
+#     domain_extent: float = None,
+# ):
+#     if states.ndim != 2:
+#         raise ValueError(
+#             "states must be a two-axis array. Extract the channel you want to plot."
+#         )
 
-    fig, ax = plt.subplots()
-    for i, state in enumerate(states):
-        plot_state_1d(
-            state,
-            vlim=vlim,
-            domain_extent=domain_extent,
-            ax=ax,
-            label=labels[i] if labels is not None else None,
-        )
-    if len(states) % 2 == 0:
-        ax.grid()
+#     fig, ax = plt.subplots()
+#     line_list
+#     for i, state in enumerate(states):
+#         plot_state_1d(
+#             state,
+#             vlim=vlim,
+#             domain_extent=domain_extent,
+#             ax=ax,
+#             label=labels[i] if labels is not None else None,
+#         )
+#     if len(states) % 2 == 0:
+#         ax.grid()
 
-    if labels is not None:
-        ax.legend()
-    return fig
+#     if labels is not None:
+#         ax.legend()
+#     return fig
 
 
 def plot_spatio_temporal(
@@ -159,6 +161,52 @@ def plot_multiple_spatio_temporal(
             ax.set_title(titles[i])
 
     return fig
+
+
+def make_animation_1d(
+    trj: Float[Array, "T B N"],
+    *,
+    vlim: tuple[float, float] = (-1, 1),
+    domain_extent: float = None,
+    dt: float = None,
+    include_init: bool = False,
+    **kwargs,
+):
+    fig, ax = plt.subplots()
+
+    plot_state_1d(
+        trj[0],
+        vlim=vlim,
+        domain_extent=domain_extent,
+        ax=ax,
+        **kwargs,
+    )
+
+    if include_init:
+        temporal_grid = jnp.arange(trj.shape[0])
+    else:
+        temporal_grid = jnp.arange(1, trj.shape[0] + 1)
+
+    if dt is not None:
+        temporal_grid *= dt
+
+    ax.set_title(f"t = {temporal_grid[0]:.2f}")
+
+    def animate(i):
+        ax.clear()
+        plot_state_1d(
+            trj[i],
+            vlim=vlim,
+            domain_extent=domain_extent,
+            ax=ax,
+            **kwargs,
+        )
+
+    plt.close(fig)
+
+    ani = FuncAnimation(fig, animate, frames=trj.shape[0], interval=100, blit=False)
+
+    return ani
 
 
 def make_animation(trj, *, vlim=(-1, 1)):

@@ -13,11 +13,11 @@ from ._utils import (
     stack_sub_trajectories,
     wrap_bc,
 )
-from ._viz import (
+from ._viz import (  # plot_multiple_state_1d,
     make_animation,
+    make_animation_1d,
     make_grouped_animation,
     plot_multiple_spatio_temporal,
-    plot_multiple_state_1d,
     plot_spatio_temporal,
     plot_state_1d,
 )
@@ -32,9 +32,10 @@ __all__ = [
     "make_incompressible",
     "make_grid",
     "make_animation",
+    "make_animation_1d",
     "make_grouped_animation",
     "plot_state_1d",
-    "plot_multiple_state_1d",
+    # "plot_multiple_state_1d",
     "plot_spatio_temporal",
     "plot_multiple_spatio_temporal",
     "rollout",
