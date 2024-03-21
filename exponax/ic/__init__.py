@@ -12,6 +12,7 @@ from ._base_ic import BaseIC, BaseRandomICGenerator
 from ._clamping import ClampingICGenerator
 from ._diffused_noise import DiffusedNoise
 from ._discontinuities import Discontinuities, RandomDiscontinuities
+from ._gaussian_blob import GaussianBlobs, RandomGaussianBlobs
 from ._gaussian_random_field import GaussianRandomField
 from ._multi_channel import MultiChannelIC, RandomMultiChannelICGenerator
 from ._scaled import ScaledIC, ScaledICGenerator
@@ -24,9 +25,11 @@ __all__ = [
     "ClampingICGenerator",
     "Discontinuities",
     "DiffusedNoise",
+    "GaussianBlobs",
     "GaussianRandomField",
     "MultiChannelIC",
     "RandomDiscontinuities",
+    "RandomGaussianBlobs",
     "RandomMultiChannelICGenerator",
     "RandomTruncatedFourierSeries",
     "ScaledIC",
