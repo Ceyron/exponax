@@ -48,6 +48,35 @@ def plot_state_1d(
     return p
 
 
+def plot_multiple_state_1d(
+    states: Float[Array, "B N"],
+    *,
+    vlim: tuple[float, float] = (-1.0, 1.0),
+    labels: list[str] = None,
+    domain_extent: float = None,
+):
+    if states.ndim != 2:
+        raise ValueError(
+            "states must be a two-axis array. Extract the channel you want to plot."
+        )
+
+    fig, ax = plt.subplots()
+    for i, state in enumerate(states):
+        plot_state_1d(
+            state,
+            vlim=vlim,
+            domain_extent=domain_extent,
+            ax=ax,
+            label=labels[i] if labels is not None else None,
+        )
+    if len(states) % 2 == 0:
+        ax.grid()
+
+    if labels is not None:
+        ax.legend()
+    return fig
+
+
 def plot_spatio_temporal(
     trj: Float[Array, "T N"],
     *,
