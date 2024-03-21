@@ -13,7 +13,12 @@ from ._utils import (
     stack_sub_trajectories,
     wrap_bc,
 )
-from ._viz import make_animation, make_grouped_animation
+from ._viz import (
+    make_animation,
+    make_grouped_animation,
+    plot_multiple_spatio_temporal,
+    plot_spatio_temporal,
+)
 
 __all__ = [
     "BaseStepper",
@@ -26,6 +31,8 @@ __all__ = [
     "make_grid",
     "make_animation",
     "make_grouped_animation",
+    "plot_spatio_temporal",
+    "plot_multiple_spatio_temporal",
     "rollout",
     "repeat",
     "stack_sub_trajectories",

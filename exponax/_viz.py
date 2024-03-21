@@ -4,7 +4,88 @@ Utilities for visualization.
 
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
+from jaxtyping import Array, Float
 from matplotlib.animation import FuncAnimation
+
+
+def plot_spatio_temporal(
+    trj: Float[Array, "T N"],
+    *,
+    vlim: tuple[float, float] = (-1.0, 1.0),
+    ax=None,
+    domain_extent: float = None,
+    dt: float = None,
+    include_init: bool = False,
+    **kwargs,
+):
+    if trj.ndim != 2:
+        raise ValueError(
+            "trj must be a two-axis array. Extract the channel you want to plot."
+        )
+
+    if domain_extent is not None:
+        space_range = (0, domain_extent)
+    else:
+        space_range = (0, trj.shape[1] - 1)
+
+    if dt is not None:
+        time_range = (0, dt * trj.shape[0])
+        if not include_init:
+            time_range = (dt, time_range[1])
+    else:
+        time_range = (0, trj.shape[0] - 1)
+
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    im = ax.imshow(
+        trj.T,
+        vmin=vlim[0],
+        vmax=vlim[1],
+        cmap="RdBu_r",
+        origin="lower",
+        extent=(*time_range, *space_range),
+        **kwargs,
+    )
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Space")
+
+    return im
+
+
+def plot_multiple_spatio_temporal(
+    trjs: Float[Array, "B T N"],
+    *,
+    vlim: tuple[float, float] = (-1.0, 1.0),
+    grid: tuple[int, int] = (3, 3),
+    figsize: tuple[float, float] = (10, 10),
+    titles: list[str] = None,
+    domain_extent: float = None,
+    dt: float = None,
+    include_init: bool = False,
+    **kwargs,
+):
+    if trjs.ndim != 3:
+        raise ValueError(
+            "trjs must be a three-axis array. Extract the channel you want to plot."
+        )
+
+    fig, ax_s = plt.subplots(*grid, sharex=True, sharey=True, figsize=figsize)
+
+    for i, ax in enumerate(ax_s.flatten()):
+        plot_spatio_temporal(
+            trjs[i],
+            vlim=vlim,
+            ax=ax,
+            domain_extent=domain_extent,
+            dt=dt,
+            include_init=include_init,
+            **kwargs,
+        )
+        if titles is not None:
+            ax.set_title(titles[i])
+
+    return fig
 
 
 def make_animation(trj, *, vlim=(-1, 1)):
