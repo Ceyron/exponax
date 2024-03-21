@@ -7,8 +7,8 @@ from ..nonlin_fun import BaseNonlinearFun
 
 
 class GrayScottNonlinearFun(BaseNonlinearFun):
-    b: float
-    d: float
+    feed_rate: float
+    kill_rate: float
 
     def __init__(
         self,
@@ -16,16 +16,16 @@ class GrayScottNonlinearFun(BaseNonlinearFun):
         num_points: int,
         *,
         dealiasing_fraction: float,
-        b: float,
-        d: float,
+        feed_rate: float,
+        kill_rate: float,
     ):
         super().__init__(
             num_spatial_dims,
             num_points,
             dealiasing_fraction=dealiasing_fraction,
         )
-        self.b = b
-        self.d = d
+        self.feed_rate = feed_rate
+        self.kill_rate = kill_rate
 
     def __call__(
         self,
@@ -37,8 +37,8 @@ class GrayScottNonlinearFun(BaseNonlinearFun):
         u = self.ifft(self.dealias(u_hat))
         u_power = jnp.stack(
             [
-                self.b * (1 - u[0]) - u[0] * u[1] ** 2,
-                -self.d * u[1] + u[0] * u[1] ** 2,
+                self.feed_rate * (1 - u[0]) - u[0] * u[1] ** 2,
+                -(self.feed_rate + self.kill_rate) * u[1] + u[0] * u[1] ** 2,
             ]
         )
         u_power_hat = self.fft(u_power)
@@ -46,10 +46,10 @@ class GrayScottNonlinearFun(BaseNonlinearFun):
 
 
 class GrayScott(BaseStepper):
-    epsilon_1: float
-    epsilon_2: float
-    b: float
-    d: float
+    diffusivity_1: float
+    diffusivity_2: float
+    feed_rate: float
+    kill_rate: float
     dealiasing_fraction: float
 
     def __init__(
@@ -59,29 +59,24 @@ class GrayScott(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        epsilon_1: float = 0.00002,
-        epsilon_2: float = 0.00001,
-        b: float = 0.04,
-        d: float = 0.1,
+        diffusivity_1: float = 2e-5,
+        diffusivity_2: float = 1e-5,
+        feed_rate: float = 0.04,
+        kill_rate: float = 0.1,
         order: int = 2,
-        dealiasing_fraction: float = 1
-        / 2,  # Needs lower value due to cubic nonlinearity
+        # Needs lower value due to cubic nonlinearity
+        dealiasing_fraction: float = 1 / 2,
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         """
         See also this papers:
         https://www.ljll.fr/hecht/ftp/ff++/2015-cimpa-IIT/edp-tuto/Pearson.pdf
-
-        There the two parameters are called F and k, named feed rate and kill
-        rate. The arguments to this equation are such that b=F and d=F+k. The
-        paper used the domain extent of 2.5. The epsilon values (=the two
-        diffusivities) are the same.
         """
-        self.epsilon_1 = epsilon_1
-        self.epsilon_2 = epsilon_2
-        self.b = b
-        self.d = d
+        self.diffusivity_1 = diffusivity_1
+        self.diffusivity_2 = diffusivity_2
+        self.feed_rate = feed_rate
+        self.kill_rate = kill_rate
         self.dealiasing_fraction = dealiasing_fraction
         super().__init__(
             num_spatial_dims=num_spatial_dims,
@@ -101,8 +96,8 @@ class GrayScott(BaseStepper):
         laplace = build_laplace_operator(derivative_operator, order=2)
         linear_operator = jnp.concatenate(
             [
-                self.epsilon_1 * laplace,
-                self.epsilon_2 * laplace,
+                self.diffusivity_1 * laplace,
+                self.diffusivity_2 * laplace,
             ]
         )
         return linear_operator
@@ -114,7 +109,7 @@ class GrayScott(BaseStepper):
         return GrayScottNonlinearFun(
             self.num_spatial_dims,
             self.num_points,
-            b=self.b,
-            d=self.d,
+            feed_rate=self.feed_rate,
+            kill_rate=self.kill_rate,
             dealiasing_fraction=self.dealiasing_fraction,
         )
