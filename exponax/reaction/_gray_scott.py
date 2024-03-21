@@ -62,7 +62,7 @@ class GrayScott(BaseStepper):
         diffusivity_1: float = 2e-5,
         diffusivity_2: float = 1e-5,
         feed_rate: float = 0.04,
-        kill_rate: float = 0.1,
+        kill_rate: float = 0.06,
         order: int = 2,
         # Needs lower value due to cubic nonlinearity
         dealiasing_fraction: float = 1 / 2,
