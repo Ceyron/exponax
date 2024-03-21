@@ -2,10 +2,13 @@
 Utilities for visualization.
 """
 
+import jax
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
 from jaxtyping import Array, Float
 from matplotlib.animation import FuncAnimation
+
+from ._utils import wrap_bc
 
 
 def plot_spatio_temporal(
@@ -23,27 +26,30 @@ def plot_spatio_temporal(
             "trj must be a two-axis array. Extract the channel you want to plot."
         )
 
+    trj_wrapped = jax.vmap(wrap_bc)(trj)
+
     if domain_extent is not None:
         space_range = (0, domain_extent)
     else:
-        space_range = (0, trj.shape[1] - 1)
+        space_range = (0, trj_wrapped.shape[1] - 1)
 
     if dt is not None:
-        time_range = (0, dt * trj.shape[0])
+        time_range = (0, dt * trj_wrapped.shape[0])
         if not include_init:
             time_range = (dt, time_range[1])
     else:
-        time_range = (0, trj.shape[0] - 1)
+        time_range = (0, trj_wrapped.shape[0] - 1)
 
     if ax is None:
         fig, ax = plt.subplots()
 
     im = ax.imshow(
-        trj.T,
+        trj_wrapped.T,
         vmin=vlim[0],
         vmax=vlim[1],
         cmap="RdBu_r",
         origin="lower",
+        aspect="auto",
         extent=(*time_range, *space_range),
         **kwargs,
     )
