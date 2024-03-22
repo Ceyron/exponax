@@ -1,4 +1,4 @@
-from typing import TypeVar
+from typing import TypeVar, Union
 
 import jax
 import matplotlib.pyplot as plt
@@ -75,7 +75,7 @@ def plot_state_1d_facet(
 
 
 def plot_spatio_temporal(
-    trj: Float[Array, "T N"],
+    trj: Float[Array, "T 1 N"],
     *,
     vlim: tuple[float, float] = (-1.0, 1.0),
     ax=None,
@@ -84,10 +84,8 @@ def plot_spatio_temporal(
     include_init: bool = False,
     **kwargs,
 ):
-    if trj.ndim != 2:
-        raise ValueError(
-            "trj must be a two-axis array. Extract the channel you want to plot."
-        )
+    if trj.ndim != 3:
+        raise ValueError("trj must be a two-axis array.")
 
     trj_wrapped = jax.vmap(wrap_bc)(trj)
 
@@ -124,8 +122,9 @@ def plot_spatio_temporal(
 
 
 def plot_spatio_temporal_facet(
-    trjs: Float[Array, "B T N"],
+    trjs: Union[Float[Array, "T C N"], Float[Array, "B T 1 N"]],
     *,
+    facet_over_channels: bool = True,
     vlim: tuple[float, float] = (-1.0, 1.0),
     grid: tuple[int, int] = (3, 3),
     figsize: tuple[float, float] = (10, 10),
@@ -135,16 +134,22 @@ def plot_spatio_temporal_facet(
     include_init: bool = False,
     **kwargs,
 ):
-    if trjs.ndim != 3:
-        raise ValueError(
-            "trjs must be a three-axis array. Extract the channel you want to plot."
-        )
+    if facet_over_channels:
+        if trjs.ndim != 3:
+            raise ValueError("trjs must be a three-axis array.")
+    else:
+        if trjs.ndim != 4:
+            raise ValueError("trjs must be a four-axis array.")
 
     fig, ax_s = plt.subplots(*grid, sharex=True, sharey=True, figsize=figsize)
 
     for i, ax in enumerate(ax_s.flatten()):
+        if facet_over_channels:
+            single_trj = trjs[:, i : i + 1]
+        else:
+            single_trj = trjs[i]
         plot_spatio_temporal(
-            trjs[i],
+            single_trj,
             vlim=vlim,
             ax=ax,
             domain_extent=domain_extent,

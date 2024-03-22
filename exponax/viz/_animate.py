@@ -1,17 +1,17 @@
-from typing import TypeVar
+from typing import TypeVar, Union
 
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
 from jaxtyping import Array, Float
 from matplotlib.animation import FuncAnimation
 
-from ._plot import plot_state_1d
+from ._plot import plot_spatio_temporal, plot_state_1d
 
 N = TypeVar("N")
 
 
 def animate_state_1d(
-    trj: Float[Array, "T B N"],
+    trj: Float[Array, "T C N"],
     *,
     vlim: tuple[float, float] = (-1, 1),
     domain_extent: float = None,
@@ -54,6 +54,99 @@ def animate_state_1d(
     ani = FuncAnimation(fig, animate, frames=trj.shape[0], interval=100, blit=False)
 
     return ani
+
+
+def animate_state_1d_facet(
+    trj: Float[Array, "T B C N"],
+    *,
+    vlim: tuple[float, float] = (-1.0, 1.0),
+    labels: list[str] = None,
+    titles: list[str] = None,
+    domain_extent: float = None,
+    grid: tuple[int, int] = (3, 3),
+    figsize: tuple[float, float] = (10, 10),
+    **kwargs,
+):
+    if trj.ndim != 4:
+        raise ValueError("states must be a four-axis array.")
+
+    fig, ax_s = plt.subplots(*grid, figsize=figsize)
+
+    for i, ax in enumerate(ax_s.flatten()):
+        plot_state_1d(
+            trj[i],
+            vlim=vlim,
+            domain_extent=domain_extent,
+            labels=labels,
+            ax=ax,
+            **kwargs,
+        )
+        if titles is not None:
+            ax.set_title(titles[i])
+
+    return fig
+
+
+def animate_spatio_temporal(
+    trjs: Float[Array, "S T C N"],
+    *,
+    vlim: tuple[float, float] = (-1.0, 1.0),
+    domain_extent: float = None,
+    dt: float = None,
+    include_init: bool = False,
+    **kwargs,
+):
+    fig, ax = plt.subplots()
+
+    plot_spatio_temporal(
+        trjs[0],
+        vlim=vlim,
+        domain_extent=domain_extent,
+        dt=dt,
+        include_init=include_init,
+        ax=ax,
+        **kwargs,
+    )
+
+    def animate(i):
+        ax.clear()
+        plot_spatio_temporal(
+            trjs[i],
+            vlim=vlim,
+            domain_extent=domain_extent,
+            dt=dt,
+            include_init=include_init,
+            ax=ax,
+            **kwargs,
+        )
+
+    plt.close(fig)
+
+    ani = FuncAnimation(fig, animate, frames=trjs.shape[0], interval=100, blit=False)
+
+    return ani
+
+
+def animate_spatial_temporal_facet(
+    trjs: Union[Float[Array, "S T C N"], Float[Array, "B S T 1 N"]],
+    *,
+    facet_over_channels: bool = True,
+    vlim: tuple[float, float] = (-1.0, 1.0),
+    domain_extent: float = None,
+    dt: float = None,
+    include_init: bool = False,
+    grid: tuple[int, int] = (3, 3),
+    figsize: tuple[float, float] = (10, 10),
+    **kwargs,
+):
+    if facet_over_channels:
+        if trjs.ndim != 4:
+            raise ValueError("trjs must be a four-axis array.")
+    else:
+        if trjs.ndim != 5:
+            raise ValueError("states must be a five-axis array.")
+    # TODO
+    pass
 
 
 def animate_state_2d(trj, *, vlim=(-1, 1)):
