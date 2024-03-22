@@ -11,12 +11,14 @@ from ._plot import (
     plot_spatio_temporal,
     plot_spatio_temporal_facet,
     plot_state_1d,
+    plot_state_1d_facet,
     plot_state_2d,
     plot_state_2d_facet,
 )
 
 __all__ = [
     "plot_state_1d",
+    "plot_state_1d_facet",
     "plot_state_2d",
     "plot_spatio_temporal",
     "plot_state_2d_facet",
