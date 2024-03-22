@@ -43,7 +43,7 @@ def plot_state_1d(
     return p
 
 
-def plot_multiple_state_1d(
+def plot_state_1d_facet(
     states: Float[Array, "B C N"],
     *,
     vlim: tuple[float, float] = (-1.0, 1.0),
@@ -123,7 +123,7 @@ def plot_spatio_temporal(
     return im
 
 
-def plot_multiple_spatio_temporal(
+def plot_spatio_temporal_facet(
     trjs: Float[Array, "B T N"],
     *,
     vlim: tuple[float, float] = (-1.0, 1.0),
@@ -191,7 +191,7 @@ def plot_state_2d(
     return im
 
 
-def plot_multiple_states_2d(
+def plot_state_2d_facet(
     states: Float[Array, "B 1 N N"],
     *,
     vlim: tuple[float, float] = (-1.0, 1.0),

@@ -6,22 +6,22 @@ You do not have to use them, as all states are pure jax arrays, plotting with
 any library is straightforward.
 """
 
-from ._animate import make_animation, make_animation_1d, make_grouped_animation
+from ._animate import animate_state_1d, animate_state_2d, animate_state_2d_facet
 from ._plot import (
-    plot_multiple_spatio_temporal,
-    plot_multiple_states_2d,
     plot_spatio_temporal,
+    plot_spatio_temporal_facet,
     plot_state_1d,
     plot_state_2d,
+    plot_state_2d_facet,
 )
 
 __all__ = [
     "plot_state_1d",
     "plot_state_2d",
     "plot_spatio_temporal",
-    "plot_multiple_states_2d",
-    "plot_multiple_spatio_temporal",
-    "make_animation",
-    "make_animation_1d",
-    "make_grouped_animation",
+    "plot_state_2d_facet",
+    "plot_spatio_temporal_facet",
+    "animate_state_2d",
+    "animate_state_1d",
+    "animate_state_2d_facet",
 ]

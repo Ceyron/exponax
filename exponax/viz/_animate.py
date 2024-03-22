@@ -10,7 +10,7 @@ from ._plot import plot_state_1d
 N = TypeVar("N")
 
 
-def make_animation_1d(
+def animate_state_1d(
     trj: Float[Array, "T B N"],
     *,
     vlim: tuple[float, float] = (-1, 1),
@@ -56,7 +56,7 @@ def make_animation_1d(
     return ani
 
 
-def make_animation(trj, *, vlim=(-1, 1)):
+def animate_state_2d(trj, *, vlim=(-1, 1)):
     fig, ax = plt.subplots()
     im = ax.imshow(
         trj[0].squeeze().T, vmin=vlim[0], vmax=vlim[1], cmap="RdBu_r", origin="lower"
@@ -75,7 +75,7 @@ def make_animation(trj, *, vlim=(-1, 1)):
     return ani
 
 
-def make_grouped_animation(
+def animate_state_2d_facet(
     trj, *, vlim=(-1, 1), grid=(3, 3), figsize=(10, 10), titles=None
 ):
     """
