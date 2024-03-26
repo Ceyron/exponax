@@ -3,7 +3,7 @@ from jaxtyping import Array
 
 from .._base_stepper import BaseStepper
 from ..nonlin_fun import ZeroNonlinearFun
-from ._utils import extract_coefficients_from_difficulty
+from ._utils import extract_normalized_coefficients_from_difficulty
 
 
 class NormalizedLinearStepper(BaseStepper):
@@ -68,7 +68,7 @@ class DifficultyLinearStepper(NormalizedLinearStepper):
         in one spatial dimension.
         """
         self.difficulties = difficulties
-        normalized_coefficients = extract_coefficients_from_difficulty(
+        normalized_coefficients = extract_normalized_coefficients_from_difficulty(
             difficulties,
             num_spatial_dims=num_spatial_dims,
             num_points=num_points,

@@ -133,7 +133,7 @@ def denormalize_polynomial_scales(
     return polynomial_scales
 
 
-def reduce_coefficients_to_difficulty(
+def reduce_normalized_coefficients_to_difficulty(
     normalized_coefficients: tuple[float, ...],
     *,
     num_spatial_dims: int,
@@ -149,7 +149,7 @@ def reduce_coefficients_to_difficulty(
     return difficulty_coefficients
 
 
-def extract_coefficients_from_difficulty(
+def extract_normalized_coefficients_from_difficulty(
     difficulty_coefficients: tuple[float, ...],
     *,
     num_spatial_dims: int,

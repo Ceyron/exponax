@@ -17,12 +17,12 @@ from ._utils import (
     denormalize_convection_scale,
     denormalize_gradient_norm_scale,
     denormalize_polynomial_scales,
-    extract_coefficients_from_difficulty,
+    extract_normalized_coefficients_from_difficulty,
     normalize_coefficients,
     normalize_convection_scale,
     normalize_gradient_norm_scale,
     normalize_polynomial_scales,
-    reduce_coefficients_to_difficulty,
+    reduce_normalized_coefficients_to_difficulty,
 )
 from ._vorticity_convection import NormalizedVorticityConvection
 
@@ -42,6 +42,6 @@ __all__ = [
     "normalize_convection_scale",
     "normalize_gradient_norm_scale",
     "normalize_polynomial_scales",
-    "reduce_coefficients_to_difficulty",
-    "extract_coefficients_from_difficulty",
+    "reduce_normalized_coefficients_to_difficulty",
+    "extract_normalized_coefficients_from_difficulty",
 ]
