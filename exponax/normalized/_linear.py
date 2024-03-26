@@ -3,6 +3,7 @@ from jaxtyping import Array
 
 from .._base_stepper import BaseStepper
 from ..nonlin_fun import ZeroNonlinearFun
+from ._utils import extract_coefficients_from_difficulty
 
 
 class NormalizedLinearStepper(BaseStepper):
@@ -49,4 +50,32 @@ class NormalizedLinearStepper(BaseStepper):
         return ZeroNonlinearFun(
             num_spatial_dims=self.num_spatial_dims,
             num_points=self.num_points,
+        )
+
+
+class DifficultyLinearStepper(NormalizedLinearStepper):
+    difficulties: tuple[float, ...]
+
+    def __init__(
+        self,
+        *,
+        difficulties: tuple[float, ...] = (0.0, -2.0),
+        num_spatial_dims: int = 1,
+        num_points: int = 48,
+    ):
+        """
+        By default: Advection equation with CFL number 2 on 48 points resolution
+        in one spatial dimension.
+        """
+        self.difficulties = difficulties
+        normalized_coefficients = extract_coefficients_from_difficulty(
+            difficulties,
+            num_spatial_dims=num_spatial_dims,
+            num_points=num_points,
+        )
+
+        super().__init__(
+            num_spatial_dims=num_spatial_dims,
+            num_points=num_points,
+            normalized_coefficients=normalized_coefficients,
         )

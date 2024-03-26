@@ -131,3 +131,35 @@ def denormalize_polynomial_scales(
     """
     polynomial_scales = tuple(c_n / dt for c_n in normalized_polynomial_scales)
     return polynomial_scales
+
+
+def reduce_coefficients_to_difficulty(
+    normalized_coefficients: tuple[float, ...],
+    *,
+    num_spatial_dims: int,
+    num_points: int,
+):
+    difficulty_coefficients = list(
+        alpha * num_points**j * 2 ** (j - 1) * num_spatial_dims
+        for j, alpha in enumerate(normalized_coefficients)
+    )
+    difficulty_coefficients[0] = normalized_coefficients[0]
+
+    difficulty_coefficients = tuple(difficulty_coefficients)
+    return difficulty_coefficients
+
+
+def extract_coefficients_from_difficulty(
+    difficulty_coefficients: tuple[float, ...],
+    *,
+    num_spatial_dims: int,
+    num_points: int,
+):
+    normalized_coefficients = list(
+        gamma / (num_points**j * 2 ** (j - 1) * num_spatial_dims)
+        for j, gamma in enumerate(difficulty_coefficients)
+    )
+    normalized_coefficients[0] = difficulty_coefficients[0]
+
+    normalized_coefficients = tuple(normalized_coefficients)
+    return normalized_coefficients
