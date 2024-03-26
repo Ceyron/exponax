@@ -1,3 +1,12 @@
+"""
+Submodule for timesteppers with normalized dynamics. Those steppers operate on
+unit dynamics, i.e., `domain_extent = 1.0` and `dt = 1.0`. As such, the
+constitutive coefficients are normalized. One has to supply fewer arguments to
+uniquely describe a dyanamics.
+
+Additionally, there are Difficulty steppers that interface the same concept
+slightly differently.
+"""
 from ._convection import NormalizedConvectionStepper
 from ._general_nonlinear import NormlizedGeneralNonlinearStepper
 from ._gradient_norm import NormalizedGradientNormStepper
