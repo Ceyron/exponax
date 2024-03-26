@@ -163,3 +163,29 @@ def extract_normalized_coefficients_from_difficulty(
 
     normalized_coefficients = tuple(normalized_coefficients)
     return normalized_coefficients
+
+
+def reduce_normalized_convection_scale_to_difficulty(
+    normalized_convection_scale: float,
+    *,
+    num_spatial_dims: int,
+    num_points: int,
+    maximum_absolute: float,
+):
+    difficulty_convection_scale = (
+        normalized_convection_scale * maximum_absolute * num_points * num_spatial_dims
+    )
+    return difficulty_convection_scale
+
+
+def extract_normalized_convection_scale_from_difficulty(
+    difficulty_convection_scale: float,
+    *,
+    num_spatial_dims: int,
+    num_points: int,
+    maximum_absolute: float,
+):
+    normalized_convection_scale = difficulty_convection_scale / (
+        maximum_absolute * num_points * num_spatial_dims
+    )
+    return normalized_convection_scale
