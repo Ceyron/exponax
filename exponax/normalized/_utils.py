@@ -189,3 +189,32 @@ def extract_normalized_convection_scale_from_difficulty(
         maximum_absolute * num_points * num_spatial_dims
     )
     return normalized_convection_scale
+
+
+def reduce_normalized_gradient_norm_scale_to_difficulty(
+    normalized_gradient_norm_scale: float,
+    *,
+    num_spatial_dims: int,
+    num_points: int,
+    maximum_absolute: float,
+):
+    difficulty_gradient_norm_scale = (
+        normalized_gradient_norm_scale
+        * maximum_absolute
+        * jnp.square(num_points)
+        * num_spatial_dims
+    )
+    return difficulty_gradient_norm_scale
+
+
+def extract_normalized_gradient_norm_scale_from_difficulty(
+    difficulty_gradient_norm_scale: float,
+    *,
+    num_spatial_dims: int,
+    num_points: int,
+    maximum_absolute: float,
+):
+    normalized_gradient_norm_scale = difficulty_gradient_norm_scale / (
+        maximum_absolute * jnp.square(num_points) * num_spatial_dims
+    )
+    return normalized_gradient_norm_scale

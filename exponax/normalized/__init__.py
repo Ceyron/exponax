@@ -9,7 +9,7 @@ slightly differently.
 """
 from ._convection import DifficultyConvectionStepper, NormalizedConvectionStepper
 from ._general_nonlinear import NormlizedGeneralNonlinearStepper
-from ._gradient_norm import NormalizedGradientNormStepper
+from ._gradient_norm import DifficultyGradientNormStepper, NormalizedGradientNormStepper
 from ._linear import (
     DifficultyLinearStepper,
     DiffultyLinearStepperSimple,
@@ -23,12 +23,14 @@ from ._utils import (
     denormalize_polynomial_scales,
     extract_normalized_coefficients_from_difficulty,
     extract_normalized_convection_scale_from_difficulty,
+    extract_normalized_gradient_norm_scale_from_difficulty,
     normalize_coefficients,
     normalize_convection_scale,
     normalize_gradient_norm_scale,
     normalize_polynomial_scales,
     reduce_normalized_coefficients_to_difficulty,
     reduce_normalized_convection_scale_to_difficulty,
+    reduce_normalized_gradient_norm_scale_to_difficulty,
 )
 from ._vorticity_convection import NormalizedVorticityConvection
 
@@ -36,6 +38,7 @@ __all__ = [
     "DifficultyLinearStepper",
     "DiffultyLinearStepperSimple",
     "DifficultyConvectionStepper",
+    "DifficultyGradientNormStepper",
     "NormalizedConvectionStepper",
     "NormlizedGeneralNonlinearStepper",
     "NormalizedGradientNormStepper",
@@ -54,4 +57,6 @@ __all__ = [
     "extract_normalized_coefficients_from_difficulty",
     "reduce_normalized_convection_scale_to_difficulty",
     "extract_normalized_convection_scale_from_difficulty",
+    "reduce_normalized_gradient_norm_scale_to_difficulty",
+    "extract_normalized_gradient_norm_scale_from_difficulty",
 ]
