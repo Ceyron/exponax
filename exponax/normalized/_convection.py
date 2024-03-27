@@ -77,8 +77,8 @@ class DifficultyConvectionStepper(NormalizedConvectionStepper):
     def __init__(
         self,
         *,
-        linear_difficulties: tuple[float, ...] = (0.0, 0.0, 0.1),
-        convection_difficulty: float = 0.1 * 1.0 * 48,
+        linear_difficulties: tuple[float, ...] = (0.0, 0.0, 4.5),
+        convection_difficulty: float = 5.0,
         num_spatial_dims: int = 1,
         num_points: int = 48,
         maximum_absolute: float = 1.0,
@@ -88,11 +88,8 @@ class DifficultyConvectionStepper(NormalizedConvectionStepper):
         circle_radius: float = 1.0,
     ):
         """
-        By default: Behaves like a Burgers with
+        By default: Behaves like a Burgers
 
-        ``` Burgers(
-            D=D, L=1, N=N, dt=0.1, diffusivity=0.01,
-        )
         """
         self.linear_difficulties = linear_difficulties
         self.convection_difficulty = convection_difficulty
