@@ -58,10 +58,10 @@ class DifficultyLinearStepper(NormalizedLinearStepper):
 
     def __init__(
         self,
-        *,
-        difficulties: tuple[float, ...] = (0.0, -2.0),
         num_spatial_dims: int = 1,
         num_points: int = 48,
+        *,
+        difficulties: tuple[float, ...] = (0.0, -2.0),
     ):
         """
         By default: Advection equation with CFL number 2 on 48 points resolution
@@ -84,11 +84,11 @@ class DifficultyLinearStepper(NormalizedLinearStepper):
 class DiffultyLinearStepperSimple(DifficultyLinearStepper):
     def __init__(
         self,
+        num_spatial_dims: int = 1,
+        num_points: int = 48,
         *,
         difficulty: float = -2.0,
         order: int = 1,
-        num_spatial_dims: int = 1,
-        num_points: int = 48,
     ):
         difficulties = (0.0,) * (order - 1) + (difficulty,)
         super().__init__(

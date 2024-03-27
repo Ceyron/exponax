@@ -76,11 +76,11 @@ class DifficultyConvectionStepper(NormalizedConvectionStepper):
 
     def __init__(
         self,
+        num_spatial_dims: int = 1,
+        num_points: int = 48,
         *,
         linear_difficulties: tuple[float, ...] = (0.0, 0.0, 4.5),
         convection_difficulty: float = 5.0,
-        num_spatial_dims: int = 1,
-        num_points: int = 48,
         maximum_absolute: float = 1.0,
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,
