@@ -2,7 +2,12 @@ import equinox as eqx
 import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
 
-from ._spectral import build_derivative_operator, build_laplace_operator, spatial_shape
+from ._spectral import (
+    build_derivative_operator,
+    build_laplace_operator,
+    space_indices,
+    spatial_shape,
+)
 
 
 class Poisson(eqx.Module):
@@ -85,9 +90,13 @@ class Poisson(eqx.Module):
         **Returns:**
             - `u`: The solution.
         """
-        f_hat = jnp.fft.rfft(f)
+        f_hat = jnp.fft.rfftn(f, axes=space_indices(self.num_spatial_dims))
         u_hat = self.step_fourier(f_hat)
-        u = jnp.fft.irfft(u_hat, self.num_points)
+        u = jnp.fft.irfftn(
+            u_hat,
+            axes=space_indices(self.num_spatial_dims),
+            s=spatial_shape(self.num_spatial_dims, self.num_points),
+        )
         return u
 
     def __call__(
