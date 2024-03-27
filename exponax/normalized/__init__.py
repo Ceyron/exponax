@@ -10,7 +10,11 @@ slightly differently.
 from ._convection import DifficultyConvectionStepper, NormalizedConvectionStepper
 from ._general_nonlinear import NormlizedGeneralNonlinearStepper
 from ._gradient_norm import NormalizedGradientNormStepper
-from ._linear import DifficultyLinearStepper, NormalizedLinearStepper
+from ._linear import (
+    DifficultyLinearStepper,
+    DiffultyLinearStepperSimple,
+    NormalizedLinearStepper,
+)
 from ._polynomial import NormalizedPolynomialStepper
 from ._utils import (
     denormalize_coefficients,
@@ -30,6 +34,7 @@ from ._vorticity_convection import NormalizedVorticityConvection
 
 __all__ = [
     "DifficultyLinearStepper",
+    "DiffultyLinearStepperSimple",
     "DifficultyConvectionStepper",
     "NormalizedConvectionStepper",
     "NormlizedGeneralNonlinearStepper",

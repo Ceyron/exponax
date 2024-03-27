@@ -79,3 +79,20 @@ class DifficultyLinearStepper(NormalizedLinearStepper):
             num_points=num_points,
             normalized_coefficients=normalized_coefficients,
         )
+
+
+class DiffultyLinearStepperSimple(DifficultyLinearStepper):
+    def __init__(
+        self,
+        *,
+        difficulty: float = -2.0,
+        order: int = 1,
+        num_spatial_dims: int = 1,
+        num_points: int = 48,
+    ):
+        difficulties = (0.0,) * (order - 1) + (difficulty,)
+        super().__init__(
+            difficulties=difficulties,
+            num_spatial_dims=num_spatial_dims,
+            num_points=num_points,
+        )
