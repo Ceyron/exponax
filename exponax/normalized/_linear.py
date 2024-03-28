@@ -90,7 +90,7 @@ class DiffultyLinearStepperSimple(DifficultyLinearStepper):
         difficulty: float = -2.0,
         order: int = 1,
     ):
-        difficulties = (0.0,) * (order - 1) + (difficulty,)
+        difficulties = (0.0,) * (order) + (difficulty,)
         super().__init__(
             difficulties=difficulties,
             num_spatial_dims=num_spatial_dims,
