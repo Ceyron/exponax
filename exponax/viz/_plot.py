@@ -16,8 +16,36 @@ def plot_state_1d(
     domain_extent: float = None,
     labels: list[str] = None,
     ax=None,
+    xlabel: str = "Space",
+    ylabel: str = "Value",
     **kwargs,
 ):
+    """
+    Plot the state of a 1d field.
+
+    Requires the input to be a real array with two axis: a leading channel axis
+    and a spatial axis.
+
+    **Arguments:**
+
+    - `state`: The state to plot as a two axis array. If there is more than one
+        dimension in the first axis (i.e., multiple channels) then each channel
+        will be plotted in a different color. Use the `labels` argument to
+        provide a legend.
+    - `vlim`: The limits of the y-axis.
+    - `domain_extent`: The extent of the spatial domain. If not provided, the
+        domain extent will be the number of points in the spatial axis. This
+        adjusts the x-axis.
+    - `labels`: The labels for the legend. This should be a list of strings with
+        the same length as the number of channels.
+    - `ax`: The axis to plot on. If not provided, a new figure will be created.
+    - `**kwargs`: Additional arguments to pass to the plot function.
+
+    **Returns:**
+
+    - If `ax` is not provided, returns a tuple with the figure, axis, and plot
+        object. Otherwise, returns the plot object.
+    """
     if state.ndim != 2:
         raise ValueError("state must be a two-axis array.")
 
@@ -39,8 +67,13 @@ def plot_state_1d(
     ax.grid()
     if labels is not None:
         ax.legend()
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
 
-    return p
+    if ax is None:
+        return fig, ax, p
+    else:
+        return p
 
 
 def plot_state_1d_facet(
@@ -54,22 +87,61 @@ def plot_state_1d_facet(
     figsize: tuple[float, float] = (10, 10),
     **kwargs,
 ):
+    """
+    Plot a facet of 1d states.
+
+    Requires the input to be a real array with three axis: a leading batch axis,
+    a channel axis, and a spatial axis. Dimensions in the batch axis will be
+    distributed over the individual plots. Dimensions in the channel axis will
+    be plotted in different colors.
+
+    **Arguments:**
+
+    - `states`: The states to plot as a three axis array. If there is more than
+        one dimension in the channel axis (i.e., multiple channels) then each
+        channel will be plotted in a different color. Use the `labels` argument
+        to provide a legend. Use the `titles` argument to provide titles for each
+        plot.
+    - `vlim`: The limits of the y-axis.
+    - `labels`: The labels for the legend. This should be a list of strings with
+        the same length as the number of channels.
+    - `titles`: The titles for each plot. This should be a list of strings with
+        the same length as the number of states.
+    - `domain_extent`: The extent of the spatial domain. If not provided, the
+        domain extent will be the number of points in the spatial axis. This
+        adjusts the x-axis.
+    - `grid`: The grid layout for the facet plot. This should be a tuple with
+        two integers. If the number of states is less than the product of the
+        grid, the remaining axes will be removed.
+    - `figsize`: The size of the figure.
+    - `**kwargs`: Additional arguments to pass to the plot
+        function.
+
+    **Returns:**
+
+    - The figure.
+    """
     if states.ndim != 3:
         raise ValueError("states must be a three-axis array.")
 
     fig, ax_s = plt.subplots(*grid, figsize=figsize)
 
+    num_batches = states.shape[0]
+
     for i, ax in enumerate(ax_s.flatten()):
-        plot_state_1d(
-            states[i],
-            vlim=vlim,
-            domain_extent=domain_extent,
-            labels=labels,
-            ax=ax,
-            **kwargs,
-        )
-        if titles is not None:
-            ax.set_title(titles[i])
+        if i < num_batches:
+            plot_state_1d(
+                states[i],
+                vlim=vlim,
+                domain_extent=domain_extent,
+                labels=labels,
+                ax=ax,
+                **kwargs,
+            )
+            if titles is not None:
+                ax.set_title(titles[i])
+        else:
+            ax.remove()
 
     return fig
 
