@@ -269,8 +269,9 @@ def plot_state_2d(
 
 
 def plot_state_2d_facet(
-    states: Float[Array, "B 1 N N"],
+    states: Union[Float[Array, "B N N"], Float[Array, "B 1 N N"]],
     *,
+    facet_over_channels: bool = True,
     vlim: tuple[float, float] = (-1.0, 1.0),
     grid: tuple[int, int] = (3, 3),
     figsize: tuple[float, float] = (10, 10),
@@ -278,8 +279,12 @@ def plot_state_2d_facet(
     domain_extent: float = None,
     **kwargs,
 ):
-    if states.ndim != 4:
-        raise ValueError("states must be a four-axis array.")
+    if facet_over_channels:
+        if states.ndim != 3:
+            raise ValueError("states must be a three-axis array.")
+    else:
+        if states.ndim != 4:
+            raise ValueError("states must be a four-axis array.")
 
     fig, ax_s = plt.subplots(*grid, sharex=True, sharey=True, figsize=figsize)
 
