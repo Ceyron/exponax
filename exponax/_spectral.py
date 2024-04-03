@@ -343,7 +343,7 @@ def low_pass_filter_mask(
     **Arguments:**
         - `num_spatial_dims`: The number of spatial dimensions.
         - `num_points`: The number of points in each spatial dimension.
-        - `cutoff`: The cutoff wavenumber.
+        - `cutoff`: The cutoff wavenumber. This is inclusive.
         - `axis_separate`: Whether to apply the cutoff to each axis separately.
           Default is `True`.
         - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
