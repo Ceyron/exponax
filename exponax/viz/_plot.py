@@ -106,7 +106,7 @@ def plot_spatio_temporal(
         fig, ax = plt.subplots()
 
     im = ax.imshow(
-        trj_wrapped.T,
+        trj_wrapped[:, 0, :].T,
         vmin=vlim[0],
         vmax=vlim[1],
         cmap="RdBu_r",
