@@ -17,7 +17,14 @@ All plotting routines (three main routines and their three facet counterparts)
 can be animated over another axis (some notion of time).
 """
 
-from ._animate import animate_state_1d, animate_state_2d, animate_state_2d_facet
+from ._animate import (
+    animate_spatial_temporal_facet,
+    animate_spatio_temporal,
+    animate_state_1d,
+    animate_state_1d_facet,
+    animate_state_2d,
+    animate_state_2d_facet,
+)
 from ._plot import (
     plot_spatio_temporal,
     plot_spatio_temporal_facet,
@@ -27,6 +34,8 @@ from ._plot import (
     plot_state_2d_facet,
 )
 
+# from IPython.display import HTML
+
 __all__ = [
     "plot_state_1d",
     "plot_state_1d_facet",
@@ -34,7 +43,10 @@ __all__ = [
     "plot_spatio_temporal",
     "plot_state_2d_facet",
     "plot_spatio_temporal_facet",
-    "animate_state_2d",
     "animate_state_1d",
+    "animate_state_1d_facet",
+    "animate_state_2d",
     "animate_state_2d_facet",
+    "animate_spatio_temporal",
+    "animate_spatial_temporal_facet",
 ]
