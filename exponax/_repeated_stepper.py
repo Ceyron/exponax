@@ -19,7 +19,7 @@ class RepeatedStepper(eqx.Module):
     def __init__(
         self,
         stepper: BaseStepper,
-        n_sub_steps: int,
+        num_sub_steps: int,
     ):
         """
         Sugarcoat the utility function `repeat` in a callable PyTree for easy
@@ -28,18 +28,18 @@ class RepeatedStepper(eqx.Module):
         One intended usage is to get "more accurate" or "more stable" time steppers
         that perform substeps.
 
-        The effective time step is `self.stepper.dt * self.n_sub_steps`. In order to
+        The effective time step is `self.stepper.dt * self.num_sub_steps`. In order to
         get a time step of X with Y substeps, first instantiate a stepper with a
-        time step of X/Y and then wrap it in a RepeatedStepper with n_sub_steps=Y.
+        time step of X/Y and then wrap it in a RepeatedStepper with num_sub_steps=Y.
 
         **Arguments:**
             - `stepper`: The stepper to repeat.
-            - `n_sub_steps`: The number of substeps to perform.
+            - `num_sub_steps`: The number of substeps to perform.
         """
         self.stepper = stepper
-        self.num_sub_steps = n_sub_steps
+        self.num_sub_steps = num_sub_steps
 
-        self.dt = stepper.dt * n_sub_steps
+        self.dt = stepper.dt * num_sub_steps
 
         self.num_spatial_dims = stepper.num_spatial_dims
         self.domain_extent = stepper.domain_extent
@@ -52,7 +52,7 @@ class RepeatedStepper(eqx.Module):
         u: Float[Array, "C ... N"],
     ) -> Float[Array, "C ... N"]:
         """
-        Step the PDE forward in time by self.n_sub_steps time steps given the
+        Step the PDE forward in time by self.num_sub_steps time steps given the
         current state `u`.
         """
         return repeat(self.stepper.step, self.num_sub_steps)(u)
@@ -62,7 +62,7 @@ class RepeatedStepper(eqx.Module):
         u_hat: Complex[Array, "C ... (N//2)+1"],
     ) -> Complex[Array, "C ... (N//2)+1"]:
         """
-        Step the PDE forward in time by self.n_sub_steps time steps given the
+        Step the PDE forward in time by self.num_sub_steps time steps given the
         current state `u_hat` in real-valued Fourier space.
         """
         return repeat(self.stepper.step_fourier, self.num_sub_steps)(u_hat)
@@ -72,7 +72,7 @@ class RepeatedStepper(eqx.Module):
         u: Float[Array, "C ... N"],
     ) -> Float[Array, "C ... N"]:
         """
-        Step the PDE forward in time by self.n_sub_steps time steps given the
+        Step the PDE forward in time by self.num_sub_steps time steps given the
         current state `u`.
         """
         return repeat(self.stepper, self.num_sub_steps)(u)
