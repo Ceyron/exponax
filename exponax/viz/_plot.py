@@ -1,6 +1,7 @@
 from typing import TypeVar, Union
 
 import jax
+import jax.numpy as jnp
 import matplotlib.pyplot as plt
 from jaxtyping import Array, Float
 
@@ -215,11 +216,14 @@ def plot_spatio_temporal_facet(
 
     fig, ax_s = plt.subplots(*grid, sharex=True, sharey=True, figsize=figsize)
 
+    if facet_over_channels:
+        trjs = jnp.swapaxes(trjs, 0, 1)
+        trjs = trjs[:, :, None, :]
+
+    num_subplots = trjs.shape[0]
+
     for i, ax in enumerate(ax_s.flatten()):
-        if facet_over_channels:
-            single_trj = trjs[:, i : i + 1]
-        else:
-            single_trj = trjs[i]
+        single_trj = trjs[i]
         plot_spatio_temporal(
             single_trj,
             vlim=vlim,
@@ -229,8 +233,11 @@ def plot_spatio_temporal_facet(
             include_init=include_init,
             **kwargs,
         )
-        if titles is not None:
-            ax.set_title(titles[i])
+        if i >= num_subplots:
+            ax.remove()
+        else:
+            if titles is not None:
+                ax.set_title(titles[i])
 
     return fig
 
