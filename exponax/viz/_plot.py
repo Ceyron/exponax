@@ -298,6 +298,8 @@ def plot_state_2d_facet(
 
     fig, ax_s = plt.subplots(*grid, sharex=True, sharey=True, figsize=figsize)
 
+    num_subplots = states.shape[0]
+
     for i, ax in enumerate(ax_s.flatten()):
         plot_state_2d(
             states[i],
@@ -306,7 +308,10 @@ def plot_state_2d_facet(
             domain_extent=domain_extent,
             **kwargs,
         )
-        if titles is not None:
-            ax.set_title(titles[i])
+        if i >= num_subplots:
+            ax.remove()
+        else:
+            if titles is not None:
+                ax.set_title(titles[i])
 
     return fig
