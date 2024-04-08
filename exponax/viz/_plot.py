@@ -249,11 +249,13 @@ def plot_state_2d(
         # One more because we wrapped the BC
         space_range = (0, state.shape[-1])
 
+    state_wrapped = wrap_bc(state)
+
     if ax is None:
         fig, ax = plt.subplots()
 
     im = ax.imshow(
-        state.T,
+        state_wrapped.T,
         vmin=vlim[0],
         vmax=vlim[1],
         cmap="RdBu_r",
@@ -264,6 +266,7 @@ def plot_state_2d(
     )
     ax.set_xlabel("x_0")
     ax.set_ylabel("x_1")
+    ax.set_aspect("equal")
 
     return im
 
