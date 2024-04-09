@@ -28,6 +28,7 @@ class ScaledICGenerator(BaseRandomICGenerator):
         """
         self.ic_gen = ic_gen
         self.scale = scale
+        self.num_spatial_dims = ic_gen.num_spatial_dims
 
     def gen_ic_fun(self, *, key: PRNGKeyArray) -> BaseIC:
         return ScaledIC(self.ic_gen.gen_ic_fun(key=key), scale=self.scale)
