@@ -84,7 +84,7 @@ class DifficultyGradientNormStepper(NormalizedGradientNormStepper):
         num_spatial_dims: int = 1,
         num_points: int = 48,
         *,
-        linear_difficulties: tuple[float, ...] = (0.0, 0.0, -0.064, 0.0, -0.04096),
+        linear_difficulties: tuple[float, ...] = (0.0, 0.0, -0.128, 0.0, -0.32768),
         gradient_norm_difficulty: float = 0.064,
         maximum_absolute: float = 1.0,
         order: int = 2,
