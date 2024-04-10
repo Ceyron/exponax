@@ -159,7 +159,7 @@ class BaseStepper(eqx.Module, ABC):
     def _build_linear_operator(
         self,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
-    ) -> Complex[Array, "D ... (N//2)+1"]:
+    ) -> Complex[Array, "C ... (N//2)+1"]:
         """
         Assemble the L operator in Fourier space.
 
@@ -169,7 +169,7 @@ class BaseStepper(eqx.Module, ABC):
               N//2+1).
 
         **Returns:**
-            - `L`: The linear operator, shape `( D, ..., N//2+1 )`.
+            - `L`: The linear operator, shape `( C, ..., N//2+1 )`.
         """
         pass
 
