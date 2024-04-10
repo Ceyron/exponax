@@ -1,5 +1,7 @@
 
 <h1 align="center">
+  <img src="exponax_logo.png" width="200">
+  <br>
     Exponax
   <br>
 </h1>
@@ -59,20 +61,26 @@ plt.xlabel("Time"); plt.ylabel("Space"); plt.show()
 
 ## Features
 
-Using JAX as the computational backend gives:
 
-1. **Backend agnotistic code** - run on CPU, GPU, or TPU, in both single and double
-   precision.
-2. **Automatic differentiation** over the timesteppers - compute gradients of
-   solutions with respect to initial conditions, parameters, etc.
-3. Also helpful for **tight integration with Deep Learning** since each
-   timestepper is also just an [Equinox](https://github.com/patrick-kidger/equinox) Module.
-4. **Automatic Vectorization** using `jax.vmap` (or `equinox.filter_vmap`)
-   allowing to advance multiple states in time or instantiate multiple solvers at a time that operate efficiently in batch.
-
-Exponax strives to be lightweight and without custom types; there is no `grid` or `state` object. Everything is based on `jax.numpy` arrays.
-
-**Other functionality**
+1. **JAX** as the computational backend:
+    1. **Backend agnotistic code** - run on CPU, GPU, or TPU, in both single and
+        double precision.
+    2. **Automatic differentiation** over the timesteppers - compute gradients
+        of solutions with respect to initial conditions, parameters, etc.
+    3. Also helpful for **tight integration with Deep Learning** since each
+        timestepper is also just an
+        [Equinox](https://github.com/patrick-kidger/equinox) Module.
+    4. **Automatic Vectorization** using `jax.vmap` (or `equinox.filter_vmap`)
+        allowing to advance multiple states in time or instantiate multiple
+        solvers at a time that operate efficiently in batch.
+2. Lightweight design without custom types. There is no `grid` or `state`
+    object. Everything is based on `jax.numpy` arrays. Timesteppers are callable
+    PyTrees.
+3. More than 35 pre-built dynamics:
+    1. Linear PDEs in 1d, 2d, and 3d (advection, diffusion, dispersion, etc.)
+    2. Nonlinear PDEs in 1d, 2d, and 3d (Burgers, Kuramoto-Sivashinsky,
+        Korteweg-de Vries, Navier-Stokes, etc.)
+    3. Reaction-Diffusion 
 
 Next to the timesteppers operating on JAX array states, it also comes with:
 
