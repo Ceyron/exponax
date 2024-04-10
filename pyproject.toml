@@ -1,3 +1,16 @@
+[project]
+name = "exponax"
+version = "0.0.1"
+description = "Efficient differentiable PDE solvers in JAX."
+readme = "README.md"
+requires-python ="~=3.9"
+authors = [
+  {name = "Felix Koehler"},
+]
+keywords = ["jax", "sciml", "deep-learning", "pde", "etdrk"]
+urls = {repository = "https://github.com/Ceyron/exponax" }
+dependencies = ["jax>=0.4.13", "jaxtyping>=0.2.20", "typing_extensions>=4.5.0", "equinox>=0.11.3", "matplotlib>=3.8.1"]
+
 [tool.black]
 line-length = 88
 target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
@@ -19,3 +32,9 @@ exclude = '''
   )/
 )
 '''
+
+[tool.setuptools.packages.find]
+where = ["."]  # list of folders that contain the packages (["."] by default)
+include = ["exponax"]  # package names should match these glob patterns (["*"] by default)
+exclude = []  # exclude packages matching these glob patterns (empty by default)
+namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
