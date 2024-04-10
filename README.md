@@ -1,11 +1,39 @@
-# Exponax
 
-A suite of simple solvers for 1d PDEs on periodic domains based on exponential
-time differencing algorithms, built on top of
-[JAX](https://github.com/google/jax). **Efficient**, **Elegant**,
-**Vectorizable**, and **Differentiable**.
+<h1 align="center">
+    Exponax
+  <br>
+</h1>
 
-### Quickstart - 1d Kuramoto-Sivashinsky equation
+<h4 align="center">Efficient Differentiable PDE solvers built on top of <a href="https://github.com/google/jax" target="_blank">JAX</a> & <a href="https://github.com/patrick-kidger/equinox" target="_blank">Equinox</a>.</h4>
+
+<p align="center">
+  <a href="#installation">Installation</a> •
+  <a href="#quickstart">Quickstart</a> •
+  <a href="#features">Features</a> •
+  <a href="#solvers">Solvers</a> •
+  <a href="#background">Background</a> •
+  <a href="#related">Related</a> •
+  <a href="#license">License</a>
+</p>
+
+<p align="center">
+    <img src="teaser_demo.gif">
+</p>
+
+## Installation
+
+1. Clone the repository
+2. Change directory to the repository
+3. Install the package
+    ```bash
+    pip install .
+    ```
+
+Requires Python 3.9+ and JAX 0.4.13+ (and Equinox & Matplotlib). 👉 [JAX install guide](https://jax.readthedocs.io/en/latest/installation.html).
+
+## Quickstart
+
+1d Kuramoto-Sivashinsky Equation.
 
 ```python
 import jax
@@ -29,15 +57,7 @@ plt.xlabel("Time"); plt.ylabel("Space"); plt.show()
 
 ![](ks_rollout.png)
 
-See also the *examples* folder for more. It is best to start with
-`simple_advection_example.ipynb` to get familiar with the ideoms of the package,
-especially if not too familiar with JAX. Then, continue with the
-`solver_showcase.ipynb`. To see the solvers in action to solve a supervised
-learning problem, see `learning_burgers_autoregressive_neural_operator.ipynb`. A
-tutorial notebook that requires the differentiability of the solvers is in the
-works.
-
-### Features
+## Features
 
 Using JAX as the computational backend gives:
 
@@ -52,19 +72,25 @@ Using JAX as the computational backend gives:
 
 Exponax strives to be lightweight and without custom types; there is no `grid` or `state` object. Everything is based on `jax.numpy` arrays.
 
-### Background
+**Other functionality**
 
-Exponax supports the efficient solution of 1d (semi-linear) partial differential equations on periodic domains. Those are PDEs of the form
+Next to the timesteppers operating on JAX array states, it also comes with:
 
-$$ \partial u/ \partial t = Lu + N(u) $$
+* Initial Conditions:
+    * Random sine waves
+    * Diffused Noise
+    * Random Discontinuities
+    * Gaussian Random Fields
+* Utilities:
+    * Mesh creation
+    * Rollout functions
+    * Spectral derivatives
+    * Initial condition set creation
+* Poisson solver
+* Modification to make solvers take an additional forcing argument
+* Modification to make solvers perform substeps for more accurate simulation
 
-where $L$ is a linear differential operator and $N$ is a nonlinear differential
-operator. The linear part can be exactly solved using a (matrix) exponential,
-and the nonlinear part is approximated using Runge-Kutta methods of various
-orders. These methods have been known in various disciplines in science for a
-long time and have been unified for a first time by [Cox & Matthews](https://doi.org/10.1006/jcph.2002.6995) [1]. In particular, this package uses the complex contour integral method of [Kassam & Trefethen](https://doi.org/10.1137/S1064827502410633) [2] for numerical stability. The package is restricted to original first, second, third and fourth order method. Since the package of [1] many extensions have been developed. A recent study by [Montanelli & Bootland](https://doi.org/10.1016/j.matcom.2020.06.008) [3] showed that the original *ETDRK4* method is still one of the most efficient methods for these types of PDEs.
-
-### Built-In solvers
+## Solvers
 
 This package comes with the following solvers:
 
@@ -83,25 +109,26 @@ This package comes with the following solvers:
 Other equations can easily be implemented by subclassing from the `BaseStepper`
 module.
 
-### Other functionality
+## Background
 
-Next to the timesteppers operating on JAX array states, it also comes with:
+Exponax supports the efficient solution of 1d (semi-linear) partial differential equations on periodic domains. Those are PDEs of the form
 
-* Initial Conditions:
-    * Random sine waves
-    * Diffused Noise
-    * Random Discontinuities
-    * Gaussian Random Fields
-* Utilities:
-    * Mesh creation
-    * Rollout functions
-    * Spectral derivatives
-    * Initial condition set creation
-* Poisson solver
-* Modification to make solvers take an additional forcing argument
-* Modification to make solvers perform substeps for more accurate simulation
+$$ \partial u/ \partial t = Lu + N(u) $$
 
-### Similar projects and motivation for this package
+where $L$ is a linear differential operator and $N$ is a nonlinear differential
+operator. The linear part can be exactly solved using a (matrix) exponential,
+and the nonlinear part is approximated using Runge-Kutta methods of various
+orders. These methods have been known in various disciplines in science for a
+long time and have been unified for a first time by [Cox & Matthews](https://doi.org/10.1006/jcph.2002.6995) [1]. In particular, this package uses the complex contour integral method of [Kassam & Trefethen](https://doi.org/10.1137/S1064827502410633) [2] for numerical stability. The package is restricted to original first, second, third and fourth order method. Since the package of [1] many extensions have been developed. A recent study by [Montanelli & Bootland](https://doi.org/10.1016/j.matcom.2020.06.008) [3] showed that the original *ETDRK4* method is still one of the most efficient methods for these types of PDEs.
+
+[1] Cox, Steven M., and Paul C. Matthews. "Exponential time differencing for stiff systems." Journal of Computational Physics 176.2 (2002): 430-455.
+
+[2] Kassam, A.K. and Trefethen, L.N., 2005. Fourth-order time-stepping for stiff PDEs. SIAM Journal on Scientific Computing, 26(4), pp.1214-1233.
+
+[3] Montanelli, Hadrien, and Niall Bootland. "Solving periodic semilinear stiff PDEs in 1D, 2D and 3D with exponential integrators." Mathematics and Computers in Simulation 178 (2020): 307-327.
+
+
+## Related
 
 This package is greatly inspired by the [chebfun](https://www.chebfun.org/)
 package in *MATLAB*, in particular the
@@ -135,10 +162,12 @@ This package took much inspiration from the
 integral method of [2] and how to handle (de)aliasing.
 
 
-### References
+## License
 
-[1] Cox, Steven M., and Paul C. Matthews. "Exponential time differencing for stiff systems." Journal of Computational Physics 176.2 (2002): 430-455.
+TODO
 
-[2] Kassam, A.K. and Trefethen, L.N., 2005. Fourth-order time-stepping for stiff PDEs. SIAM Journal on Scientific Computing, 26(4), pp.1214-1233.
+---
 
-[3] Montanelli, Hadrien, and Niall Bootland. "Solving periodic semilinear stiff PDEs in 1D, 2D and 3D with exponential integrators." Mathematics and Computers in Simulation 178 (2020): 307-327.
+> [fkoehler.site](https://fkoehler.site/) &nbsp;&middot;&nbsp;
+> GitHub [@ceyron](https://github.com/ceyron) &nbsp;&middot;&nbsp;
+> X [@felix_m_koehler](https://twitter.com/felix_m_koehler)
