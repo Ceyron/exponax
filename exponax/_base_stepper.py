@@ -36,6 +36,58 @@ class BaseStepper(eqx.Module, ABC):
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
+        """
+        Baseclass for timesteppers based on Fourier pseudo-spectral Exponential
+        Time Differencing Runge Kutta methods (ETDRK); efficiently solving
+        semi-linear PDEs of the form
+
+            uₜ = ℒu + 𝒩(u)
+
+        with a linear differential operator ℒ and a nonlinear differential
+        operator 𝒩(...).
+
+        A subclass must implement the methods `_build_linear_operator` and
+        `_build_nonlinear_fun`. The former returns the diagonal linear operator
+        in Fourier space. The latter returns a subclass of `BaseNonlinearFun`.
+        See the `exponax.ic` submodule for pre-defined nonlinear operators and
+        how to subclass your own.
+
+        Save attributes specific to the concrete PDE before calling the parent
+        constructor because it will call the abstract methods.
+
+        **Arguments:**
+
+        - `num_spatial_dims`: The number of spatial dimensions.
+        - `domain_extent`: The size of the domain `L`; in higher dimensions
+            the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same. Hence, the total number of degrees of
+            freedom is `Nᵈ`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `num_channels`: The number of channels `C` in the state vector/tensor.
+            For most problem, like simple linear PDEs this will be one (because
+            the temperature field in a heat/diffusion PDE is a scalar field).
+            Some other problems like Burgers equation in higher dimensions or
+            reaction-diffusion equations with multiple species will have more
+            than one channel. This information is only used to check the shape
+            of the input state vector in the `__call__` method. (keyword-only)
+        - `order`: The order of the ETDRK method to use. Must be one of {0, 1,
+            2, 3, 4}. The option `0` only solves the linear part of the
+            equation. Hence, only use this for linear PDEs. For nonlinear PDEs,
+            a higher order method tends to be more stable and accurate. `2` is
+            often a good compromis in single-precision. Use `4` together with
+            double precision (`jax.config.update("jax_enable_x64", True)`) for
+            highest accuracy. (keyword-only)
+        - `num_circle_points`: The number of points to use on the unit circle
+        - `num_circle_points`: How many points to use in the complex contour
+            integral method to compute the coefficients of the exponential time
+            differencing Runge Kutta method. Default: 16.
+        - `circle_radius`: The radius of the contour used to compute the
+            coefficients of the exponential time differencing Runge Kutta
+            method. Default: 1.0.
+        """
         self.num_spatial_dims = num_spatial_dims
         self.domain_extent = domain_extent
         self.num_points = num_points
