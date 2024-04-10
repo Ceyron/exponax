@@ -12,7 +12,6 @@
   <a href="#installation">Installation</a> •
   <a href="#quickstart">Quickstart</a> •
   <a href="#features">Features</a> •
-  <a href="#solvers">Solvers</a> •
   <a href="#background">Background</a> •
   <a href="#related">Related</a> •
   <a href="#license">License</a>
@@ -68,58 +67,33 @@ plt.xlabel("Time"); plt.ylabel("Space"); plt.show()
     2. **Automatic differentiation** over the timesteppers - compute gradients
         of solutions with respect to initial conditions, parameters, etc.
     3. Also helpful for **tight integration with Deep Learning** since each
-        timestepper is also just an
+        timestepper is just an
         [Equinox](https://github.com/patrick-kidger/equinox) Module.
     4. **Automatic Vectorization** using `jax.vmap` (or `equinox.filter_vmap`)
         allowing to advance multiple states in time or instantiate multiple
         solvers at a time that operate efficiently in batch.
-2. Lightweight design without custom types. There is no `grid` or `state`
+2. **Lightweight Design** without custom types. There is no `grid` or `state`
     object. Everything is based on `jax.numpy` arrays. Timesteppers are callable
     PyTrees.
 3. More than 35 pre-built dynamics:
     1. Linear PDEs in 1d, 2d, and 3d (advection, diffusion, dispersion, etc.)
     2. Nonlinear PDEs in 1d, 2d, and 3d (Burgers, Kuramoto-Sivashinsky,
         Korteweg-de Vries, Navier-Stokes, etc.)
-    3. Reaction-Diffusion 
+    3. Reaction-Diffusion (Gray-Scott, Swift-Hohenberg, etc.)
+4. Collection of initial condition distributions (truncated Fourier series,
+   Gaussian Random Fields, etc.)
+5. **Utilities** for spectral derivatives, grid creation, autogressive rollout,
+   etc.
+6. Easily extendable to new PDEs by subclassing from the `BaseStepper` module.
+7. Normalized interface for reduced number of parameters to uniquely define any
+   dynamics.
 
-Next to the timesteppers operating on JAX array states, it also comes with:
-
-* Initial Conditions:
-    * Random sine waves
-    * Diffused Noise
-    * Random Discontinuities
-    * Gaussian Random Fields
-* Utilities:
-    * Mesh creation
-    * Rollout functions
-    * Spectral derivatives
-    * Initial condition set creation
-* Poisson solver
-* Modification to make solvers take an additional forcing argument
-* Modification to make solvers perform substeps for more accurate simulation
-
-## Solvers
-
-This package comes with the following solvers:
-
-* Linear PDEs:
-    * Advection equation
-    * Diffusion equation
-    * Advection-Diffusion equation
-    * Dispersion equation
-    * Hyper-Diffusion equation
-    * General linear equation containing zeroth, first, second, third, and fourth order derivatives
-* Nonlinear PDEs:
-    * Burgers equation
-    * Kuramoto-Sivashinsky equation
-    * Korteweg-de Vries equation
-
-Other equations can easily be implemented by subclassing from the `BaseStepper`
-module.
 
 ## Background
 
-Exponax supports the efficient solution of 1d (semi-linear) partial differential equations on periodic domains. Those are PDEs of the form
+Exponax supports the efficient solution of (semi-linear) partial differential
+equations on periodic domains in arbitrary dimensions. Those are PDEs of the
+form
 
 $$ \partial u/ \partial t = Lu + N(u) $$
 
@@ -127,7 +101,21 @@ where $L$ is a linear differential operator and $N$ is a nonlinear differential
 operator. The linear part can be exactly solved using a (matrix) exponential,
 and the nonlinear part is approximated using Runge-Kutta methods of various
 orders. These methods have been known in various disciplines in science for a
-long time and have been unified for a first time by [Cox & Matthews](https://doi.org/10.1006/jcph.2002.6995) [1]. In particular, this package uses the complex contour integral method of [Kassam & Trefethen](https://doi.org/10.1137/S1064827502410633) [2] for numerical stability. The package is restricted to original first, second, third and fourth order method. Since the package of [1] many extensions have been developed. A recent study by [Montanelli & Bootland](https://doi.org/10.1016/j.matcom.2020.06.008) [3] showed that the original *ETDRK4* method is still one of the most efficient methods for these types of PDEs.
+long time and have been unified for a first time by [Cox &
+Matthews](https://doi.org/10.1006/jcph.2002.6995) [1]. In particular, this
+package uses the complex contour integral method of [Kassam &
+Trefethen](https://doi.org/10.1137/S1064827502410633) [2] for numerical
+stability. The package is restricted to the original first, second, third and
+fourth order method. A recent study by [Montanelli &
+Bootland](https://doi.org/10.1016/j.matcom.2020.06.008) [3] showed that the
+original *ETDRK4* method is still one of the most efficient methods for these
+types of PDEs.
+
+We focus on periodic domains on scaled hypercubes with a uniform Cartesian
+discretization. This allows using the Fast Fourier Transform resulting in
+blazing fast simulations. For example, a dataset of trajectories for the 2d
+Kuramoto-Sivashinsky equation with 50 initial conditions over 200 time steps
+with a 128x128 discretization is created in less than a second on a modern GPU.
 
 [1] Cox, Steven M., and Paul C. Matthews. "Exponential time differencing for stiff systems." Journal of Computational Physics 176.2 (2002): 430-455.
 
@@ -139,24 +127,25 @@ long time and have been unified for a first time by [Cox & Matthews](https://doi
 ## Related
 
 This package is greatly inspired by the [chebfun](https://www.chebfun.org/)
-package in *MATLAB*, in particular the
-[`spinX`](https://www.chebfun.org/docs/guide/guide19.html) module within it. It
-has been used extensively as a data generator in early works for supervised
-physics-informed ML, e.g., the
+library in *MATLAB*, in particular the
+[`spinX`](https://www.chebfun.org/docs/guide/guide19.html) (Stiff Pde INtegrator
+in X dimensions) module within it. These *MATLAB* utilties have been used
+extensively as a data generator in early works for supervised physics-informed
+ML, e.g., the
 [DeepHiddenPhysics](https://github.com/maziarraissi/DeepHPMs/tree/7b579dbdcf5be4969ebefd32e65f709a8b20ec44/Matlab)
 and [Fourier Neural
 Operators](https://github.com/neuraloperator/neuraloperator/tree/af93f781d5e013f8ba5c52baa547f2ada304ffb0/data_generation)
 (the links show where in their public repos they use the `spinX` module). The
 approach of pre-sampling the solvers, writing out the trajectories, and then
 using them for supervised training worked for these problems, but of course
-limits to purely supervised problem. Modern research ideas like correcting
-coarse solvers (see for instance the [Solver-in-the-Loop
+limits the scope to purely supervised problem. Modern research ideas like
+correcting coarse solvers (see for instance the [Solver-in-the-Loop
 paper](https://arxiv.org/abs/2007.00016) or the [ML-accelerated CFD
 paper](https://arxiv.org/abs/2102.01010)) requires the coarse solvers to be
 [differentiable](https://physicsbaseddeeplearning.org/diffphys.html). Some ideas
 of diverted chain training also requires the fine solver to be differentiable!
 Even for applications without differentiable solvers, we still have the
-**interface problem** with legacy solvers (like the MATLAB ones). Hence, we
+**interface problem** with legacy solvers (like the *MATLAB* ones). Hence, we
 cannot easily query them "on-the-fly" for sth like active learning tasks, nor do
 they run efficiently on hardward accelerators (GPUs, TPUs, etc.). Additionally,
 they were not designed with batch execution (in the sense of vectorized
@@ -164,9 +153,9 @@ application) in mind which we get more or less for free by `jax.vmap`. With the
 reproducible randomness of `JAX` we might not even have to ever write out a
 dataset and can re-create it in seconds!
 
-This package took much inspiration from the
+This package also took much inspiration from the
 [FourierFlows.jl](https://github.com/FourierFlows/FourierFlows.jl) in the
-*Julia* ecosystem, especially for checking the implementation of the contout
+*Julia* ecosystem, especially for checking the implementation of the contour
 integral method of [2] and how to handle (de)aliasing.
 
 
