@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 import equinox as eqx
 import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
@@ -12,7 +14,7 @@ from .etdrk import ETDRK0, ETDRK1, ETDRK2, ETDRK3, ETDRK4, BaseETDRK
 from .nonlin_fun import BaseNonlinearFun
 
 
-class BaseStepper(eqx.Module):
+class BaseStepper(eqx.Module, ABC):
     num_spatial_dims: int
     domain_extent: float
     num_points: int
@@ -101,6 +103,7 @@ class BaseStepper(eqx.Module):
         else:
             raise NotImplementedError(f"Order {order} not implemented.")
 
+    @abstractmethod
     def _build_linear_operator(
         self,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
@@ -116,8 +119,9 @@ class BaseStepper(eqx.Module):
         **Returns:**
             - `L`: The linear operator, shape `( D, ..., N//2+1 )`.
         """
-        raise NotImplementedError("Must be implemented in subclass.")
+        pass
 
+    @abstractmethod
     def _build_nonlinear_fun(
         self,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
@@ -134,7 +138,7 @@ class BaseStepper(eqx.Module):
                 time space, transforms to Fourier space, and evaluates the
                 derivatives there. Should be a subclass of `BaseNonlinearFun`.
         """
-        raise NotImplementedError("Must be implemented in subclass.")
+        pass
 
     def step(self, u: Float[Array, "C ... N"]) -> Float[Array, "C ... N"]:
         """
