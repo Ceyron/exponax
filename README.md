@@ -12,6 +12,7 @@
   <a href="#installation">Installation</a> •
   <a href="#quickstart">Quickstart</a> •
   <a href="#features">Features</a> •
+  <a href="#documentation">Documentation</a> •
   <a href="#background">Background</a> •
   <a href="#related">Related</a> •
   <a href="#license">License</a>
@@ -58,6 +59,8 @@ plt.xlabel("Time"); plt.ylabel("Space"); plt.show()
 
 ![](img/ks_rollout.png)
 
+For a next step, check out the [simple_advection_example_1d.ipynb](examples/simple_advection_example_1d.ipynb) notebook in the `examples` folder, and check out the <a href="#documentation">Documentation</a>.
+
 ## Features
 
 
@@ -88,6 +91,15 @@ plt.xlabel("Time"); plt.ylabel("Space"); plt.show()
 7. Normalized interface for reduced number of parameters to uniquely define any
    dynamics.
 
+## Documentation
+
+The following Jupyter notebooks showcase the usage of the package:
+
+1. [Simple Advection Example in 1d](examples/simple_advection_example_1d.ipynb)
+2. ...
+
+The documentation is still in progress. For now, the best way to get started is
+to look at the examples and the docstrings in the code.
 
 ## Background
 
