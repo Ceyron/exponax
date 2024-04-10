@@ -1,6 +1,6 @@
 
 <h1 align="center">
-  <img src="exponax_logo.png" width="200">
+  <img src="img/exponax_logo.png" width="200">
   <br>
     Exponax
   <br>
@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-    <img src="teaser_demo.gif">
+    <img src="img/teaser_demo.gif">
 </p>
 
 ## Installation
@@ -57,7 +57,7 @@ plt.imshow(trajectory[:, 0, :].T, aspect='auto', cmap='RdBu', vmin=-2, vmax=2, o
 plt.xlabel("Time"); plt.ylabel("Space"); plt.show()
 ```
 
-![](ks_rollout.png)
+![](img/ks_rollout.png)
 
 ## Features
 
