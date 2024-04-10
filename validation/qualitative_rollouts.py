@@ -91,7 +91,7 @@ CONFIGURATIONS_1D = [
     ),
     # Nonlinear
     (
-        ex.stepper.Burgers(1, 3.0, 110, 0.01, diffusivity=0.01),
+        ex.stepper.Burgers(1, 3.0, 110, 0.01, diffusivity=0.03),
         "burgers",
         ex.ic.RandomTruncatedFourierSeries(1, cutoff=5),
         0,
@@ -122,25 +122,9 @@ CONFIGURATIONS_1D = [
         200,
         (-2.5, 2.5),
     ),
-    (
-        ex.stepper.Nikolaevskiy(1, 60.0, 110, 0.5),
-        "niko",
-        ex.ic.RandomTruncatedFourierSeries(1, cutoff=3),
-        500,
-        200,
-        (-6.5, 6.5),
-    ),
-    (
-        ex.stepper.NikolaevskiyConservative(1, 60.0, 110, 0.5),
-        "niko_conservative",
-        ex.ic.RandomTruncatedFourierSeries(1, cutoff=3),
-        500,
-        200,
-        (-2.5, 2.5),
-    ),
     # Reaction
     (
-        ex.reaction.FisherKPP(1, 10.0, 256, 0.001, r=10.0),
+        ex.reaction.FisherKPP(1, 10.0, 256, 0.001, reactivity=10.0),
         "fisher_kpp",
         ex.ic.ClampingICGenerator(
             ex.ic.RandomTruncatedFourierSeries(1, cutoff=5), (0.0, 1.0)
@@ -297,52 +281,6 @@ CONFIGURATIONS_2D = [
         (-6.5, 6.5),
     ),
     (
-        ex.stepper.KuramotoSivashinskyConservative(2, 60.0, 60, 0.1),
-        "ks_conservative",
-        ex.ic.RandomMultiChannelICGenerator(
-            2 * [ex.ic.RandomTruncatedFourierSeries(2, cutoff=3)]
-        ),
-        500,
-        100,
-        (-2.5, 2.5),
-    ),
-    (
-        ex.stepper.KuramotoSivashinskyConservative(
-            2, 60.0, 60, 0.01, single_channel=True
-        ),
-        "ks_conservative_single_channel",
-        ex.ic.RandomTruncatedFourierSeries(2, cutoff=3),
-        500,
-        100,
-        (-2.5, 2.5),
-    ),
-    (
-        ex.stepper.Nikolaevskiy(2, 30.0, 60, 0.1),
-        "niko",
-        ex.ic.RandomTruncatedFourierSeries(2, cutoff=3),
-        500,
-        100,
-        (-6.5, 6.5),
-    ),
-    (
-        ex.stepper.NikolaevskiyConservative(2, 60.0, 60, 0.1),
-        "niko_conservative",
-        ex.ic.RandomMultiChannelICGenerator(
-            2 * [ex.ic.RandomTruncatedFourierSeries(2, cutoff=3)]
-        ),
-        500,
-        100,
-        (-2.5, 2.5),
-    ),
-    (
-        ex.stepper.NikolaevskiyConservative(2, 60.0, 60, 0.01, single_channel=True),
-        "niko_conservative_single_channel",
-        ex.ic.RandomTruncatedFourierSeries(2, cutoff=3),
-        500,
-        100,
-        (-2.5, 2.5),
-    ),
-    (
         ex.RepeatedStepper(
             ex.stepper.NavierStokesVorticity(
                 2,
@@ -378,7 +316,7 @@ CONFIGURATIONS_2D = [
     ),
     # Reaction
     (
-        ex.reaction.CahnHilliard(2, 128, 300, 0.001, hyper_diffusivity=1.2),
+        ex.reaction.CahnHilliard(2, 128, 300, 0.001, gamma=1e-3),
         "cahn_hilliard",
         ex.ic.RandomTruncatedFourierSeries(2, cutoff=10),
         0,
@@ -386,28 +324,25 @@ CONFIGURATIONS_2D = [
         (-10.0, 10.0),
     ),
     (
-        ex.reaction.GrayScott(2, 2.0, 60, 0.1),
+        ex.reaction.GrayScott(2, 2.0, 60, 1.0),
         "gray_scott",
         ex.ic.RandomMultiChannelICGenerator(
-            2
-            * [
-                ex.ic.ClampingICGenerator(
-                    ex.ic.RandomTruncatedFourierSeries(2, cutoff=2),
-                    (0.0, 1.0),
-                )
+            [
+                ex.ic.RandomGaussianBlobs(2, one_complement=True),
+                ex.ic.RandomGaussianBlobs(2),
             ]
         ),
         0,
         100,
-        (0.0, 1.0),
+        (-1.0, 1.0),
     ),
     (
-        ex.reaction.SwiftHohenberg(2, 20.0 * jnp.pi, 100, 0.01),
+        ex.reaction.SwiftHohenberg(2, 20.0 * jnp.pi, 100, 0.1),
         "swift_hohenberg",
-        ex.ic.RandomTruncatedFourierSeries(2, cutoff=5),
+        ex.ic.RandomTruncatedFourierSeries(2, cutoff=5, max_one=True),
         0,
         100,
-        (-5.0, 5.0),
+        (-1.0, 1.0),
     ),
 ]
 
