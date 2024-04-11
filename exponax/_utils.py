@@ -265,8 +265,8 @@ def stack_sub_trajectories(
             condition in the subtrajectories.
 
     **Returns:**
-        - `sub_trjs`: The stacked subtrajectories. Expected shape: `(n_stacks, n, ...)`. 
-           `n_stacks` is the number of subtrajectories stacked together, i.e., 
+        - `sub_trjs`: The stacked subtrajectories. Expected shape: `(n_stacks, n, ...)`.
+           `n_stacks` is the number of subtrajectories stacked together, i.e.,
            `n_timesteps - n + 1`.
     """
     n_time_steps = [leaf.shape[0] for leaf in jtu.tree_leaves(trj)]
