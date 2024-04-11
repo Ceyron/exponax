@@ -1,0 +1,51 @@
+name: Build documentation
+
+on:
+  # only run on PRs, not on pushes to main
+  # (this is handled by deploy_docs.yml)
+  pull_request:
+
+  workflow_call:
+    inputs:
+      artifact_name:
+        description: "Name of the artifact to upload"
+        required: false
+        type: string
+
+jobs:
+  test-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install system requirements
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+
+      - name: Setup Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install doc requirements
+        run: |
+          pip install jax[cpu]
+          pip install .
+          pip install -r docs/requirements.txt
+
+      - name: Build docs
+        run: |
+          cd docs
+          export SPHINXOPTS="-W"  # treat warnings as errors
+          make html
+
+      - name: Upload HTML files
+        uses: actions/upload-artifact@v3
+        if: ${{ inputs.artifact_name }}
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: docs/build/html
+          if-no-files-found: error

@@ -14,6 +14,8 @@ from ._utils import (
     wrap_bc,
 )
 
+__version__ = "0.1.0"
+
 __all__ = [
     "BaseStepper",
     "ForcedStepper",
