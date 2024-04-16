@@ -29,7 +29,7 @@ def make_grid(
         - `domain_extent`: The extent of the domain in each spatial dimension.
         - `num_points`: The number of points in each spatial dimension.
         - `full`: Whether to include the right boundary point in the grid.
-          Default: `False`. The right point is redundant for periodic boundary
+            Default: `False`. The right point is redundant for periodic boundary
             conditions and is not considered a degree of freedom. Use this
             option, for example, if you need a full grid for plotting.
         - `zero_centered`: Whether to center the grid around zero. Default:
@@ -38,8 +38,7 @@ def make_grid(
         - `indexing`: The indexing convention to use. Default: `'ij'`.
 
     **Returns:**
-        - `grid`: The grid in the spatial domain. Shape: `(num_spatial_dims,
-            ..., num_points)`.
+        - `grid`: The grid in the spatial domain. Shape: `(num_spatial_dims, ..., num_points)`.
     """
     if full:
         grid_1d = jnp.linspace(0, domain_extent, num_points + 1, endpoint=True)
@@ -266,9 +265,9 @@ def stack_sub_trajectories(
             condition in the subtrajectories.
 
     **Returns:**
-        - `sub_trjs`: The stacked subtrajectories. Expected shape: `(n_stacks,
-            n, ...)`. `n_stacks` is the number of subtrajectories stacked
-            together, i.e., `n_timesteps - n + 1`.
+        - `sub_trjs`: The stacked subtrajectories. Expected shape: `(n_stacks, n, ...)`.
+           `n_stacks` is the number of subtrajectories stacked together, i.e.,
+           `n_timesteps - n + 1`.
     """
     n_time_steps = [leaf.shape[0] for leaf in jtu.tree_leaves(trj)]
 
