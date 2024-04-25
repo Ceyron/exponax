@@ -120,7 +120,10 @@ class VorticityConvection2dKolmogorov(VorticityConvection2d):
             f = -k (2π/L) γ cos(k (2π/L) x₁)
         ```
 
-        i.e., energy of intensity `γ` is injected at wavenumber `k`.
+        i.e., energy of intensity `γ` is injected at wavenumber `k`. Note that
+        the forcing is on the **vorticity**. As such, we get the prefactor `k
+        (2π/L)` and the `sin(...)` turns into a `-cos(...)` (minus sign because
+        the vorticity is derived via the curl).
 
         **Arguments:**
             - `num_spatial_dims`: The number of spatial dimensions `d`.
