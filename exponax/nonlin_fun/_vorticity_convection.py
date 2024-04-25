@@ -125,20 +125,20 @@ class VorticityConvection2dKolmogorov(VorticityConvection2d):
         **Arguments:**
             - `num_spatial_dims`: The number of spatial dimensions `d`.
             - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and **excludes**
-                the right boundary point. In higher dimensions; the number of
-                points in each dimension is the same.
-            - `convection_scale`: The scale `b` of the convection term. Defaults to
-                `1.0`.
+                domain. This **includes** the left boundary point and
+                **excludes** the right boundary point. In higher dimensions; the
+                number of points in each dimension is the same.
+            - `convection_scale`: The scale `b` of the convection term. Defaults
+                to `1.0`.
             - `injection_mode`: The wavenumber `k` at which energy is injected.
                 Defaults to `4`.
-            - `injection_scale`: The intensity `γ` of the injection term. Defaults
-                to `1.0`.
-            - `derivative_operator`: A complex array of shape `(d, ..., N//2+1)` that
-                represents the derivative operator in Fourier space.
-            - `dealiasing_fraction`: The fraction of the highest resolved modes that
-                are not aliased. Defaults to `2/3` which corresponds to Orszag's 2/3
-                rule.
+            - `injection_scale`: The intensity `γ` of the injection term.
+                Defaults to `1.0`.
+            - `derivative_operator`: A complex array of shape `(d, ..., N//2+1)`
+                that represents the derivative operator in Fourier space.
+            - `dealiasing_fraction`: The fraction of the highest resolved modes
+                that are not aliased. Defaults to `2/3` which corresponds to
+                Orszag's 2/3 rule.
         """
         super().__init__(
             num_spatial_dims,
