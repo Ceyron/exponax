@@ -148,13 +148,15 @@ class VorticityConvection2dKolmogorov(VorticityConvection2d):
             dealiasing_fraction=dealiasing_fraction,
         )
 
-        # TODO: shouldn't this be scaled differently sine we are in the
-        # streamfunction-vorticity formulation?
         wavenumbers = build_wavenumbers(num_spatial_dims, num_points)
         injection_mask = (wavenumbers[0] == 0) & (wavenumbers[1] == injection_mode)
         self.injection = jnp.where(
             injection_mask,
-            injection_scale * build_scaling_array(num_spatial_dims, num_points),
+            # Need to additional scale the `injection_scale` with the
+            # `injection_mode`, because we apply the forcing on the vorticity.
+            injection_mode
+            * injection_scale
+            * build_scaling_array(num_spatial_dims, num_points),
             0.0,
         )
 
