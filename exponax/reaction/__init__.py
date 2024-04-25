@@ -11,8 +11,7 @@ steppers often operate on a wide range of initial conditions.
 """
 
 from ._allen_cahn import AllenCahn
-
-# from ._belousov_zhabotinsky import BelousovZhabotinsky
+from ._belousov_zhabotinsky import BelousovZhabotinsky
 from ._cahn_hilliard import CahnHilliard
 from ._fisher_kpp import FisherKPP
 from ._gray_scott import GrayScott
@@ -20,7 +19,7 @@ from ._swift_hohenberg import SwiftHohenberg
 
 __all__ = [
     "AllenCahn",
-    # "BelousovZhabotinsky",
+    "BelousovZhabotinsky",
     "CahnHilliard",
     "FisherKPP",
     "GrayScott",

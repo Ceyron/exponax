@@ -42,6 +42,8 @@ class BelousovZhabotinskyNonlinearFun(BaseNonlinearFun):
                 u[0] - u[2],
             ]
         )
+        # Below is a hack to ensure no rounding errors cause negative values
+        u_power = jnp.maximum(u_power, 0.0)
         u_power_hat = self.fft(u_power)
         return u_power_hat
 
