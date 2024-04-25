@@ -218,8 +218,8 @@ class KolmogorovFlowVorticity(BaseStepper):
                 convection term. Default is `1.0`.
             - `drag`: The drag coefficient `λ`. Default is `-0.1`.
             - `injection_mode`: The mode of the injection. Default is `4`.
-            - `injection_scale`: The scaling factor for the injection. Default is
-                `1.0`.
+            - `injection_scale`: The scaling factor for the injection. Default
+                is `1.0`.
             - `order`: The order of the Exponential Time Differencing Runge
                 Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0`
                 only solves the linear part of the equation. Use higher values
