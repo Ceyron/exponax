@@ -31,7 +31,7 @@
     pip install .
     ```
 
-Requires Python 3.9+ and JAX 0.4.13+ (and Equinox & Matplotlib). 👉 [JAX install guide](https://jax.readthedocs.io/en/latest/installation.html).
+Requires Python 3.10+ and JAX 0.4.13+ (and Equinox & Matplotlib). 👉 [JAX install guide](https://jax.readthedocs.io/en/latest/installation.html).
 
 ## Quickstart
 
