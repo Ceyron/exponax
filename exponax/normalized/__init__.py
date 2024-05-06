@@ -15,7 +15,7 @@ from ._linear import (
     DiffultyLinearStepperSimple,
     NormalizedLinearStepper,
 )
-from ._polynomial import NormalizedPolynomialStepper
+from ._polynomial import DifficultyPolynomialStepper, NormalizedPolynomialStepper
 from ._utils import (
     denormalize_coefficients,
     denormalize_convection_scale,
@@ -39,6 +39,7 @@ __all__ = [
     "DiffultyLinearStepperSimple",
     "DifficultyConvectionStepper",
     "DifficultyGradientNormStepper",
+    "DifficultyPolynomialStepper",
     "NormalizedConvectionStepper",
     "NormlizedGeneralNonlinearStepper",
     "NormalizedGradientNormStepper",
