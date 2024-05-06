@@ -8,14 +8,17 @@ Additionally, there are Difficulty steppers that interface the same concept
 slightly differently.
 """
 from ._convection import DifficultyConvectionStepper, NormalizedConvectionStepper
-from ._general_nonlinear import NormlizedGeneralNonlinearStepper
+from ._general_nonlinear import (
+    DifficultyGeneralNonlinearStepper,
+    NormlizedGeneralNonlinearStepper,
+)
 from ._gradient_norm import DifficultyGradientNormStepper, NormalizedGradientNormStepper
 from ._linear import (
     DifficultyLinearStepper,
     DiffultyLinearStepperSimple,
     NormalizedLinearStepper,
 )
-from ._polynomial import NormalizedPolynomialStepper
+from ._polynomial import DifficultyPolynomialStepper, NormalizedPolynomialStepper
 from ._utils import (
     denormalize_coefficients,
     denormalize_convection_scale,
@@ -39,6 +42,8 @@ __all__ = [
     "DiffultyLinearStepperSimple",
     "DifficultyConvectionStepper",
     "DifficultyGradientNormStepper",
+    "DifficultyPolynomialStepper",
+    "DifficultyGeneralNonlinearStepper",
     "NormalizedConvectionStepper",
     "NormlizedGeneralNonlinearStepper",
     "NormalizedGradientNormStepper",

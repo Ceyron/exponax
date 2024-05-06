@@ -218,3 +218,53 @@ def extract_normalized_gradient_norm_scale_from_difficulty(
         maximum_absolute * jnp.square(num_points) * num_spatial_dims
     )
     return normalized_gradient_norm_scale
+
+
+def reduce_normalized_nonlinear_scales_to_difficulty(
+    normalized_nonlinear_scales: tuple[float],
+    *,
+    num_spatial_dims: int,
+    num_points: int,
+    maximum_absolute: float,
+):
+    nonlinear_difficulties = (
+        normalized_nonlinear_scales[0],  # Polynomial: normalized == difficulty
+        reduce_normalized_convection_scale_to_difficulty(
+            normalized_nonlinear_scales[1],
+            num_spatial_dims=num_spatial_dims,
+            num_points=num_points,
+            maximum_absolute=maximum_absolute,
+        ),
+        reduce_normalized_gradient_norm_scale_to_difficulty(
+            normalized_nonlinear_scales[2],
+            num_spatial_dims=num_spatial_dims,
+            num_points=num_points,
+            maximum_absolute=maximum_absolute,
+        ),
+    )
+    return nonlinear_difficulties
+
+
+def extract_normalized_nonlinear_scales_from_difficulty(
+    nonlinear_difficulties: tuple[float],
+    *,
+    num_spatial_dims: int,
+    num_points: int,
+    maximum_absolute: float,
+):
+    normalized_nonlinear_scales = (
+        nonlinear_difficulties[0],  # Polynomial: normalized == difficulty
+        extract_normalized_convection_scale_from_difficulty(
+            nonlinear_difficulties[1],
+            num_spatial_dims=num_spatial_dims,
+            num_points=num_points,
+            maximum_absolute=maximum_absolute,
+        ),
+        extract_normalized_gradient_norm_scale_from_difficulty(
+            nonlinear_difficulties[2],
+            num_spatial_dims=num_spatial_dims,
+            num_points=num_points,
+            maximum_absolute=maximum_absolute,
+        ),
+    )
+    return normalized_nonlinear_scales

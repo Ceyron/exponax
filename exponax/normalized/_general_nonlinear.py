@@ -3,6 +3,10 @@ from jaxtyping import Array, Complex
 
 from .._base_stepper import BaseStepper
 from ..nonlin_fun import GeneralNonlinearFun
+from ._utils import (
+    extract_normalized_coefficients_from_difficulty,
+    extract_normalized_nonlinear_scales_from_difficulty,
+)
 
 
 class NormlizedGeneralNonlinearStepper(BaseStepper):
@@ -15,7 +19,7 @@ class NormlizedGeneralNonlinearStepper(BaseStepper):
         num_spatial_dims: int,
         num_points: int,
         *,
-        normalized_coefficients_linear: tuple[float, ...] = (0.0, 0.0, 0.01 * 0.1),
+        normalized_coefficients_linear: tuple[float, ...] = (0.0, 0.0, 0.1 * 0.1),
         normalized_coefficients_nonlinear: tuple[float, ...] = (0.0, -1.0 * 0.1, 0.0),
         order=2,
         dealiasing_fraction: float = 2 / 3,
@@ -67,4 +71,63 @@ class NormlizedGeneralNonlinearStepper(BaseStepper):
             dealiasing_fraction=self.dealiasing_fraction,
             scale_list=self.normalized_coefficients_nonlinear,
             zero_mode_fix=True,  # ToDo: check this
+        )
+
+
+class DifficultyGeneralNonlinearStepper(NormlizedGeneralNonlinearStepper):
+    linear_difficulties: tuple[float, ...]
+    nonlinear_difficulties: tuple[float, ...]
+
+    def __init__(
+        self,
+        num_spatial_dims: int = 1,
+        num_points: int = 48,
+        *,
+        linear_difficulties: tuple[float, ...] = (
+            0.0,
+            0.0,
+            0.1 * 0.1 / 1.0 * 48**2 * 2,
+        ),
+        nonlinear_difficulties: tuple[float, ...] = (
+            0.0,
+            -1.0 * 0.1 / 1.0 * 48,
+            0.0,
+        ),
+        maximum_absolute: float = 1.0,
+        order: int = 2,
+        dealiasing_fraction: float = 2 / 3,
+        num_circle_points: int = 16,
+        circle_radius: float = 1.0,
+    ):
+        """
+        By default Burgers.
+        """
+        self.linear_difficulties = linear_difficulties
+        self.nonlinear_difficulties = nonlinear_difficulties
+
+        normalized_coefficients_linear = (
+            extract_normalized_coefficients_from_difficulty(
+                linear_difficulties,
+                num_spatial_dims=num_spatial_dims,
+                num_points=num_points,
+            )
+        )
+        normalized_coefficients_nonlinear = (
+            extract_normalized_nonlinear_scales_from_difficulty(
+                nonlinear_difficulties,
+                num_spatial_dims=num_spatial_dims,
+                num_points=num_points,
+                maximum_absolute=maximum_absolute,
+            )
+        )
+
+        super().__init__(
+            num_spatial_dims=num_spatial_dims,
+            num_points=num_points,
+            normalized_coefficients_linear=normalized_coefficients_linear,
+            normalized_coefficients_nonlinear=normalized_coefficients_nonlinear,
+            order=order,
+            dealiasing_fraction=dealiasing_fraction,
+            num_circle_points=num_circle_points,
+            circle_radius=circle_radius,
         )
