@@ -180,8 +180,7 @@ trj = ex.rollout(stepper, num_steps, include_init=True)(u_0)
 v_range = st.slider("Value range", 0.1, 10.0, 1.0)
 
 
-st.write(f"Linear: {linear_tuple}")
-st.write(f"Nonlinear: {nonlinear_tuple}")
+st.write(f"Linear: {linear_tuple}   Nonlinear: {nonlinear_tuple}")
 
 
 TEMPLATE_IFRAME = """
