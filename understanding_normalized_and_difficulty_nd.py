@@ -35,73 +35,110 @@ with st.sidebar:
     overall_scale = st.slider("Overall scale", 0.1, 10.0, 1.0)
 
     preset_mode = st.selectbox(
-        "Select a preset", ["None", "Burgers (single-channel hack)"]
+        "Select a preset",
+        [
+            "None",
+            "Burgers (single-channel hack)",
+            "KdV (viscous, single-channel-hack)",
+            "KdV (hyper-viscous, single-channel-hack)",
+            "KS (conservative, single-channel-hack)",
+            "KS (combustion)",
+        ],
     )
 
-    if preset_mode == "None":
-        a_0_default_mantisssa = 0.0
-        a_0_default_exponent = 0
-        a_0_default_sign = "-"
+    a_0_default_mantisssa = 0.0
+    a_0_default_exponent = 0
+    a_0_default_sign = "-"
 
+    a_1_default_mantisssa = 0.0
+    a_1_default_exponent = 0
+    a_1_default_sign = "-"
+
+    a_2_default_mantisssa = 0.0
+    a_2_default_exponent = 0
+    a_2_default_sign = "-"
+
+    a_3_default_mantisssa = 0.0
+    a_3_default_exponent = 0
+    a_3_default_sign = "-"
+
+    a_4_default_mantisssa = 0.0
+    a_4_default_exponent = 0
+    a_4_default_sign = "-"
+
+    b_0_default_mantisssa = 0.0
+    b_0_default_exponent = 0
+    b_0_default_sign = "-"
+
+    b_1_default_mantisssa = 0.0
+    b_1_default_exponent = 0
+    b_1_default_sign = "-"
+
+    b_2_default_mantisssa = 0.0
+    b_2_default_exponent = 0
+    b_2_default_sign = "-"
+    if preset_mode == "None":
         a_1_default_mantisssa = 0.1
         a_1_default_exponent = 0
         a_1_default_sign = "-"
 
-        a_2_default_mantisssa = 0.0
-        a_2_default_exponent = 0
-        a_2_default_sign = "-"
-
-        a_3_default_mantisssa = 0.0
-        a_3_default_exponent = 0
-        a_3_default_sign = "-"
-
-        a_4_default_mantisssa = 0.0
-        a_4_default_exponent = 0
-        a_4_default_sign = "-"
-
-        b_0_default_mantisssa = 0.0
-        b_0_default_exponent = 0
-        b_0_default_sign = "-"
-
-        b_1_default_mantisssa = 0.0
-        b_1_default_exponent = 0
-        b_1_default_sign = "-"
-
-        b_2_default_mantisssa = 0.0
-        b_2_default_exponent = 0
-        b_2_default_sign = "-"
-
     elif preset_mode == "Burgers (single-channel hack)":
-        a_0_default_mantisssa = 0.0
-        a_0_default_exponent = 0
-        a_0_default_sign = "-"
-
-        a_1_default_mantisssa = 0.0
-        a_1_default_exponent = 0
-        a_1_default_sign = "-"
-
         a_2_default_mantisssa = 0.15
         a_2_default_exponent = 1
         a_2_default_sign = "+"
 
-        a_3_default_mantisssa = 0.0
-        a_3_default_exponent = 0
-        a_3_default_sign = "-"
-
-        a_4_default_mantisssa = 0.0
-        a_4_default_exponent = 0
-        a_4_default_sign = "-"
-
-        b_0_default_mantisssa = 0.0
-        b_0_default_exponent = 0
-        b_0_default_sign = "-"
-
-        b_1_default_mantisssa = 0.0
-        b_1_default_exponent = 0
+        b_1_default_mantisssa = 0.2
+        b_1_default_exponent = 1
         b_1_default_sign = "-"
 
-        b_2_default_mantisssa = 0.0
-        b_2_default_exponent = 0
+    elif preset_mode == "KdV (viscous, single-channel-hack)":
+        a_2_default_mantisssa = 0.2
+        a_2_default_exponent = 1
+        a_2_default_sign = "+"
+
+        a_3_default_mantisssa = 0.14
+        a_3_default_exponent = 2
+        a_3_default_sign = "-"
+
+        b_1_default_mantisssa = 0.2
+        b_1_default_exponent = 1
+        b_1_default_sign = "-"
+    elif preset_mode == "KdV (hyper-viscous, single-channel-hack)":
+        a_3_default_mantisssa = 0.14
+        a_3_default_exponent = 2
+        a_3_default_sign = "-"
+
+        a_4_default_mantisssa = 0.9
+        a_4_default_exponent = 1
+        a_4_default_sign = "-"
+
+        b_1_default_mantisssa = 0.2
+        b_1_default_exponent = 1
+        b_1_default_sign = "-"
+
+    elif preset_mode == "KS (conservative, single-channel-hack)":
+        a_2_default_mantisssa = 0.2
+        a_2_default_exponent = 1
+        a_2_default_sign = "-"
+
+        a_4_default_mantisssa = 0.15
+        a_4_default_exponent = 2
+        a_4_default_sign = "-"
+
+        b_1_default_mantisssa = 0.1
+        b_1_default_exponent = 1
+        b_1_default_sign = "-"
+    elif preset_mode == "KS (combustion)":
+        a_2_default_mantisssa = 0.12
+        a_2_default_exponent = 1
+        a_2_default_sign = "-"
+
+        a_4_default_mantisssa = 0.15
+        a_4_default_exponent = 2
+        a_4_default_sign = "-"
+
+        b_2_default_mantisssa = 0.6
+        b_2_default_exponent = 1
         b_2_default_sign = "-"
 
     use_difficulty = st.toggle("Use difficulty", value=True)
