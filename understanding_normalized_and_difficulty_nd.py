@@ -23,6 +23,7 @@ st.set_page_config(layout="wide")
 jax.config.update("jax_platform_name", "cpu")
 
 with st.sidebar:
+    st.title("Exponax Dynamics Brewer")
     dimension_type = st.select_slider(
         "Number of Spatial Dimensions (ST=Spatio-Temporal plot)",
         options=["1d ST", "1d", "2d", "2d ST", "3d"],
@@ -31,6 +32,10 @@ with st.sidebar:
     num_steps = st.slider("Number of steps", 1, 300, 50)
     num_modes_init = st.slider("Number of modes in the initial condition", 1, 40, 5)
     num_substeps = st.slider("Number of substeps", 1, 100, 1)
+
+    v_range = st.slider("Value range", 0.1, 10.0, 1.0)
+
+    st.divider()
 
     overall_scale = st.slider("Overall scale", 0.1, 10.0, 1.0)
 
@@ -229,24 +234,14 @@ with st.sidebar:
         )
     b_2 = float(f"{b_2_sign}{b_2_mantissa}e{b_2_exponent}")
 
-    # elif preset_mode == "Burgers (single-channel hack)":
-    #     use_difficulty = True
+    linear_tuple = (a_0, a_1, a_2, a_3, a_4)
+    nonlinear_tuple = (b_0, b_1, b_2)
 
-    #     a_0 = 0.0
-    #     a_1 = 0.0
-    #     a_2 = 1.5
-    #     a_3 = 0.0
-    #     a_4 = 0.0
-    #     b_0 = 0.0
-    #     b_1 = -2.0
-    #     b_2 = 0.0
+    linear_tuple = tuple([overall_scale * x for x in linear_tuple])
+    nonlinear_tuple = tuple([overall_scale * x for x in nonlinear_tuple])
 
-
-linear_tuple = (a_0, a_1, a_2, a_3, a_4)
-nonlinear_tuple = (b_0, b_1, b_2)
-
-linear_tuple = tuple([overall_scale * x for x in linear_tuple])
-nonlinear_tuple = tuple([overall_scale * x for x in nonlinear_tuple])
+    st.write(f"Linear: {linear_tuple}")
+    st.write(f"Nonlinear: {nonlinear_tuple}")
 
 if dimension_type in ["1d ST", "1d"]:
     num_spatial_dims = 1
@@ -291,12 +286,6 @@ else:
 u_0 = ic_gen(num_points, key=jax.random.PRNGKey(0))
 
 trj = ex.rollout(stepper, num_steps, include_init=True)(u_0)
-
-
-v_range = st.slider("Value range", 0.1, 10.0, 1.0)
-
-
-st.write(f"Linear: {linear_tuple}   Nonlinear: {nonlinear_tuple}")
 
 
 TEMPLATE_IFRAME = """
