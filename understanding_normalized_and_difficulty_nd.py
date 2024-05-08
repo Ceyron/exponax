@@ -39,91 +39,170 @@ with st.sidebar:
     )
 
     if preset_mode == "None":
-        use_difficulty = st.toggle("Use difficulty", value=True)
+        a_0_default_mantisssa = 0.0
+        a_0_default_exponent = 0
+        a_0_default_sign = "-"
 
-        a_0_cols = st.columns(3)
-        with a_0_cols[0]:
-            a_0_mantissa = st.slider("a_0 mantissa", 0.0, 1.0, 0.0)
-        with a_0_cols[1]:
-            a_0_exponent = st.slider("a_0 exponent", -5, 5, 0)
-        with a_0_cols[2]:
-            a_0_sign = st.select_slider("a_0 sign", options=["-", "+"])
-        a_0 = float(f"{a_0_sign}{a_0_mantissa}e{a_0_exponent}")
+        a_1_default_mantisssa = 0.1
+        a_1_default_exponent = 0
+        a_1_default_sign = "-"
 
-        a_1_cols = st.columns(3)
-        with a_1_cols[0]:
-            a_1_mantissa = st.slider("a_1 mantissa", 0.0, 1.0, 0.1)
-        with a_1_cols[1]:
-            a_1_exponent = st.slider("a_1 exponent", -5, 5, 0)
-        with a_1_cols[2]:
-            a_1_sign = st.select_slider("a_1 sign", options=["-", "+"])
-        a_1 = float(f"{a_1_sign}{a_1_mantissa}e{a_1_exponent}")
+        a_2_default_mantisssa = 0.0
+        a_2_default_exponent = 0
+        a_2_default_sign = "-"
 
-        a_2_cols = st.columns(3)
-        with a_2_cols[0]:
-            a_2_mantissa = st.slider("a_2 mantissa", 0.0, 1.0, 0.0)
-        with a_2_cols[1]:
-            a_2_exponent = st.slider("a_2 exponent", -5, 5, 0)
-        with a_2_cols[2]:
-            a_2_sign = st.select_slider("a_2 sign", options=["-", "+"])
-        a_2 = float(f"{a_2_sign}{a_2_mantissa}e{a_2_exponent}")
+        a_3_default_mantisssa = 0.0
+        a_3_default_exponent = 0
+        a_3_default_sign = "-"
 
-        a_3_cols = st.columns(3)
-        with a_3_cols[0]:
-            a_3_mantissa = st.slider("a_3 mantissa", 0.0, 1.0, 0.0)
-        with a_3_cols[1]:
-            a_3_exponent = st.slider("a_3 exponent", -5, 5, 0)
-        with a_3_cols[2]:
-            a_3_sign = st.select_slider("a_3 sign", options=["-", "+"])
-        a_3 = float(f"{a_3_sign}{a_3_mantissa}e{a_3_exponent}")
+        a_4_default_mantisssa = 0.0
+        a_4_default_exponent = 0
+        a_4_default_sign = "-"
 
-        a_4_cols = st.columns(3)
-        with a_4_cols[0]:
-            a_4_mantissa = st.slider("a_4 mantissa", 0.0, 1.0, 0.0)
-        with a_4_cols[1]:
-            a_4_exponent = st.slider("a_4 exponent", -5, 5, 0)
-        with a_4_cols[2]:
-            a_4_sign = st.select_slider("a_4 sign", options=["-", "+"])
-        a_4 = float(f"{a_4_sign}{a_4_mantissa}e{a_4_exponent}")
+        b_0_default_mantisssa = 0.0
+        b_0_default_exponent = 0
+        b_0_default_sign = "-"
 
-        b_0_cols = st.columns(3)
-        with b_0_cols[0]:
-            b_0_mantissa = st.slider("b_0 mantissa", 0.0, 1.0, 0.0)
-        with b_0_cols[1]:
-            b_0_exponent = st.slider("b_0 exponent", -5, 5, 0)
-        with b_0_cols[2]:
-            b_0_sign = st.select_slider("b_0 sign", options=["-", "+"])
-        b_0 = float(f"{b_0_sign}{b_0_mantissa}e{b_0_exponent}")
+        b_1_default_mantisssa = 0.0
+        b_1_default_exponent = 0
+        b_1_default_sign = "-"
 
-        b_1_cols = st.columns(3)
-        with b_1_cols[0]:
-            b_1_mantissa = st.slider("b_1 mantissa", 0.0, 1.0, 0.0)
-        with b_1_cols[1]:
-            b_1_exponent = st.slider("b_1 exponent", -5, 5, 0)
-        with b_1_cols[2]:
-            b_1_sign = st.select_slider("b_1 sign", options=["-", "+"])
-        b_1 = float(f"{b_1_sign}{b_1_mantissa}e{b_1_exponent}")
-
-        b_2_cols = st.columns(3)
-        with b_2_cols[0]:
-            b_2_mantissa = st.slider("b_2 mantissa", 0.0, 1.0, 0.0)
-        with b_2_cols[1]:
-            b_2_exponent = st.slider("b_2 exponent", -5, 5, 0)
-        with b_2_cols[2]:
-            b_2_sign = st.select_slider("b_2 sign", options=["-", "+"])
-        b_2 = float(f"{b_2_sign}{b_2_mantissa}e{b_2_exponent}")
+        b_2_default_mantisssa = 0.0
+        b_2_default_exponent = 0
+        b_2_default_sign = "-"
 
     elif preset_mode == "Burgers (single-channel hack)":
-        use_difficulty = True
+        a_0_default_mantisssa = 0.0
+        a_0_default_exponent = 0
+        a_0_default_sign = "-"
 
-        a_0 = 0.0
-        a_1 = 0.0
-        a_2 = 1.5
-        a_3 = 0.0
-        a_4 = 0.0
-        b_0 = 0.0
-        b_1 = -2.0
-        b_2 = 0.0
+        a_1_default_mantisssa = 0.0
+        a_1_default_exponent = 0
+        a_1_default_sign = "-"
+
+        a_2_default_mantisssa = 0.15
+        a_2_default_exponent = 1
+        a_2_default_sign = "+"
+
+        a_3_default_mantisssa = 0.0
+        a_3_default_exponent = 0
+        a_3_default_sign = "-"
+
+        a_4_default_mantisssa = 0.0
+        a_4_default_exponent = 0
+        a_4_default_sign = "-"
+
+        b_0_default_mantisssa = 0.0
+        b_0_default_exponent = 0
+        b_0_default_sign = "-"
+
+        b_1_default_mantisssa = 0.0
+        b_1_default_exponent = 0
+        b_1_default_sign = "-"
+
+        b_2_default_mantisssa = 0.0
+        b_2_default_exponent = 0
+        b_2_default_sign = "-"
+
+    use_difficulty = st.toggle("Use difficulty", value=True)
+
+    a_0_cols = st.columns(3)
+    with a_0_cols[0]:
+        a_0_mantissa = st.slider("a_0 mantissa", 0.0, 1.0, a_0_default_mantisssa)
+    with a_0_cols[1]:
+        a_0_exponent = st.slider("a_0 exponent", -5, 5, a_0_default_exponent)
+    with a_0_cols[2]:
+        a_0_sign = st.select_slider("a_0 sign", options=["-", "+"])
+    a_0 = float(f"{a_0_sign}{a_0_mantissa}e{a_0_exponent}")
+
+    a_1_cols = st.columns(3)
+    with a_1_cols[0]:
+        a_1_mantissa = st.slider("a_1 mantissa", 0.0, 1.0, a_1_default_mantisssa)
+    with a_1_cols[1]:
+        a_1_exponent = st.slider("a_1 exponent", -5, 5, a_0_default_exponent)
+    with a_1_cols[2]:
+        a_1_sign = st.select_slider(
+            "a_1 sign", options=["-", "+"], value=a_1_default_sign
+        )
+    a_1 = float(f"{a_1_sign}{a_1_mantissa}e{a_1_exponent}")
+
+    a_2_cols = st.columns(3)
+    with a_2_cols[0]:
+        a_2_mantissa = st.slider("a_2 mantissa", 0.0, 1.0, a_2_default_mantisssa)
+    with a_2_cols[1]:
+        a_2_exponent = st.slider("a_2 exponent", -5, 5, a_2_default_exponent)
+    with a_2_cols[2]:
+        a_2_sign = st.select_slider(
+            "a_2 sign", options=["-", "+"], value=a_2_default_sign
+        )
+    a_2 = float(f"{a_2_sign}{a_2_mantissa}e{a_2_exponent}")
+
+    a_3_cols = st.columns(3)
+    with a_3_cols[0]:
+        a_3_mantissa = st.slider("a_3 mantissa", 0.0, 1.0, a_3_default_mantisssa)
+    with a_3_cols[1]:
+        a_3_exponent = st.slider("a_3 exponent", -5, 5, a_3_default_exponent)
+    with a_3_cols[2]:
+        a_3_sign = st.select_slider(
+            "a_3 sign", options=["-", "+"], value=a_3_default_sign
+        )
+    a_3 = float(f"{a_3_sign}{a_3_mantissa}e{a_3_exponent}")
+
+    a_4_cols = st.columns(3)
+    with a_4_cols[0]:
+        a_4_mantissa = st.slider("a_4 mantissa", 0.0, 1.0, a_4_default_mantisssa)
+    with a_4_cols[1]:
+        a_4_exponent = st.slider("a_4 exponent", -5, 5, a_4_default_exponent)
+    with a_4_cols[2]:
+        a_4_sign = st.select_slider(
+            "a_4 sign", options=["-", "+"], value=a_4_default_sign
+        )
+    a_4 = float(f"{a_4_sign}{a_4_mantissa}e{a_4_exponent}")
+
+    b_0_cols = st.columns(3)
+    with b_0_cols[0]:
+        b_0_mantissa = st.slider("b_0 mantissa", 0.0, 1.0, b_0_default_mantisssa)
+    with b_0_cols[1]:
+        b_0_exponent = st.slider("b_0 exponent", -5, 5, b_0_default_exponent)
+    with b_0_cols[2]:
+        b_0_sign = st.select_slider(
+            "b_0 sign", options=["-", "+"], value=b_0_default_sign
+        )
+    b_0 = float(f"{b_0_sign}{b_0_mantissa}e{b_0_exponent}")
+
+    b_1_cols = st.columns(3)
+    with b_1_cols[0]:
+        b_1_mantissa = st.slider("b_1 mantissa", 0.0, 1.0, b_1_default_mantisssa)
+    with b_1_cols[1]:
+        b_1_exponent = st.slider("b_1 exponent", -5, 5, b_1_default_exponent)
+    with b_1_cols[2]:
+        b_1_sign = st.select_slider(
+            "b_1 sign", options=["-", "+"], value=b_1_default_sign
+        )
+    b_1 = float(f"{b_1_sign}{b_1_mantissa}e{b_1_exponent}")
+
+    b_2_cols = st.columns(3)
+    with b_2_cols[0]:
+        b_2_mantissa = st.slider("b_2 mantissa", 0.0, 1.0, b_2_default_mantisssa)
+    with b_2_cols[1]:
+        b_2_exponent = st.slider("b_2 exponent", -5, 5, b_2_default_exponent)
+    with b_2_cols[2]:
+        b_2_sign = st.select_slider(
+            "b_2 sign", options=["-", "+"], value=b_2_default_sign
+        )
+    b_2 = float(f"{b_2_sign}{b_2_mantissa}e{b_2_exponent}")
+
+    # elif preset_mode == "Burgers (single-channel hack)":
+    #     use_difficulty = True
+
+    #     a_0 = 0.0
+    #     a_1 = 0.0
+    #     a_2 = 1.5
+    #     a_3 = 0.0
+    #     a_4 = 0.0
+    #     b_0 = 0.0
+    #     b_1 = -2.0
+    #     b_2 = 0.0
 
 
 linear_tuple = (a_0, a_1, a_2, a_3, a_4)
