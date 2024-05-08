@@ -34,7 +34,9 @@ with st.sidebar:
 
     overall_scale = st.slider("Overall scale", 0.1, 10.0, 1.0)
 
-    preset_mode = st.selectbox("Select a preset", ["None"])
+    preset_mode = st.selectbox(
+        "Select a preset", ["None", "Burgers (single-channel hack)"]
+    )
 
     if preset_mode == "None":
         use_difficulty = st.toggle("Use difficulty", value=True)
@@ -110,6 +112,18 @@ with st.sidebar:
         with b_2_cols[2]:
             b_2_sign = st.select_slider("b_2 sign", options=["-", "+"])
         b_2 = float(f"{b_2_sign}{b_2_mantissa}e{b_2_exponent}")
+
+    elif preset_mode == "Burgers (single-channel hack)":
+        use_difficulty = True
+
+        a_0 = 0.0
+        a_1 = 0.0
+        a_2 = 1.5
+        a_3 = 0.0
+        a_4 = 0.0
+        b_0 = 0.0
+        b_1 = -2.0
+        b_2 = 0.0
 
 
 linear_tuple = (a_0, a_1, a_2, a_3, a_4)
