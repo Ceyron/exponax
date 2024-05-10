@@ -201,6 +201,35 @@ class KolmogorovFlowVorticity(BaseStepper):
         A negative drag coefficient `λ` is needed to remove some of the energy
         piling up in low modes.
 
+        According to
+
+            Chandler, G.J. and Kerswell, R.R. (2013) ‘Invariant recurrent
+            solutions embedded in a turbulent two-dimensional Kolmogorov flow’,
+            Journal of Fluid Mechanics, 722, pp. 554–595.
+            doi:10.1017/jfm.2013.122.
+
+        equation (2.5), the Reynolds number of the Kolmogorov flow is given by
+
+            Re = √ζ / ν √(L / (2π))³
+
+        with `ζ` being the scaling of the Kolmogorov forcing, i.e., the
+        `injection_scale`. Hence, in the case of `L = 2π`, `ζ = 1`, the Reynolds
+        number is `Re = 1 / ν`. If one uses the default value of `ν = 0.001`,
+        the Reynolds number is `Re = 1000` which also corresponds to the main
+        experiments in
+
+            Kochkov, D., Smith, J.A., Alieva, A., Wang, Q., Brenner, M.P. and
+            Hoyer, S., 2021. Machine learning–accelerated computational fluid
+            dynamics. Proceedings of the National Academy of Sciences, 118(21),
+            p.e2101784118.
+
+        together with `injection_mode = 4`. Note that they required a resolution
+        of `num_points = 2048` (=> 2048^2 = 4.2M degrees of freedom in 2d) to
+        fully resolve all scales at that Reynolds number. Using `Re = 0.01`
+        which corresponds to `ν = 0.01` can be a good starting for
+        `num_points=128`.
+
+
         **Arguments:**
             - `num_spatial_dims`: The number of spatial dimensions `d`.
             - `domain_extent`: The size of the domain `L`; in higher dimensions
@@ -218,8 +247,8 @@ class KolmogorovFlowVorticity(BaseStepper):
                 convection term. Default is `1.0`.
             - `drag`: The drag coefficient `λ`. Default is `-0.1`.
             - `injection_mode`: The mode of the injection. Default is `4`.
-            - `injection_scale`: The scaling factor for the injection. Default is
-                `1.0`.
+            - `injection_scale`: The scaling factor for the injection. Default
+                is `1.0`.
             - `order`: The order of the Exponential Time Differencing Runge
                 Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0`
                 only solves the linear part of the equation. Use higher values
