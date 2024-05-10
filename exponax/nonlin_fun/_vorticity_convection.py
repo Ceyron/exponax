@@ -120,25 +120,28 @@ class VorticityConvection2dKolmogorov(VorticityConvection2d):
             f = -k (2π/L) γ cos(k (2π/L) x₁)
         ```
 
-        i.e., energy of intensity `γ` is injected at wavenumber `k`.
+        i.e., energy of intensity `γ` is injected at wavenumber `k`. Note that
+        the forcing is on the **vorticity**. As such, we get the prefactor `k
+        (2π/L)` and the `sin(...)` turns into a `-cos(...)` (minus sign because
+        the vorticity is derived via the curl).
 
         **Arguments:**
             - `num_spatial_dims`: The number of spatial dimensions `d`.
             - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and **excludes**
-                the right boundary point. In higher dimensions; the number of
-                points in each dimension is the same.
-            - `convection_scale`: The scale `b` of the convection term. Defaults to
-                `1.0`.
+                domain. This **includes** the left boundary point and
+                **excludes** the right boundary point. In higher dimensions; the
+                number of points in each dimension is the same.
+            - `convection_scale`: The scale `b` of the convection term. Defaults
+                to `1.0`.
             - `injection_mode`: The wavenumber `k` at which energy is injected.
                 Defaults to `4`.
-            - `injection_scale`: The intensity `γ` of the injection term. Defaults
-                to `1.0`.
-            - `derivative_operator`: A complex array of shape `(d, ..., N//2+1)` that
-                represents the derivative operator in Fourier space.
-            - `dealiasing_fraction`: The fraction of the highest resolved modes that
-                are not aliased. Defaults to `2/3` which corresponds to Orszag's 2/3
-                rule.
+            - `injection_scale`: The intensity `γ` of the injection term.
+                Defaults to `1.0`.
+            - `derivative_operator`: A complex array of shape `(d, ..., N//2+1)`
+                that represents the derivative operator in Fourier space.
+            - `dealiasing_fraction`: The fraction of the highest resolved modes
+                that are not aliased. Defaults to `2/3` which corresponds to
+                Orszag's 2/3 rule.
         """
         super().__init__(
             num_spatial_dims,
@@ -148,13 +151,15 @@ class VorticityConvection2dKolmogorov(VorticityConvection2d):
             dealiasing_fraction=dealiasing_fraction,
         )
 
-        # TODO: shouldn't this be scaled differently sine we are in the
-        # streamfunction-vorticity formulation?
         wavenumbers = build_wavenumbers(num_spatial_dims, num_points)
         injection_mask = (wavenumbers[0] == 0) & (wavenumbers[1] == injection_mode)
         self.injection = jnp.where(
             injection_mask,
-            injection_scale * build_scaling_array(num_spatial_dims, num_points),
+            # Need to additional scale the `injection_scale` with the
+            # `injection_mode`, because we apply the forcing on the vorticity.
+            -injection_mode
+            * injection_scale
+            * build_scaling_array(num_spatial_dims, num_points),
             0.0,
         )
 
