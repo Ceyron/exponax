@@ -110,8 +110,8 @@ with st.sidebar:
             feed_rate = 0.008
             kill_rate = 0.046
         elif gs_type == "beta":
-            feed_rate = 0.016
-            kill_rate = 0.040
+            feed_rate = 0.020
+            kill_rate = 0.046
         elif gs_type == "gamma":
             feed_rate = 0.024
             kill_rate = 0.056
@@ -122,9 +122,11 @@ with st.sidebar:
             feed_rate = 0.02
             kill_rate = 0.056
         elif gs_type == "zeta":
+            # Does not seem to work
             feed_rate = 0.024
             kill_rate = 0.06
         elif gs_type == "eta":
+            # Does not seem to work
             feed_rate = 0.036
             kill_rate = 0.063
         elif gs_type == "theta":
@@ -134,12 +136,14 @@ with st.sidebar:
             feed_rate = 0.05
             kill_rate = 0.0605
         elif gs_type == "kappa":
-            feed_rate = 0.04
+            feed_rate = 0.052
             kill_rate = 0.063
         elif gs_type == "lambda":
+            # Does not seem to work
             feed_rate = 0.036
             kill_rate = 0.0655
         elif gs_type == "mu":
+            # Does not seem to work
             feed_rate = 0.044
             kill_rate = 0.066
 
