@@ -40,7 +40,8 @@ with st.sidebar:
     st.divider()
 
     rd_type = st.select_slider(
-        "Type of Equation", ["FisherKPP", "GrayScott", "SwiftHohenberg"]
+        "Type of Equation",
+        ["FisherKPP", "GrayScott", "GrayScottType", "SwiftHohenberg"],
     )
 
     domain_extent_cols = st.columns(3)
@@ -86,6 +87,65 @@ with st.sidebar:
         kill_rate = st.slider("kill_rate", 0.03, 0.07, 0.046, 0.002, format="%.3f")
 
         st.write("Only displays the second channel")
+    elif rd_type == "GrayScottType":
+        gs_type = st.select_slider(
+            "Type of Gray-Scott",
+            [
+                "alpha",
+                "beta",
+                "gamma",
+                "delta",
+                "epsilon",
+                "zeta",
+                "eta",
+                "theta",
+                "iota",
+                "kappa",
+                "lambda",
+                "mu",
+            ],
+        )
+
+        if gs_type == "alpha":
+            feed_rate = 0.008
+            kill_rate = 0.046
+        elif gs_type == "beta":
+            feed_rate = 0.016
+            kill_rate = 0.040
+        elif gs_type == "gamma":
+            feed_rate = 0.024
+            kill_rate = 0.056
+        elif gs_type == "delta":
+            feed_rate = 0.028
+            kill_rate = 0.056
+        elif gs_type == "epsilon":
+            feed_rate = 0.02
+            kill_rate = 0.056
+        elif gs_type == "zeta":
+            feed_rate = 0.024
+            kill_rate = 0.06
+        elif gs_type == "eta":
+            feed_rate = 0.036
+            kill_rate = 0.063
+        elif gs_type == "theta":
+            feed_rate = 0.04
+            kill_rate = 0.06
+        elif gs_type == "iota":
+            feed_rate = 0.05
+            kill_rate = 0.0605
+        elif gs_type == "kappa":
+            feed_rate = 0.04
+            kill_rate = 0.063
+        elif gs_type == "lambda":
+            feed_rate = 0.036
+            kill_rate = 0.0655
+        elif gs_type == "mu":
+            feed_rate = 0.044
+            kill_rate = 0.066
+
+        st.write(f"feed_rate: {feed_rate}")
+        st.write(f"kill_rate: {kill_rate}")
+        st.write("Only displays the second channel")
     elif rd_type == "SwiftHohenberg":
         reactivity = st.slider("reactivity", 0.0, 1.0, 0.7)
         critical_number = st.slider("critical_number", 0.0, 1.0, 1.0)
@@ -116,7 +176,7 @@ if rd_type == "FisherKPP":
         ),
         num_substeps,
     )
-elif rd_type == "GrayScott":
+elif rd_type == "GrayScott" or rd_type == "GrayScottType":
     stepper = ex.RepeatedStepper(
         ex.reaction.GrayScott(
             num_spatial_dims,
@@ -141,7 +201,7 @@ elif rd_type == "SwiftHohenberg":
         num_substeps,
     )
 
-if rd_type == "GrayScott":
+if rd_type == "GrayScott" or rd_type == "GrayScottType":
     ic_gen = ex.ic.RandomMultiChannelICGenerator(
         [
             ex.ic.RandomGaussianBlobs(num_spatial_dims, one_complement=True),
@@ -165,7 +225,7 @@ u_0 = ic_gen(num_points, key=jax.random.PRNGKey(0))
 
 trj = ex.rollout(stepper, num_steps, include_init=True)(u_0)
 
-if rd_type == "GrayScott":
+if rd_type == "GrayScott" or rd_type == "GrayScottType":
     trj = trj[:, 1:]
 
 
