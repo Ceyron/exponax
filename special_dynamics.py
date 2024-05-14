@@ -67,16 +67,6 @@ with st.sidebar:
     dt_sign = "+"
     dt = float(f"{dt_sign}{dt_mantissa}e{dt_exponent}")
 
-    diffusivity_cols = st.columns(3)
-    with diffusivity_cols[0]:
-        diffusivity_mantissa = st.slider("diffusivity mantissa", 0.0, 1.0, 0.1)
-    with diffusivity_cols[1]:
-        diffusivity_exponent = st.slider("diffusivity exponent", -5, 5, -2)
-    diffusivity_sign = "+"
-    diffusivity = float(
-        f"{diffusivity_sign}{diffusivity_mantissa}e{diffusivity_exponent}"
-    )
-
     dynamic_type = st.select_slider(
         "Dynamic Type",
         [
@@ -129,6 +119,140 @@ with st.sidebar:
         else:
             advectivity = jnp.array([advectivity_0, advectivity_1])
 
+    if dynamic_type == "Anisotropic Diffusion":
+        diffusivity_0_0_cols = st.columns(3)
+        with diffusivity_0_0_cols[0]:
+            diffusivity_0_0_mantissa = st.slider(
+                "diffusivity_0_0 mantissa", 0.0, 1.0, 0.1
+            )
+        with diffusivity_0_0_cols[1]:
+            diffusivity_0_0_exponent = st.slider("diffusivity_0_0 exponent", -5, 5, 0)
+        with diffusivity_0_0_cols[2]:
+            diffusivity_0_0_sign = st.select_slider("diffusivity_0_0 sign", ["+", "-"])
+        diffusivity_0_0 = float(
+            f"{diffusivity_0_0_sign}{diffusivity_0_0_mantissa}e{diffusivity_0_0_exponent}"
+        )
+
+        diffusivity_1_1_cols = st.columns(3)
+        with diffusivity_1_1_cols[0]:
+            diffusivity_1_1_mantissa = st.slider(
+                "diffusivity_1_1 mantissa", 0.0, 1.0, 0.1
+            )
+        with diffusivity_1_1_cols[1]:
+            diffusivity_1_1_exponent = st.slider("diffusivity_1_1 exponent", -5, 5, 0)
+        with diffusivity_1_1_cols[2]:
+            diffusivity_1_1_sign = st.select_slider("diffusivity_1_1 sign", ["+", "-"])
+        diffusivity_1_1 = float(
+            f"{diffusivity_1_1_sign}{diffusivity_1_1_mantissa}e{diffusivity_1_1_exponent}"
+        )
+
+        if num_spatial_dims == 3:
+            diffusivity_2_2_cols = st.columns(3)
+            with diffusivity_2_2_cols[0]:
+                diffusivity_2_2_mantissa = st.slider(
+                    "diffusivity_2_2 mantissa", 0.0, 1.0, 0.1
+                )
+            with diffusivity_2_2_cols[1]:
+                diffusivity_2_2_exponent = st.slider(
+                    "diffusivity_2_2 exponent", -5, 5, 0
+                )
+            with diffusivity_2_2_cols[2]:
+                diffusivity_2_2_sign = st.select_slider(
+                    "diffusivity_2_2 sign", ["+", "-"]
+                )
+            diffusivity_2_2 = float(
+                f"{diffusivity_2_2_sign}{diffusivity_2_2_mantissa}e{diffusivity_2_2_exponent}"
+            )
+
+            diffusivity_0_1_cols = st.columns(3)
+            with diffusivity_0_1_cols[0]:
+                diffusivity_0_1_mantissa = st.slider(
+                    "diffusivity_0_1 mantissa", 0.0, 1.0, 0.1
+                )
+            with diffusivity_0_1_cols[1]:
+                diffusivity_0_1_exponent = st.slider(
+                    "diffusivity_0_1 exponent", -5, 5, 0
+                )
+            with diffusivity_0_1_cols[2]:
+                diffusivity_0_1_sign = st.select_slider(
+                    "diffusivity_0_1 sign", ["+", "-"]
+                )
+            diffusivity_0_1 = float(
+                f"{diffusivity_0_1_sign}{diffusivity_0_1_mantissa}e{diffusivity_0_1_exponent}"
+            )
+
+            diffusivity_0_2_cols = st.columns(3)
+            with diffusivity_0_2_cols[0]:
+                diffusivity_0_2_mantissa = st.slider(
+                    "diffusivity_0_2 mantissa", 0.0, 1.0, 0.1
+                )
+            with diffusivity_0_2_cols[1]:
+                diffusivity_0_2_exponent = st.slider(
+                    "diffusivity_0_2 exponent", -5, 5, 0
+                )
+            with diffusivity_0_2_cols[2]:
+                diffusivity_0_2_sign = st.select_slider(
+                    "diffusivity_0_2 sign", ["+", "-"]
+                )
+            diffusivity_0_2 = float(
+                f"{diffusivity_0_2_sign}{diffusivity_0_2_mantissa}e{diffusivity_0_2_exponent}"
+            )
+
+            diffusivity_1_2_cols = st.columns(3)
+            with diffusivity_1_2_cols[0]:
+                diffusivity_1_2_mantissa = st.slider(
+                    "diffusivity_1_2 mantissa", 0.0, 1.0, 0.1
+                )
+            with diffusivity_1_2_cols[1]:
+                diffusivity_1_2_exponent = st.slider(
+                    "diffusivity_1_2 exponent", -5, 5, 0
+                )
+            with diffusivity_1_2_cols[2]:
+                diffusivity_1_2_sign = st.select_slider(
+                    "diffusivity_1_2 sign", ["+", "-"]
+                )
+            diffusivity_1_2 = float(
+                f"{diffusivity_1_2_sign}{diffusivity_1_2_mantissa}e{diffusivity_1_2_exponent}"
+            )
+
+            diffusivity_1_0 = diffusivity_0_1
+            diffusivity_2_0 = diffusivity_0_2
+            diffusivity_2_1 = diffusivity_1_2
+
+            diffusivity = jnp.array(
+                [
+                    [diffusivity_0_0, diffusivity_0_1, diffusivity_0_2],
+                    [diffusivity_1_0, diffusivity_1_1, diffusivity_1_2],
+                    [diffusivity_2_0, diffusivity_2_1, diffusivity_2_2],
+                ]
+            )
+        else:
+            diffusivity_0_1_cols = st.columns(3)
+            with diffusivity_0_1_cols[0]:
+                diffusivity_0_1_mantissa = st.slider(
+                    "diffusivity_0_1 mantissa", 0.0, 1.0, 0.1
+                )
+            with diffusivity_0_1_cols[1]:
+                diffusivity_0_1_exponent = st.slider(
+                    "diffusivity_0_1 exponent", -5, 5, 0
+                )
+            with diffusivity_0_1_cols[2]:
+                diffusivity_0_1_sign = st.select_slider(
+                    "diffusivity_0_1 sign", ["+", "-"]
+                )
+            diffusivity_0_1 = float(
+                f"{diffusivity_0_1_sign}{diffusivity_0_1_mantissa}e{diffusivity_0_1_exponent}"
+            )
+
+            diffusivity_1_0 = diffusivity_0_1
+
+            diffusivity = jnp.array(
+                [
+                    [diffusivity_0_0, diffusivity_0_1],
+                    [diffusivity_1_0, diffusivity_1_1],
+                ]
+            )
+
 
 if dynamic_type == "Unbalanced Advection":
     stepper = ex.stepper.Advection(
@@ -137,6 +261,14 @@ if dynamic_type == "Unbalanced Advection":
         num_points,
         dt,
         velocity=advectivity,
+    )
+elif dynamic_type == "Anisotropic Diffusion":
+    stepper = ex.stepper.Diffusion(
+        num_spatial_dims,
+        domain_extent,
+        num_points,
+        dt,
+        diffusivity=diffusivity,
     )
 
 
