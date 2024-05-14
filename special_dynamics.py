@@ -253,6 +253,19 @@ with st.sidebar:
                 ]
             )
 
+    elif dynamic_type == "Dispersion":
+        dispersivity_cols = st.columns(3)
+        with dispersivity_cols[0]:
+            dispersivity_mantissa = st.slider("dispersivity mantissa", 0.0, 1.0, 0.1)
+        with dispersivity_cols[1]:
+            dispersivity_exponent = st.slider("dispersivity exponent", -5, 5, 0)
+        dispersivity_sign = "+"
+        dispersivity = float(
+            f"{dispersivity_sign}{dispersivity_mantissa}e{dispersivity_exponent}"
+        )
+
+        advect_over_diffuse = st.toggle("Advect over diffuse", value=False)
+
 
 if dynamic_type == "Unbalanced Advection":
     stepper = ex.stepper.Advection(
@@ -269,6 +282,15 @@ elif dynamic_type == "Anisotropic Diffusion":
         num_points,
         dt,
         diffusivity=diffusivity,
+    )
+elif dynamic_type == "Dispersion":
+    stepper = ex.stepper.Dispersion(
+        num_spatial_dims,
+        domain_extent,
+        num_points,
+        dt,
+        dispersivity=dispersivity,
+        advect_on_diffusion=advect_over_diffuse,
     )
 
 
