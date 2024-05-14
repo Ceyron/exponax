@@ -73,8 +73,8 @@ with st.sidebar:
             "Unbalanced Advection",
             "Anisotropic Diffusion",
             "Dispersion",
-            "Hyper-Diffusions",
-            "Korteweg-de Vries",
+            "Hyper-Diffusion",
+            # "Korteweg-de Vries",
         ],
     )
 
@@ -266,6 +266,23 @@ with st.sidebar:
 
         advect_over_diffuse = st.toggle("Advect over diffuse", value=False)
 
+    elif dynamic_type == "Hyper-Diffusion":
+        hyper_diffusivity_cols = st.columns(3)
+        with hyper_diffusivity_cols[0]:
+            hyper_diffusivity_mantissa = st.slider(
+                "hyper_diffusivity mantissa", 0.0, 1.0, 0.1
+            )
+        with hyper_diffusivity_cols[1]:
+            hyper_diffusivity_exponent = st.slider(
+                "hyper_diffusivity exponent", -5, 5, 0
+            )
+        hyper_diffusivity_sign = "+"
+        hyper_diffusivity = float(
+            f"{hyper_diffusivity_sign}{hyper_diffusivity_mantissa}e{hyper_diffusivity_exponent}"
+        )
+
+        diffuse_over_diffuse = st.toggle("Diffuse over diffuse", value=False)
+
 
 if dynamic_type == "Unbalanced Advection":
     stepper = ex.stepper.Advection(
@@ -291,6 +308,15 @@ elif dynamic_type == "Dispersion":
         dt,
         dispersivity=dispersivity,
         advect_on_diffusion=advect_over_diffuse,
+    )
+elif dynamic_type == "Hyper-Diffusion":
+    stepper = ex.stepper.HyperDiffusion(
+        num_spatial_dims,
+        domain_extent,
+        num_points,
+        dt,
+        hyper_diffusivity=hyper_diffusivity,
+        diffuse_on_diffuse=diffuse_over_diffuse,
     )
 
 
