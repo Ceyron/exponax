@@ -470,3 +470,68 @@ def build_scaling_array(
     )
 
     return scaling
+
+
+def fft(
+    field: Float[Array, "C ... N"],
+    *,
+    num_spatial_dims: int,
+) -> Complex[Array, "C ... (N//2)+1"]:
+    """
+    Perform a **real-valued** FFT of a field. This function is designed for
+    states in `Exponax` with a leading channel axis and then one, two, or three
+    following spatial axes, **each of the same length** N.
+
+    Only accepts real-valued input fields and performs a real-valued FFT. Hence,
+    the last axis of the returned field is of length N//2+1.
+
+    **Arguments:**
+        - `field`: The field to transform, shape `(C, ..., N,)`.
+        - `num_spatial_dims`: The number of spatial dimensions, i.e., how many
+            spatial axes follow the channel axis.
+
+    **Returns:**
+        - `field_hat`: The transformed field, shape `(C, ..., N//2+1)`.
+    """
+    return jnp.fft.rfftn(field, axes=space_indices(num_spatial_dims))
+
+
+def ifft(
+    field_hat: Complex[Array, "C ... (N//2)+1"],
+    *,
+    num_spatial_dims: int,
+    num_points: int = None,
+) -> Float[Array, "C ... N"]:
+    """
+    Perform the inverse **real-valued** FFT of a field. This is the inverse
+    operation of `fft`. This function is designed for states in `Exponax` with a
+    leading channel axis and then one, two, or three following spatial axes. In
+    state space all spatial axes have the same length N (here called
+    `num_points`).
+
+    Requires a complex-valued field in Fourier space with the last axis of length
+    N//2+1.
+
+    The number of points (N, or `num_points`) must be provided if the number of
+    spatial dimensions is 1. Otherwise, it can be inferred from the shape of the
+    field.
+
+    **Arguments:**
+        - `field_hat`: The transformed field, shape `(C, ..., N//2+1)`.
+        - `num_spatial_dims`: The number of spatial dimensions.
+        - `num_points`: The number of points in each spatial dimension. Can be
+          inferred if `num_spatial_dims` >= 2
+
+    **Returns:**
+        - `field`: The transformed field, shape `(C, ..., N,)`.
+    """
+    if num_points is None:
+        if num_spatial_dims >= 2:
+            num_points = field_hat.shape[-2]
+        else:
+            raise ValueError("num_points must be provided if num_spatial_dims == 1.")
+    return jnp.fft.irfftn(
+        field_hat,
+        s=spatial_shape(num_spatial_dims, num_points),
+        axes=space_indices(num_spatial_dims),
+    )
