@@ -31,6 +31,7 @@ with st.sidebar:
     num_points = st.slider("Number of points", 16, 256, 48)
     num_steps = st.slider("Number of steps", 1, 300, 50)
     num_modes_init = st.slider("Number of modes in the initial condition", 1, 40, 5)
+    ic_seed = st.slider("Initial condition seed", 0, 100, 0)
     num_substeps = st.slider("Number of substeps", 1, 100, 1)
 
     v_range = st.slider("Value range", 0.1, 10.0, 1.0)
@@ -283,7 +284,7 @@ else:
     ic_gen = ex.ic.RandomTruncatedFourierSeries(
         num_spatial_dims, cutoff=num_modes_init, max_one=True
     )
-u_0 = ic_gen(num_points, key=jax.random.PRNGKey(0))
+u_0 = ic_gen(num_points, key=jax.random.PRNGKey(ic_seed))
 
 trj = ex.rollout(stepper, num_steps, include_init=True)(u_0)
 
