@@ -30,7 +30,7 @@ with st.sidebar:
     )
     num_points = st.slider("Number of points", 16, 256, 48)
     num_steps = st.slider("Number of steps", 1, 300, 50)
-    num_modes_init = st.slider("Number of modes in the initial condition", 1, 40, 5)
+    num_modes_init = st.slider("Number of modes in the initial condition", 1, 40, 10)
     ic_seed = st.slider("Initial condition seed", 0, 100, 0)
     num_substeps = st.slider("Number of substeps", 1, 100, 1)
 
@@ -49,6 +49,7 @@ with st.sidebar:
             "KdV (hyper-viscous, single-channel-hack)",
             "KS (conservative, single-channel-hack)",
             "KS (combustion)",
+            "Fisher-KPP (clamps IC)",
         ],
     )
 
@@ -146,6 +147,18 @@ with st.sidebar:
         b_2_default_mantisssa = 0.6
         b_2_default_exponent = 1
         b_2_default_sign = "-"
+    elif preset_mode == "Fisher-KPP (clamps IC)":
+        a_0_default_mantisssa = 0.2
+        a_0_default_exponent = -1
+        a_0_default_sign = "+"
+
+        a_2_default_mantisssa = 0.2
+        a_2_default_exponent = 0
+        a_2_default_sign = "+"
+
+        b_0_default_mantisssa = 0.2
+        b_0_default_exponent = -1
+        b_0_default_sign = "-"
 
     use_difficulty = st.toggle("Use difficulty", value=True)
 
@@ -155,7 +168,9 @@ with st.sidebar:
     with a_0_cols[1]:
         a_0_exponent = st.slider("a_0 exponent", -5, 5, a_0_default_exponent)
     with a_0_cols[2]:
-        a_0_sign = st.select_slider("a_0 sign", options=["-", "+"])
+        a_0_sign = st.select_slider(
+            "a_0 sign", options=["-", "+"], value=a_0_default_sign
+        )
     a_0 = float(f"{a_0_sign}{a_0_mantissa}e{a_0_exponent}")
 
     a_1_cols = st.columns(3)
@@ -284,6 +299,8 @@ else:
     ic_gen = ex.ic.RandomTruncatedFourierSeries(
         num_spatial_dims, cutoff=num_modes_init, max_one=True
     )
+if preset_mode == "Fisher-KPP (clamps IC)":
+    ic_gen = ex.ic.ClampingICGenerator(ic_gen, limits=(0, 1))
 u_0 = ic_gen(num_points, key=jax.random.PRNGKey(ic_seed))
 
 trj = ex.rollout(stepper, num_steps, include_init=True)(u_0)
