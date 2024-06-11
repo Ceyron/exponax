@@ -17,7 +17,12 @@ All plotting routines (three main routines and their three facet counterparts)
 can be animated over another axis (some notion of time).
 """
 
-from ._animate import animate_spatio_temporal, animate_state_1d, animate_state_2d
+from ._animate import (
+    animate_spatio_temporal,
+    animate_state_1d,
+    animate_state_2d,
+    animate_state_3d,
+)
 from ._animate_facet import (
     animate_spatial_temporal_facet,
     animate_state_1d_facet,
@@ -55,4 +60,5 @@ __all__ = [
     "volume_render_state_3d",
     "plot_state_3d",
     "plot_spatio_temporal_2d",
+    "animate_state_3d",
 ]

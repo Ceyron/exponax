@@ -1,11 +1,14 @@
-from typing import TypeVar
+from typing import Literal, TypeVar, Union
 
+import jax
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
 from jaxtyping import Array, Float
 from matplotlib.animation import FuncAnimation
 
+from .._utils import wrap_bc
 from ._plot import plot_spatio_temporal, plot_state_1d, plot_state_2d
+from ._volume import volume_render_state_3d, zigzag_alpha
 
 N = TypeVar("N")
 
@@ -231,5 +234,76 @@ def animate_state_2d(
     plt.close(fig)
 
     ani = FuncAnimation(fig, animate, frames=trj.shape[0], interval=100, blit=False)
+
+    return ani
+
+
+def animate_state_3d(
+    trj: Float[Array, "T 1 N N N"],
+    *,
+    vlim: tuple[float, float] = (-1.0, 1.0),
+    domain_extent: float = None,
+    dt: float = None,
+    include_init: bool = False,
+    ax=None,
+    bg_color: Union[
+        Literal["black"],
+        Literal["white"],
+        tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8],
+    ] = "white",
+    resolution: int = 384,
+    cmap: str = "RdBu_r",
+    transfer_function: callable = zigzag_alpha,
+    distance_scale: float = 10.0,
+    gamma_correction: float = 2.4,
+    chunk_size: int = 64,
+    **kwargs,
+):
+    if trj.ndim != 5:
+        raise ValueError("trj must be a five-axis array.")
+
+    fig, ax = plt.subplots()
+
+    if include_init:
+        temporal_grid = jnp.arange(trj.shape[0])
+    else:
+        temporal_grid = jnp.arange(1, trj.shape[0] + 1)
+
+    if dt is not None:
+        temporal_grid *= dt
+
+    trj_wrapped = jax.vmap(wrap_bc)(trj)
+    trj_wrapped_no_channel = trj_wrapped[:, 0]
+
+    imgs = volume_render_state_3d(
+        trj_wrapped_no_channel,
+        vlim=vlim,
+        domain_extent=domain_extent,
+        ax=ax,
+        bg_color=bg_color,
+        resolution=resolution,
+        cmap=cmap,
+        transfer_function=transfer_function,
+        distance_scale=distance_scale,
+        gamma_correction=gamma_correction,
+        chunk_size=chunk_size,
+        **kwargs,
+    )
+
+    print(len(imgs))
+
+    ax.imshow(imgs[0])
+    ax.axis("off")
+    ax.set_title(f"t = {temporal_grid[0]:.2f}")
+
+    def animate(i):
+        ax.clear()
+        ax.imshow(imgs[i])
+        ax.axis("off")
+        ax.set_title(f"t = {temporal_grid[i]:.2f}")
+
+    ani = FuncAnimation(fig, animate, frames=trj.shape[0], interval=100, blit=False)
+
+    plt.close(fig)
 
     return ani
