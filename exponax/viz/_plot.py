@@ -248,7 +248,7 @@ def plot_state_3d(
     one_channel_state = state[0:1]
     one_channel_state_wrapped = wrap_bc(one_channel_state)
 
-    img = volume_render_state_3d(
+    imgs = volume_render_state_3d(
         one_channel_state_wrapped,
         vlim=vlim,
         domain_extent=domain_extent,
@@ -261,6 +261,8 @@ def plot_state_3d(
         gamma_correction=gamma_correction,
         **kwargs,
     )
+
+    img = imgs[0]
 
     if ax is None:
         fig, ax = plt.subplots()
@@ -298,7 +300,7 @@ def plot_spatio_temporal_2d(
         jnp.array(trj_one_channel_wrapped.transpose(1, 2, 3, 0)), 3
     )
 
-    img = volume_render_state_3d(
+    imgs = volume_render_state_3d(
         trj_reshaped_to_3d,
         vlim=vlim,
         bg_color=bg_color,
@@ -309,6 +311,8 @@ def plot_spatio_temporal_2d(
         gamma_correction=gamma_correction,
         **kwargs,
     )
+
+    img = imgs[0]
 
     if ax is None:
         fig, ax = plt.subplots()

@@ -50,6 +50,11 @@ def zigzag_alpha(cmap, min_alpha=0.0):
         )
 
 
+def chunk_list(lst, n):
+    for i in range(0, len(lst), n):
+        yield lst[i : i + n]
+
+
 def volume_render_state_3d(
     states: Float[Array, "B N N N"],
     *,
@@ -66,6 +71,7 @@ def volume_render_state_3d(
     transfer_function: callable = zigzag_alpha,
     distance_scale: float = 10.0,
     gamma_correction: float = 2.4,
+    chunk_size: int = 64,
     **kwargs,
 ) -> Float[Array, "B resolution resolution 3"]:
     """
@@ -88,18 +94,39 @@ def volume_render_state_3d(
 
     cmap_with_alpha_transfer = transfer_function(plt.get_cmap(cmap))
 
-    imgs = vape.render(
-        states,
-        cmap=cmap_with_alpha_transfer,
-        time=0.0 if states.shape[0] == 1 else np.arange(states.shape[0]),
-        width=resolution,
-        height=resolution,
-        background=bg_color,
-        vmin=vlim[0],
-        vmax=vlim[1],
-        distance_scale=distance_scale,
-    )
+    num_images = states.shape[0]
 
+    imgs = []
+    for time_steps in chunk_list(range(num_images), chunk_size):
+        if num_images == 1:
+            sub_time_steps = [0.0]
+        else:
+            sub_time_steps = [i / (num_images - 1) for i in time_steps]
+        imgs_this_batch = vape.render(
+            states,
+            cmap=cmap_with_alpha_transfer,
+            time=sub_time_steps,
+            width=resolution,
+            height=resolution,
+            background=bg_color,
+            vmin=vlim[0],
+            vmax=vlim[1],
+            distance_scale=distance_scale,
+        )
+        # imgs = vape.render(
+        #     states,
+        #     cmap=cmap_with_alpha_transfer,
+        #     time=[0.0,],
+        #     width=resolution,
+        #     height=resolution,
+        #     background=bg_color,
+        #     vmin=vlim[0],
+        #     vmax=vlim[1],
+        #     distance_scale=distance_scale,
+        # )
+        imgs.append(imgs_this_batch)
+
+    imgs = np.concatenate(imgs, axis=0)
     imgs = ((imgs / 255.0) ** (gamma_correction) * 255).astype(np.uint8)
 
     return imgs
