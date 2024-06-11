@@ -246,12 +246,61 @@ def plot_state_3d(
         raise ValueError("state must be a four-axis array.")
 
     one_channel_state = state[0:1]
+    one_channel_state_wrapped = wrap_bc(one_channel_state)
 
     img = volume_render_state_3d(
-        one_channel_state,
+        one_channel_state_wrapped,
         vlim=vlim,
         domain_extent=domain_extent,
         ax=ax,
+        bg_color=bg_color,
+        resolution=resolution,
+        cmap=cmap,
+        transfer_function=transfer_function,
+        distance_scale=distance_scale,
+        gamma_correction=gamma_correction,
+        **kwargs,
+    )
+
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    im = ax.imshow(img)
+    ax.axis("off")
+
+    return im
+
+
+def plot_spatio_temporal_2d(
+    trj: Float[Array, "T 1 N N"],
+    *,
+    vlim: tuple[float, float] = (-1.0, 1.0),
+    ax=None,
+    bg_color: Union[
+        Literal["black"],
+        Literal["white"],
+        tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8],
+    ] = "white",
+    resolution: int = 384,
+    cmap: str = "RdBu_r",
+    transfer_function: callable = zigzag_alpha,
+    distance_scale: float = 10.0,
+    gamma_correction: float = 2.4,
+    **kwargs,
+):
+    if trj.ndim != 4:
+        raise ValueError("trj must be a four-axis array.")
+
+    trj_one_channel = trj[:, 0:1]
+    trj_one_channel_wrapped = jax.vmap(wrap_bc)(trj_one_channel)
+
+    trj_reshaped_to_3d = jnp.flip(
+        jnp.array(trj_one_channel_wrapped.transpose(1, 2, 3, 0)), 3
+    )
+
+    img = volume_render_state_3d(
+        trj_reshaped_to_3d,
+        vlim=vlim,
         bg_color=bg_color,
         resolution=resolution,
         cmap=cmap,

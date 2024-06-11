@@ -23,7 +23,13 @@ from ._animate_facet import (
     animate_state_1d_facet,
     animate_state_2d_facet,
 )
-from ._plot import plot_spatio_temporal, plot_state_1d, plot_state_2d, plot_state_3d
+from ._plot import (
+    plot_spatio_temporal,
+    plot_spatio_temporal_2d,
+    plot_state_1d,
+    plot_state_2d,
+    plot_state_3d,
+)
 from ._plot_facet import (
     plot_spatio_temporal_facet,
     plot_state_1d_facet,
@@ -48,4 +54,5 @@ __all__ = [
     "animate_spatial_temporal_facet",
     "volume_render_state_3d",
     "plot_state_3d",
+    "plot_spatio_temporal_2d",
 ]
