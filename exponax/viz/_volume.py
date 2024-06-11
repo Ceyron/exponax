@@ -60,7 +60,7 @@ def render_3d_state(
         Literal["black"],
         Literal["white"],
         tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8],
-    ] = "black",
+    ] = "white",
     resolution: int = 384,
     cmap: str = "RdBu_r",
     transfer_function: callable = zigzag_alpha,
