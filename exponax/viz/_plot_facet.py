@@ -1,10 +1,11 @@
-from typing import TypeVar, Union
+from typing import Literal, TypeVar, Union
 
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
 from jaxtyping import Array, Float
 
-from ._plot import plot_spatio_temporal, plot_state_1d, plot_state_2d
+from ._plot import plot_spatio_temporal, plot_state_1d, plot_state_2d, plot_state_3d
+from ._volume import zigzag_alpha
 
 N = TypeVar("N")
 
@@ -236,6 +237,62 @@ def plot_state_2d_facet(
             vlim=vlim,
             ax=ax,
             domain_extent=domain_extent,
+            **kwargs,
+        )
+        if i >= num_subplots:
+            ax.remove()
+        else:
+            if titles is not None:
+                ax.set_title(titles[i])
+
+    return fig
+
+
+def plot_state_3d_facet(
+    states: Union[Float[Array, "C N N N"], Float[Array, "B 1 N N N"]],
+    *,
+    facet_over_channels: bool = True,
+    vlim: tuple[float, float] = (-1.0, 1.0),
+    grid: tuple[int, int] = (3, 3),
+    figsize: tuple[float, float] = (10, 10),
+    titles: list[str] = None,
+    domain_extent: float = None,
+    bg_color: Union[
+        Literal["black"],
+        Literal["white"],
+        tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8],
+    ] = "white",
+    resolution: int = 384,
+    cmap: str = "RdBu_r",
+    transfer_function: callable = zigzag_alpha,
+    distance_scale: float = 10.0,
+    gamma_correction: float = 2.4,
+    **kwargs,
+):
+    if facet_over_channels:
+        if states.ndim != 4:
+            raise ValueError("states must be a four-axis array.")
+        states = states[:, None, :, :, :]
+    else:
+        if states.ndim != 5:
+            raise ValueError("states must be a five-axis array.")
+
+    fig, ax_s = plt.subplots(*grid, figsize=figsize)
+
+    num_subplots = states.shape[0]
+
+    for i, ax in enumerate(ax_s.flatten()):
+        plot_state_3d(
+            states[i],
+            vlim=vlim,
+            domain_extent=domain_extent,
+            ax=ax,
+            bg_color=bg_color,
+            resolution=resolution,
+            cmap=cmap,
+            transfer_function=transfer_function,
+            distance_scale=distance_scale,
+            gamma_correction=gamma_correction,
             **kwargs,
         )
         if i >= num_subplots:

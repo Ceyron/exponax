@@ -39,6 +39,7 @@ from ._plot_facet import (
     plot_spatio_temporal_facet,
     plot_state_1d_facet,
     plot_state_2d_facet,
+    plot_state_3d_facet,
 )
 from ._volume import volume_render_state_3d
 
@@ -61,4 +62,5 @@ __all__ = [
     "plot_state_3d",
     "plot_spatio_temporal_2d",
     "animate_state_3d",
+    "plot_state_3d_facet",
 ]
