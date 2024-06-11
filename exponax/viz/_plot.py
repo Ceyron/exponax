@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from jaxtyping import Array, Float
 
 from .._utils import make_grid, wrap_bc
-from ._volume import render_3d_state, zigzag_alpha
+from ._volume import volume_render_state_3d, zigzag_alpha
 
 N = TypeVar("N")
 
@@ -242,8 +242,13 @@ def plot_state_3d(
     gamma_correction: float = 2.4,
     **kwargs,
 ):
-    img = render_3d_state(
-        state,
+    if state.ndim != 4:
+        raise ValueError("state must be a four-axis array.")
+
+    one_channel_state = state[0:1]
+
+    img = volume_render_state_3d(
+        one_channel_state,
         vlim=vlim,
         domain_extent=domain_extent,
         ax=ax,

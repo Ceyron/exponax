@@ -50,8 +50,8 @@ def zigzag_alpha(cmap, min_alpha=0.0):
         )
 
 
-def render_3d_state(
-    state: Float[Array, "1 N N N"],
+def volume_render_state_3d(
+    states: Float[Array, "B N N N"],
     *,
     vlim: tuple[float, float] = (-1.0, 1.0),
     domain_extent: float = None,
@@ -67,8 +67,11 @@ def render_3d_state(
     distance_scale: float = 10.0,
     gamma_correction: float = 2.4,
     **kwargs,
-):
-    if state.ndim != 4:
+) -> Float[Array, "B resolution resolution 3"]:
+    """
+    Batch rendering
+    """
+    if states.ndim != 4:
         raise ValueError("state must be a four-axis array.")
     try:
         import vape
@@ -81,16 +84,14 @@ def render_3d_state(
         bg_color = (255, 255, 255, 255)
 
     # Need to convert to numpy array
-    state = np.array(state).astype(np.float32)
+    states = np.array(states).astype(np.float32)
 
     cmap_with_alpha_transfer = transfer_function(plt.get_cmap(cmap))
 
     imgs = vape.render(
-        state,
+        states,
         cmap=cmap_with_alpha_transfer,
-        time=[
-            0.0,
-        ],
+        time=0.0 if states.shape[0] == 1 else np.arange(states.shape[0]),
         width=resolution,
         height=resolution,
         background=bg_color,
@@ -99,8 +100,6 @@ def render_3d_state(
         distance_scale=distance_scale,
     )
 
-    img = imgs[0]
+    imgs = ((imgs / 255.0) ** (gamma_correction) * 255).astype(np.uint8)
 
-    img = ((img / 255.0) ** (gamma_correction) * 255).astype(np.uint8)
-
-    return img
+    return imgs

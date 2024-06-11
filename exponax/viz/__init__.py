@@ -29,7 +29,7 @@ from ._plot_facet import (
     plot_state_1d_facet,
     plot_state_2d_facet,
 )
-from ._volume import render_3d_state
+from ._volume import volume_render_state_3d
 
 # from IPython.display import HTML
 
@@ -46,6 +46,6 @@ __all__ = [
     "animate_state_2d_facet",
     "animate_spatio_temporal",
     "animate_spatial_temporal_facet",
-    "render_3d_state",
+    "volume_render_state_3d",
     "plot_state_3d",
 ]
