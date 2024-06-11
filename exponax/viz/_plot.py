@@ -239,6 +239,7 @@ def plot_state_3d(
     cmap: str = "RdBu_r",
     transfer_function: callable = zigzag_alpha,
     distance_scale: float = 10.0,
+    gamma_correction: float = 2.4,
     **kwargs,
 ):
     img = render_3d_state(
@@ -251,6 +252,7 @@ def plot_state_3d(
         cmap=cmap,
         transfer_function=transfer_function,
         distance_scale=distance_scale,
+        gamma_correction=gamma_correction,
         **kwargs,
     )
 

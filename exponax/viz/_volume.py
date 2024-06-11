@@ -65,6 +65,7 @@ def render_3d_state(
     cmap: str = "RdBu_r",
     transfer_function: callable = zigzag_alpha,
     distance_scale: float = 10.0,
+    gamma_correction: float = 2.4,
     **kwargs,
 ):
     if state.ndim != 4:
@@ -99,5 +100,7 @@ def render_3d_state(
     )
 
     img = imgs[0]
+
+    img = ((img / 255.0) ** (gamma_correction) * 255).astype(np.uint8)
 
     return img
