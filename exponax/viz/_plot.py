@@ -1,10 +1,12 @@
-from typing import TypeVar
+from typing import Literal, TypeVar, Union
 
 import jax
+import jax.numpy as jnp
 import matplotlib.pyplot as plt
 from jaxtyping import Array, Float
 
 from .._utils import make_grid, wrap_bc
+from ._volume import render_3d_state, zigzag_alpha
 
 N = TypeVar("N")
 
@@ -218,5 +220,44 @@ def plot_state_2d(
     ax.set_xlabel("x_0")
     ax.set_ylabel("x_1")
     ax.set_aspect("equal")
+
+    return im
+
+
+def plot_state_3d(
+    state: Float[Array, "1 N N N"],
+    *,
+    vlim: tuple[float, float] = (-1.0, 1.0),
+    domain_extent: float = None,
+    ax=None,
+    bg_color: Union[
+        Literal["black"],
+        Literal["white"],
+        tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8],
+    ] = "black",
+    resolution: int = 384,
+    cmap: str = "RdBu_r",
+    transfer_function: callable = zigzag_alpha,
+    distance_scale: float = 10.0,
+    **kwargs,
+):
+    img = render_3d_state(
+        state,
+        vlim=vlim,
+        domain_extent=domain_extent,
+        ax=ax,
+        bg_color=bg_color,
+        resolution=resolution,
+        cmap=cmap,
+        transfer_function=transfer_function,
+        distance_scale=distance_scale,
+        **kwargs,
+    )
+
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    im = ax.imshow(img)
+    ax.axis("off")
 
     return im

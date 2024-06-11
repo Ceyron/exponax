@@ -23,12 +23,13 @@ from ._animate_facet import (
     animate_state_1d_facet,
     animate_state_2d_facet,
 )
-from ._plot import plot_spatio_temporal, plot_state_1d, plot_state_2d
+from ._plot import plot_spatio_temporal, plot_state_1d, plot_state_2d, plot_state_3d
 from ._plot_facet import (
     plot_spatio_temporal_facet,
     plot_state_1d_facet,
     plot_state_2d_facet,
 )
+from ._volume import render_3d_state
 
 # from IPython.display import HTML
 
@@ -45,4 +46,6 @@ __all__ = [
     "animate_state_2d_facet",
     "animate_spatio_temporal",
     "animate_spatial_temporal_facet",
+    "render_3d_state",
+    "plot_state_3d",
 ]
