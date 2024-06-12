@@ -7,10 +7,7 @@ import exponax as ex
 def test_plot_state_1d():
     state = jax.random.normal(
         jax.random.PRNGKey(0),
-        (
-            10,
-            100,
-        ),
+        (10, 100),
     )
 
     fig = ex.viz.plot_state_1d(state)
