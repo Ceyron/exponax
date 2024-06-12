@@ -242,6 +242,42 @@ def plot_state_3d(
     gamma_correction: float = 2.4,
     **kwargs,
 ):
+    """
+    Visualizes a three-dimensional state as a volume rendering.
+
+    Requires the input to be a real array with four axes: a leading channel axis,
+    and three subsequent spatial axes. This function will visualize the zeroth
+    channel. For plotting multiple channels at the same time, see
+    `plot_state_3d_facet`.
+
+    Periodic boundary conditions will be applied to the spatial axes (the state
+    is wrapped around).
+
+    **Arguments:**
+
+    - `state`: The state to plot as a four axis array. The first axis should be
+        the channel axis, and the subsequent three axes the spatial axes.
+    - `vlim`: The limits of the color scale.
+    - `domain_extent`: (Unused as of now)
+    - `ax`: The axis to plot on. If not provided, a new figure will be created.
+    - `bg_color`: The background color. Either `"black"`, `"white"`, or a tuple
+        of RGBA values.
+    - `resolution`: The resolution of the output image (affects render time).
+    - `cmap`: The colormap to use.
+    - `transfer_function`: The transfer function to use, i.e., how values within
+        the `vlim` range are mapped to alpha values.
+    - `distance_scale`: The distance scale of the volume renderer.
+    - `gamma_correction`: The gamma correction to apply to the image.
+
+    **Returns:**
+
+    - If `ax` is not provided, returns a tuple with the figure, axis, and image
+        object. Otherwise, returns the image object.
+
+    **Note:**
+
+    - This function requires the `vape` volume renderer package.
+    """
     if state.ndim != 4:
         raise ValueError("state must be a four-axis array.")
 
