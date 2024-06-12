@@ -251,7 +251,6 @@ def plot_state_3d(
     imgs = volume_render_state_3d(
         one_channel_state_wrapped,
         vlim=vlim,
-        domain_extent=domain_extent,
         ax=ax,
         bg_color=bg_color,
         resolution=resolution,

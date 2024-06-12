@@ -278,8 +278,6 @@ def animate_state_3d(
     imgs = volume_render_state_3d(
         trj_wrapped_no_channel,
         vlim=vlim,
-        domain_extent=domain_extent,
-        ax=ax,
         bg_color=bg_color,
         resolution=resolution,
         cmap=cmap,

@@ -295,7 +295,6 @@ def animate_state_3d_facet(
             volume_render_state_3d(
                 facet_entry_trj_no_channel,
                 vlim=vlim,
-                domain_extent=domain_extent,
                 bg_color=bg_color,
                 resolution=resolution,
                 cmap=cmap,
