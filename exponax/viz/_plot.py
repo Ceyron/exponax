@@ -86,6 +86,7 @@ def plot_spatio_temporal(
     trj: Float[Array, "T 1 N"],
     *,
     vlim: tuple[float, float] = (-1.0, 1.0),
+    cmap: str = "RdBu_r",
     ax=None,
     domain_extent: float = None,
     dt: float = None,
@@ -110,6 +111,7 @@ def plot_spatio_temporal(
         be the time axis, the second axis the channel axis, and the third axis
         the spatial axis.
     - `vlim`: The limits of the color scale.
+    - `cmap`: The colormap to use.
     - `ax`: The axis to plot on. If not provided, a new figure will be created.
     - `domain_extent`: The extent of the spatial domain. If not provided, the
         domain extent will be the number of points in the spatial axis. This
@@ -153,7 +155,7 @@ def plot_spatio_temporal(
         trj_wrapped[:, 0, :].T,
         vmin=vlim[0],
         vmax=vlim[1],
-        cmap="RdBu_r",
+        cmap=cmap,
         origin="lower",
         aspect="auto",
         extent=(*time_range, *space_range),
@@ -173,6 +175,7 @@ def plot_state_2d(
     state: Float[Array, "1 N N"],
     *,
     vlim: tuple[float, float] = (-1.0, 1.0),
+    cmap: str = "RdBu_r",
     domain_extent: float = None,
     ax=None,
     **kwargs,
@@ -193,6 +196,7 @@ def plot_state_2d(
     - `state`: The state to plot as a three axis array. The first axis should be
         the channel axis, and the subsequent two axes the spatial axes.
     - `vlim`: The limits of the color scale.
+    - `cmap`: The colormap to use.
     - `domain_extent`: The extent of the spatial domain. If not provided, the
         domain extent will be the number of points in the spatial axes. This
         adjusts the x and y axes.
@@ -225,7 +229,7 @@ def plot_state_2d(
         state_wrapped.T,
         vmin=vlim[0],
         vmax=vlim[1],
-        cmap="RdBu_r",
+        cmap=cmap,
         origin="lower",
         aspect="auto",
         extent=(*space_range, *space_range),

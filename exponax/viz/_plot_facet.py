@@ -93,6 +93,7 @@ def plot_spatio_temporal_facet(
     *,
     facet_over_channels: bool = True,
     vlim: tuple[float, float] = (-1.0, 1.0),
+    cmap: str = "RdBu_r",
     grid: tuple[int, int] = (3, 3),
     figsize: tuple[float, float] = (10, 10),
     titles: list[str] = None,
@@ -125,6 +126,7 @@ def plot_spatio_temporal_facet(
     - `facet_over_channels`: Whether to facet over the channel axis (three axes)
         or the batch axis (four axes).
     - `vlim`: The limits of the color scale.
+    - `cmap`: The colormap to use.
     - `grid`: The grid layout for the facet plot. This should be a tuple with
         two integers. If the number of trajectories is less than the product of
         the grid, the remaining axes will be removed.
@@ -164,6 +166,7 @@ def plot_spatio_temporal_facet(
         plot_spatio_temporal(
             single_trj,
             vlim=vlim,
+            cmap=cmap,
             ax=ax,
             domain_extent=domain_extent,
             dt=dt,
@@ -186,6 +189,7 @@ def plot_state_2d_facet(
     *,
     facet_over_channels: bool = True,
     vlim: tuple[float, float] = (-1.0, 1.0),
+    cmap: str = "RdBu_r",
     grid: tuple[int, int] = (3, 3),
     figsize: tuple[float, float] = (10, 10),
     titles: list[str] = None,
@@ -215,6 +219,7 @@ def plot_state_2d_facet(
     - `facet_over_channels`: Whether to facet over the channel axis (three axes)
         or the batch axis (four axes).
     - `vlim`: The limits of the color scale.
+    - `cmap`: The colormap to use.
     - `grid`: The grid layout for the facet plot. This should be a tuple with
         two integers. If the number of states is less than the product of the
         grid, the remaining axes will be removed.
@@ -245,6 +250,7 @@ def plot_state_2d_facet(
         plot_state_2d(
             states[i],
             vlim=vlim,
+            cmap=cmap,
             ax=ax,
             domain_extent=domain_extent,
             **kwargs,

@@ -117,6 +117,7 @@ def animate_spatial_temporal_facet(
     *,
     facet_over_channels: bool = True,
     vlim: tuple[float, float] = (-1.0, 1.0),
+    cmap: str = "RdBu_r",
     domain_extent: float = None,
     dt: float = None,
     include_init: bool = False,
@@ -154,6 +155,7 @@ def animate_spatial_temporal_facet(
     - `facet_over_channels`: Whether to facet over the channel axis or the batch
         axis. Default is `True`.
     - `vlim`: The limits of the colorbar. Default is `(-1, 1)`.
+    - `cmap`: The colormap to use. Default is `"RdBu_r"`.
     - `domain_extent`: The extent of the spatial domain. Default is `None`. This
         affects the x-axis limits of the plot.
     - `dt`: The time step between each frame. Default is `None`. If provided,
@@ -184,10 +186,11 @@ def animate_state_2d_facet(
     trj: Union[Float[Array, "T C N N"], Float[Array, "B T 1 N N"]],
     *,
     facet_over_channels: bool = True,
+    vlim: tuple[float, float] = (-1.0, 1.0),
+    cmap: str = "RdBu_r",
     domain_extent: float = None,
     dt: float = None,
     include_init: bool = False,
-    vlim: tuple[float, float] = (-1.0, 1.0),
     grid: tuple[int, int] = (3, 3),
     figsize: tuple[float, float] = (10, 10),
     titles=None,
@@ -217,13 +220,14 @@ def animate_state_2d_facet(
         `facet_over_channels` is `False`.
     - `facet_over_channels`: Whether to facet over the channel axis or the batch
         axis. Default is `True`.
+    - `vlim`: The limits of the colorbar. Default is `(-1, 1)`.
+    - `cmap`: The colormap to use. Default is `"RdBu_r"`.
     - `domain_extent`: The extent of the spatial domain. Default is `None`. This
         affects the x-axis and y-axis limits of the plot.
     - `dt`: The time step between each frame. Default is `None`.
     - `include_init`: Whether to the state starts at an initial condition (t=0)
         or at the first frame in the trajectory. This affects is the the time
         range is [0, (T-1)dt] or [dt, Tdt]. Default is `False`.
-    - `vlim`: The limits of the colorbar. Default is `(-1, 1)`.
     - `grid`: The grid of subplots. Default is `(3, 3)`.
     - `figsize`: The size of the figure. Default is `(10, 10)`.
     - `titles`: The titles for each subplot. Default is `None`.
@@ -257,6 +261,7 @@ def animate_state_2d_facet(
         plot_state_2d(
             trj[j, 0],
             vlim=vlim,
+            cmap=cmap,
             ax=ax,
             domain_extent=domain_extent,
         )
@@ -270,6 +275,7 @@ def animate_state_2d_facet(
             plot_state_2d(
                 trj[j, i],
                 vlim=vlim,
+                cmap=cmap,
                 ax=ax,
             )
             if titles is not None:

@@ -94,6 +94,7 @@ def animate_spatio_temporal(
     trjs: Float[Array, "S T C N"],
     *,
     vlim: tuple[float, float] = (-1.0, 1.0),
+    cmap: str = "RdBu_r",
     domain_extent: float = None,
     dt: float = None,
     include_init: bool = False,
@@ -117,6 +118,7 @@ def animate_spatio_temporal(
     - `trjs`: The trajectory of states to animate. Must be a four-axis array
         with shape `(n_timesteps_outer, n_time_steps, n_channels, n_spatial)`.
     - `vlim`: The limits of the colorbar. Default is `(-1, 1)`.
+    - `cmap`: The colormap to use. Default is `"RdBu_r"`.
     - `domain_extent`: The extent of the spatial domain. Default is `None`. This
         affects the x-axis limits of the plot.
     - `dt`: The time step between each frame. Default is `None`. If provided,
@@ -139,6 +141,7 @@ def animate_spatio_temporal(
     plot_spatio_temporal(
         trjs[0],
         vlim=vlim,
+        cmap=cmap,
         domain_extent=domain_extent,
         dt=dt,
         include_init=include_init,
@@ -151,6 +154,7 @@ def animate_spatio_temporal(
         plot_spatio_temporal(
             trjs[i],
             vlim=vlim,
+            cmap=cmap,
             domain_extent=domain_extent,
             dt=dt,
             include_init=include_init,
@@ -169,6 +173,7 @@ def animate_state_2d(
     trj: Float[Array, "T 1 N N"],
     *,
     vlim: tuple[float, float] = (-1.0, 1.0),
+    cmap: str = "RdBu_r",
     domain_extent: float = None,
     dt: float = None,
     include_init: bool = False,
@@ -189,6 +194,7 @@ def animate_state_2d(
     - `trj`: The trajectory of states to animate. Must be a four-axis array with
         shape `(n_timesteps, 1, n_spatial, n_spatial)`.
     - `vlim`: The limits of the colorbar. Default is `(-1, 1)`.
+    - `cmap`: The colormap to use. Default is `"RdBu_r"`.
     - `domain_extent`: The extent of the spatial domain. Default is `None`. This
         affects the x- and y-axis limits of the plot.
     - `dt`: The time step between each frame. Default is `None`. If provided,
@@ -219,6 +225,7 @@ def animate_state_2d(
     plot_state_2d(
         trj[0],
         vlim=vlim,
+        cmap=cmap,
         domain_extent=domain_extent,
         ax=ax,
     )
@@ -229,6 +236,7 @@ def animate_state_2d(
         plot_state_2d(
             trj[i],
             vlim=vlim,
+            cmap=cmap,
             domain_extent=domain_extent,
             ax=ax,
         )
