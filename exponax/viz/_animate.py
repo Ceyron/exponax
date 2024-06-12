@@ -288,8 +288,6 @@ def animate_state_3d(
         **kwargs,
     )
 
-    print(len(imgs))
-
     ax.imshow(imgs[0])
     ax.axis("off")
     ax.set_title(f"t = {temporal_grid[0]:.2f}")
