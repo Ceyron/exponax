@@ -208,12 +208,13 @@ def animate_state_2d(
 
     fig, ax = plt.subplots()
 
-    if dt is not None:
-        time_range = (0, dt * trj.shape[0])
-        if not include_init:
-            time_range = (dt, time_range[1])
+    if include_init:
+        temporal_grid = jnp.arange(trj.shape[0])
     else:
-        time_range = (0, trj.shape[0] - 1)
+        temporal_grid = jnp.arange(1, trj.shape[0] + 1)
+
+    if dt is not None:
+        temporal_grid *= dt
 
     plot_state_2d(
         trj[0],
@@ -221,6 +222,7 @@ def animate_state_2d(
         domain_extent=domain_extent,
         ax=ax,
     )
+    ax.set_title(f"t = {temporal_grid[0]:.2f}")
 
     def animate(i):
         ax.clear()
@@ -230,6 +232,7 @@ def animate_state_2d(
             domain_extent=domain_extent,
             ax=ax,
         )
+        ax.set_title(f"t = {temporal_grid[i]:.2f}")
 
     plt.close(fig)
 
