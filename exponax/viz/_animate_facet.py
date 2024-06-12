@@ -20,6 +20,8 @@ def animate_state_1d_facet(
     labels: list[str] = None,
     titles: list[str] = None,
     domain_extent: float = None,
+    dt: float = None,
+    include_init: bool = False,
     grid: tuple[int, int] = (3, 3),
     figsize: tuple[float, float] = (10, 10),
     **kwargs,
@@ -59,6 +61,14 @@ def animate_state_1d_facet(
     if trj.ndim != 4:
         raise ValueError("states must be a four-axis array.")
 
+    if include_init:
+        temporal_grid = jnp.arange(trj.shape[1])
+    else:
+        temporal_grid = jnp.arange(1, trj.shape[1] + 1)
+
+    if dt is not None:
+        temporal_grid *= dt
+
     fig, ax_s = plt.subplots(*grid, figsize=figsize)
 
     num_subplots = trj.shape[0]
@@ -77,6 +87,7 @@ def animate_state_1d_facet(
         else:
             if titles is not None:
                 ax.set_title(titles[j])
+    title = fig.suptitle(f"t = {temporal_grid[0]:.2f}")
 
     def animate(i):
         for j, ax in enumerate(ax_s.flatten()):
@@ -94,6 +105,7 @@ def animate_state_1d_facet(
             else:
                 if titles is not None:
                     ax.set_title(titles[j])
+        title.set_text(f"t = {temporal_grid[i]:.2f}")
 
     ani = FuncAnimation(fig, animate, frames=trj.shape[1], interval=100, blit=False)
 
@@ -172,6 +184,9 @@ def animate_state_2d_facet(
     trj: Union[Float[Array, "T C N N"], Float[Array, "B T 1 N N"]],
     *,
     facet_over_channels: bool = True,
+    domain_extent: float = None,
+    dt: float = None,
+    include_init: bool = False,
     vlim: tuple[float, float] = (-1.0, 1.0),
     grid: tuple[int, int] = (3, 3),
     figsize: tuple[float, float] = (10, 10),
@@ -202,6 +217,12 @@ def animate_state_2d_facet(
         `facet_over_channels` is `False`.
     - `facet_over_channels`: Whether to facet over the channel axis or the batch
         axis. Default is `True`.
+    - `domain_extent`: The extent of the spatial domain. Default is `None`. This
+        affects the x-axis and y-axis limits of the plot.
+    - `dt`: The time step between each frame. Default is `None`.
+    - `include_init`: Whether to the state starts at an initial condition (t=0)
+        or at the first frame in the trajectory. This affects is the the time
+        range is [0, (T-1)dt] or [dt, Tdt]. Default is `False`.
     - `vlim`: The limits of the colorbar. Default is `(-1, 1)`.
     - `grid`: The grid of subplots. Default is `(3, 3)`.
     - `figsize`: The size of the figure. Default is `(10, 10)`.
@@ -222,6 +243,14 @@ def animate_state_2d_facet(
         trj = jnp.swapaxes(trj, 0, 1)
         trj = trj[:, :, None]
 
+    if include_init:
+        temporal_grid = jnp.arange(trj.shape[1])
+    else:
+        temporal_grid = jnp.arange(1, trj.shape[1] + 1)
+
+    if dt is not None:
+        temporal_grid *= dt
+
     fig, ax_s = plt.subplots(*grid, sharex=True, sharey=True, figsize=figsize)
 
     for j, ax in enumerate(ax_s.flatten()):
@@ -229,9 +258,11 @@ def animate_state_2d_facet(
             trj[j, 0],
             vlim=vlim,
             ax=ax,
+            domain_extent=domain_extent,
         )
         if titles is not None:
             ax.set_title(titles[j])
+    title = fig.suptitle(f"t = {temporal_grid[0]:.2f}")
 
     def animate(i):
         for j, ax in enumerate(ax_s.flatten()):
@@ -243,6 +274,7 @@ def animate_state_2d_facet(
             )
             if titles is not None:
                 ax.set_title(titles[j])
+        title.set_text(f"t = {temporal_grid[i]:.2f}")
 
     plt.close(fig)
 
