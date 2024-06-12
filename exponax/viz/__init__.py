@@ -37,6 +37,7 @@ from ._plot import (
     plot_state_3d,
 )
 from ._plot_facet import (
+    plot_spatio_temporal_2d_facet,
     plot_spatio_temporal_facet,
     plot_state_1d_facet,
     plot_state_2d_facet,
@@ -65,4 +66,5 @@ __all__ = [
     "animate_state_3d",
     "plot_state_3d_facet",
     "animate_state_3d_facet",
+    "plot_spatio_temporal_2d_facet",
 ]
