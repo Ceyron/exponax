@@ -59,8 +59,6 @@ def volume_render_state_3d(
     states: Float[Array, "B N N N"],
     *,
     vlim: tuple[float, float] = (-1.0, 1.0),
-    domain_extent: float = None,
-    ax=None,
     bg_color: Union[
         Literal["black"],
         Literal["white"],
@@ -72,7 +70,6 @@ def volume_render_state_3d(
     distance_scale: float = 10.0,
     gamma_correction: float = 2.4,
     chunk_size: int = 64,
-    **kwargs,
 ) -> Float[Array, "B resolution resolution 3"]:
     """
     Batch rendering
