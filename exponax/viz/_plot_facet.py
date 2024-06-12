@@ -281,6 +281,49 @@ def plot_state_3d_facet(
     gamma_correction: float = 2.4,
     **kwargs,
 ):
+    """
+    Plot a facet of 3d states as volume renders.
+
+    Requires the input to be a real array with four or five axes: a leading
+    batch axis, a channel axis, and three subsequent spatial axes. The facet
+    will be done over the batch axis, requires the `facet_over_channels`
+    argument to be `False`. Only the zeroth channel for each state will be
+    plotted.
+
+    Periodic boundary conditions will be applied to the spatial axes (the state
+    is wrapped around).
+
+    **Arguments:**
+
+    - `states`: The states to plot as a four or five axis array. See above for
+        the requirements.
+    - `facet_over_channels`: Whether to facet over the channel axis (four axes)
+        or the batch axis (five axes).
+    - `vlim`: The limits of the color scale.
+    - `grid`: The grid layout for the facet plot. This should be a tuple with
+        two integers. If the number of states is less than the product of the
+        grid, the remaining axes will be removed.
+    - `figsize`: The size of the figure.
+    - `titles`: The titles for each plot. This should be a list of strings with
+        the same length as the number of states.
+    - `domain_extent`: (Unused as of now)
+    - `bg_color`: The background color. Either `"black"`, `"white"`, or a tuple
+        of RGBA values.
+    - `resolution`: The resolution of the output image (affects render time).
+    - `cmap`: The colormap to use.
+    - `transfer_function`: The transfer function to use, i.e., how values within
+        the `vlim` range are mapped to alpha values.
+    - `distance_scale`: The distance scale of the volume renderer.
+    - `gamma_correction`: The gamma correction to apply to the image.
+
+    **Returns:**
+
+    - The figure.
+
+    **Note:**
+
+    - This function requires the `vape` volume renderer package.
+    """
     if facet_over_channels:
         if states.ndim != 4:
             raise ValueError("states must be a four-axis array.")
@@ -341,6 +384,54 @@ def plot_spatio_temporal_2d_facet(
     gamma_correction: float = 2.4,
     **kwargs,
 ):
+    """
+    Plot a facet of spatio-temporal trajectories.
+
+    Requires the input to be a real array with either four or five axes:
+
+    * Four axes: a leading time axis, a channel axis, and two subsequent spatial
+        axes. The faceting is performed over the channel axis. Requires the
+        `facet_over_channels` argument to be `True` (default).
+    * Five axes: a leading batch axis, a time axis, a channel axis, and two
+        subsequent spatial axes. The faceting is performed over the batch axis.
+        Requires the `facet_over_channels` argument to be `False`.
+
+    Periodic boundary conditions will be applied to the spatial axes (the state
+    is wrapped around).
+
+    **Arguments:**
+
+    - `trjs`: The trajectories to plot as a four or five axis array. See above
+        for the requirements.
+    - `facet_over_channels`: Whether to facet over the channel axis (four axes)
+        or the batch axis (five axes).
+    - `vlim`: The limits of the color scale.
+    - `grid`: The grid layout for the facet plot. This should be a tuple with
+        two integers. If the number of trajectories is less than the product of
+        the grid, the remaining axes will be removed.
+    - `figsize`: The size of the figure.
+    - `titles`: The titles for each plot. This should be a list of strings with
+        the same length as the number of trajectories.
+    - `domain_extent`: (Unused as of now)
+    - `dt`: (Unused as of now)
+    - `include_init`: (Unused as of now)
+    - `bg_color`: The background color. Either `"black"`, `"white"`, or a tuple
+        of RGBA values.
+    - `resolution`: The resolution of the output image (affects render time).
+    - `cmap`: The colormap to use.
+    - `transfer_function`: The transfer function to use, i.e., how values within
+        the `vlim` range are mapped to alpha values.
+    - `distance_scale`: The distance scale of the volume renderer.
+    - `gamma_correction`: The gamma correction to apply to the image.
+
+    **Returns:**
+
+    - The figure.
+
+    **Note:**
+
+    - This function requires the `vape` volume renderer package.
+    """
     if facet_over_channels:
         if trjs.ndim != 4:
             raise ValueError("trjs must be a four-axis array.")
