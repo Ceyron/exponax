@@ -345,3 +345,8 @@ def animate_state_3d_facet(
     plt.close(fig)
 
     return ani
+
+
+def animate_spatio_temporal_2d_facet():
+    # TODO
+    raise NotImplementedError("Not implemented yet.")
