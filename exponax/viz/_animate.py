@@ -248,7 +248,6 @@ def animate_state_3d(
     domain_extent: float = None,
     dt: float = None,
     include_init: bool = False,
-    ax=None,
     bg_color: Union[
         Literal["black"],
         Literal["white"],
@@ -262,6 +261,46 @@ def animate_state_3d(
     chunk_size: int = 64,
     **kwargs,
 ):
+    """
+    Animate a trajectory of 3d states as volume renderings.
+
+    Requires the input to be a five-axis array with a leading time axis, a
+    channel axis, and three spatial axes. Only the zeroth dimension in the
+    channel axis is plotted.
+
+    Periodic boundary conditions will be applied to the spatial axes (the state
+    is wrapped around).
+
+    **Arguments**:
+
+    - `trj`: The trajectory of states to animate. Must be a five-axis array with
+        shape `(n_timesteps, 1, n_spatial, n_spatial, n_spatial)`.
+    - `vlim`: The limits of the colorbar. Default is `(-1, 1)`.
+    - `domain_extent`: (Unused as of now)
+    - `dt`: The time step between each frame. Default is `None`. If provided,
+        a title will be displayed with the current time. If not provided, just
+        the frames are counted.
+    - `include_init`: Whether to the state starts at an initial condition (t=0)
+        or at the first frame in the trajectory. This affects is the the time
+        range is [0, (T-1)dt] or [dt, Tdt]. Default is `False`.
+    - `bg_color`: The background color. Either `"black"`, `"white"`, or a tuple
+        of RGBA values. Default is `"white"`.
+    - `resolution`: The resolution of the output image (affects render time).
+        Default is `384`.
+    - `cmap`: The colormap to use. Default is `"RdBu_r"`.
+    - `transfer_function`: The transfer function to use. Default is `zigzag_alpha`.
+    - `distance_scale`: The distance scale. Default is `10.0`.
+    - `gamma_correction`: The gamma correction. Default is `2.4`.
+    - `chunk_size`: The chunk size. Default is `64`.
+
+    **Returns**:
+
+    - `ani`: The animation object.
+
+    **Note:**
+
+    - This function requires the `vape` volume renderer package.
+    """
     if trj.ndim != 5:
         raise ValueError("trj must be a five-axis array.")
 
