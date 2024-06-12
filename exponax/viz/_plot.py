@@ -328,6 +328,45 @@ def plot_spatio_temporal_2d(
     gamma_correction: float = 2.4,
     **kwargs,
 ):
+    """
+    Plot a trajectory of a 2d state as a spatio-temporal plot visualized by a
+    volume render (space in in plain parallel to screen, and time in the
+    direction into the screen).
+
+    Requires the input to be a real array with four axes: a leading time axis, a
+    channel axis, and two subsequent spatial axes. Only the leading dimension in
+    the channel axis will be plotted. See `plot_spatio_temporal_facet` for
+    plotting multiple trajectories (e.g. for problems consisting of multiple
+    channels like Burgers simulations).
+
+    Periodic boundary conditions will be applied to the spatial axes (the state
+    is wrapped around).
+
+    **Arguments:**
+
+    - `trj`: The trajectory to plot as a four axis array. The first axis should
+        be the time axis, the second axis the channel axis, and the third and
+        fourth axes the spatial axes.
+    - `vlim`: The limits of the color scale.
+    - `ax`: The axis to plot on. If not provided, a new figure will be created.
+    - `bg_color`: The background color. Either `"black"`, `"white"`, or a tuple
+        of RGBA values.
+    - `resolution`: The resolution of the output image (affects render time).
+    - `cmap`: The colormap to use.
+    - `transfer_function`: The transfer function to use, i.e., how values within
+        the `vlim` range are mapped to alpha values.
+    - `distance_scale`: The distance scale of the volume renderer.
+    - `gamma_correction`: The gamma correction to apply to the image.
+
+    **Returns:**
+
+    - If `ax` is not provided, returns a tuple with the figure, axis, and image
+        object. Otherwise, returns the image object.
+
+    **Note:**
+
+    - This function requires the `vape` volume renderer package.
+    """
     if trj.ndim != 4:
         raise ValueError("trj must be a four-axis array.")
 
