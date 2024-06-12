@@ -155,7 +155,10 @@ def plot_spatio_temporal(
     ax.set_xlabel("Time")
     ax.set_ylabel("Space")
 
-    return im
+    if ax is None:
+        return fig, ax, im
+    else:
+        return im
 
 
 def plot_state_2d(
@@ -221,7 +224,10 @@ def plot_state_2d(
     ax.set_ylabel("x_1")
     ax.set_aspect("equal")
 
-    return im
+    if ax is None:
+        return fig, ax, im
+    else:
+        return im
 
 
 def plot_state_3d(
