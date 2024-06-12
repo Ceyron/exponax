@@ -268,7 +268,11 @@ def plot_state_3d(
     im = ax.imshow(img)
     ax.axis("off")
 
-    return im
+    if ax is None:
+        plt.close(fig)
+        return fig, ax, im
+    else:
+        return im
 
 
 def plot_spatio_temporal_2d(
@@ -318,4 +322,8 @@ def plot_spatio_temporal_2d(
     im = ax.imshow(img)
     ax.axis("off")
 
-    return im
+    if ax is None:
+        plt.close(fig)
+        return fig, ax, im
+    else:
+        return im
