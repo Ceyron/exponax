@@ -173,7 +173,7 @@ integral method of [2] and how to handle (de)aliasing.
 
 ## License
 
-TODO
+MIT, see [here](LICENSE.txt)
 
 ---
 
