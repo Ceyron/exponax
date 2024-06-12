@@ -291,9 +291,9 @@ def animate_state_3d_facet(
     grid: tuple[int, int] = (3, 3),
     figsize: tuple[float, float] = (10, 10),
     titles=None,
+    domain_extent: float = None,
     dt: float = None,
     include_init: bool = False,
-    domain_extent: float = None,
     bg_color: Union[
         Literal["black"],
         Literal["white"],
@@ -307,6 +307,59 @@ def animate_state_3d_facet(
     chunk_size: int = 64,
     **kwargs,
 ):
+    """
+    Animate a facet of trajectories of 3d states as volume renderings.
+
+    Requires the input to be either a five-axis array or a six-axis array:
+
+    - If `facet_over_channels` is `True`, the input must be a five-axis array
+        with a leading time axis, a channel axis, and three spatial axes. Each
+        faceted subplot displays a different channel.
+    - If `facet_over_channels` is `False`, the input must be a six-axis array
+        with a leading batch axis, a time axis, a channel axis, and three spatial
+        axes. Each faceted subplot displays a different batch. Only the zeroth
+        dimension in the channel axis is plotted.
+
+    **Arguments**:
+
+    - `trj`: The trajectory of states to animate. Must be a five-axis array with
+        shape `(n_timesteps, n_channels, n_spatial, n_spatial, n_spatial)` if
+        `facet_over_channels` is `True`, or a six-axis array with shape
+        `(n_batches, n_timesteps, n_channels, n_spatial, n_spatial, n_spatial)`
+        if `facet_over_channels` is `False`.
+    - `facet_over_channels`: Whether to facet over the channel axis or the batch
+        axis. Default is `True`.
+    - `vlim`: The limits of the colorbar. Default is `(-1, 1)`.
+    - `grid`: The grid of subplots. Default is `(3, 3)`.
+    - `figsize`: The size of the figure. Default is `(10, 10)`.
+    - `titles`: The titles for each subplot. Default is `None`.
+    - `domain_extent`: The extent of the spatial domain. Default is `None`. This
+        affects the x-axis and y-axis limits of the plot.
+    - `dt`: The time step between each frame. Default is `None`.
+    - `include_init`: Whether to the state starts at an initial condition (t=0)
+        or at the first frame in the trajectory. This affects is the the time
+        range is [0, (T-1)dt] or [dt, Tdt]. Default is `False`.
+    - `bg_color`: The background color. Either `"black"`, `"white"`, or a tuple
+        of RGBA values. Default is `"white"`.
+    - `resolution`: The resolution of the output image (affects render time).
+        Default is `384`.
+    - `cmap`: The colormap to use. Default is `"RdBu_r"`.
+    - `transfer_function`: The transfer function to use, i.e., how values within
+        the `vlim` range are mapped to alpha values. Default is `zigzag_alpha`.
+    - `distance_scale`: The distance scale of the volume renderer. Default is
+        `10.0`.
+    - `gamma_correction`: The gamma correction to apply to the image. Default is
+        `2.4`.
+    - `chunk_size`: The number of images to render at once. Default is `64`.
+
+    **Returns**:
+
+    - `ani`: The animation object.
+
+    **Note:**
+
+    - This function requires the `vape` volume renderer package.
+    """
     if facet_over_channels:
         if trj.ndim != 5:
             raise ValueError("trj must be a five-axis array.")
