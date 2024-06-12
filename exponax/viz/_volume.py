@@ -72,7 +72,28 @@ def volume_render_state_3d(
     chunk_size: int = 64,
 ) -> Float[Array, "B resolution resolution 3"]:
     """
-    Batch rendering
+    (Batched) rendering using the vape volume renderer.
+
+    **Arguments:**
+
+    - `states`: The states to render, shape `(B, N, N, N)`. To just render one
+        image, this array must have a leading singleton axis (i.e., has shape
+        `(1, N, N, N)`), then extract the one image from the returned array.
+    - `vlim`: The min and max values for the colormap.
+    - `bg_color`: The background color. Either `"black"`, `"white"`, or a tuple
+        of RGBA values.
+    - `resolution`: The resolution of the output image (affects render time).
+    - `cmap`: The colormap to use.
+    - `transfer_function`: The transfer function to use, i.e., how values within
+        the `vlim` range are mapped to alpha values.
+    - `distance_scale`: The distance scale of the volume renderer.
+    - `gamma_correction`: The gamma correction to apply to the image.
+    - `chunk_size`: The number of images to render at once.
+
+    **Returns:**
+
+    - `imgs`: The rendered images, in terms of RBG-images (channels-last) and a
+        leading batch axis, shape `(B, resolution, resolution, 3)`.
     """
     if states.ndim != 4:
         raise ValueError("state must be a four-axis array.")
@@ -110,17 +131,6 @@ def volume_render_state_3d(
             vmax=vlim[1],
             distance_scale=distance_scale,
         )
-        # imgs = vape.render(
-        #     states,
-        #     cmap=cmap_with_alpha_transfer,
-        #     time=[0.0,],
-        #     width=resolution,
-        #     height=resolution,
-        #     background=bg_color,
-        #     vmin=vlim[0],
-        #     vmax=vlim[1],
-        #     distance_scale=distance_scale,
-        # )
         imgs.append(imgs_this_batch)
 
     imgs = np.concatenate(imgs, axis=0)
