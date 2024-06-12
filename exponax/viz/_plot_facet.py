@@ -83,6 +83,8 @@ def plot_state_1d_facet(
         else:
             ax.remove()
 
+    plt.close(fig)
+
     return fig
 
 
@@ -174,6 +176,8 @@ def plot_spatio_temporal_facet(
             if titles is not None:
                 ax.set_title(titles[i])
 
+    plt.close(fig)
+
     return fig
 
 
@@ -251,6 +255,8 @@ def plot_state_2d_facet(
             if titles is not None:
                 ax.set_title(titles[i])
 
+    plt.close(fig)
+
     return fig
 
 
@@ -306,6 +312,8 @@ def plot_state_3d_facet(
         else:
             if titles is not None:
                 ax.set_title(titles[i])
+
+    plt.close(fig)
 
     return fig
 
