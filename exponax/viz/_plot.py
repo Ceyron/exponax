@@ -62,7 +62,10 @@ def plot_state_1d(
     grid = make_grid(1, domain_extent, num_points, full=True)
 
     if ax is None:
+        return_all = True
         fig, ax = plt.subplots()
+    else:
+        return_all = False
 
     p = ax.plot(grid[0], state_wrapped.T, label=labels, **kwargs)
     ax.set_ylim(vlim)
@@ -72,7 +75,7 @@ def plot_state_1d(
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
 
-    if ax is None:
+    if return_all:
         return fig, ax, p
     else:
         return p
@@ -141,6 +144,9 @@ def plot_spatio_temporal(
 
     if ax is None:
         fig, ax = plt.subplots()
+        return_all = True
+    else:
+        return_all = False
 
     im = ax.imshow(
         trj_wrapped[:, 0, :].T,
@@ -155,7 +161,7 @@ def plot_spatio_temporal(
     ax.set_xlabel("Time")
     ax.set_ylabel("Space")
 
-    if ax is None:
+    if return_all:
         return fig, ax, im
     else:
         return im
@@ -209,6 +215,9 @@ def plot_state_2d(
 
     if ax is None:
         fig, ax = plt.subplots()
+        return_all = True
+    else:
+        return_all = False
 
     im = ax.imshow(
         state_wrapped.T,
@@ -224,7 +233,7 @@ def plot_state_2d(
     ax.set_ylabel("x_1")
     ax.set_aspect("equal")
 
-    if ax is None:
+    if return_all:
         return fig, ax, im
     else:
         return im
@@ -306,12 +315,14 @@ def plot_state_3d(
 
     if ax is None:
         fig, ax = plt.subplots()
+        return_all = True
+    else:
+        return_all = False
 
     im = ax.imshow(img)
     ax.axis("off")
 
-    if ax is None:
-        plt.close(fig)
+    if return_all:
         return fig, ax, im
     else:
         return im
@@ -399,12 +410,14 @@ def plot_spatio_temporal_2d(
 
     if ax is None:
         fig, ax = plt.subplots()
+        return_all = True
+    else:
+        return_all = False
 
     im = ax.imshow(img)
     ax.axis("off")
 
-    if ax is None:
-        plt.close(fig)
+    if return_all:
         return fig, ax, im
     else:
         return im
