@@ -45,8 +45,8 @@ def plot_state_1d(
 
     **Returns:**
 
-    - If `ax` is not provided, returns a tuple with the figure, axis, and plot
-        object. Otherwise, returns the plot object.
+    - If `ax` is not provided, returns the figure. Otherwise, returns the plot
+        object.
     """
     if state.ndim != 2:
         raise ValueError("state must be a two-axis array.")
@@ -76,7 +76,8 @@ def plot_state_1d(
     ax.set_ylabel(ylabel)
 
     if return_all:
-        return fig, ax, p
+        plt.close(fig)
+        return fig
     else:
         return p
 
@@ -121,8 +122,8 @@ def plot_spatio_temporal(
 
     **Returns:**
 
-    - If `ax` is not provided, returns a tuple with the figure, axis, and image
-        object. Otherwise, returns the image object.
+    - If `ax` is not provided, returns the figure. Otherwise, returns the image
+        object.
     """
     if trj.ndim != 3:
         raise ValueError("trj must be a two-axis array.")
@@ -162,7 +163,8 @@ def plot_spatio_temporal(
     ax.set_ylabel("Space")
 
     if return_all:
-        return fig, ax, im
+        plt.close(fig)
+        return fig
     else:
         return im
 
@@ -199,8 +201,8 @@ def plot_state_2d(
 
     **Returns:**
 
-    - If `ax` is not provided, returns a tuple with the figure, axis, and image
-        object. Otherwise, returns the image object.
+    - If `ax` is not provided, returns the figure. Otherwise, returns the image
+        object.
     """
     if state.ndim != 3:
         raise ValueError("state must be a three-axis array.")
@@ -234,7 +236,8 @@ def plot_state_2d(
     ax.set_aspect("equal")
 
     if return_all:
-        return fig, ax, im
+        plt.close(fig)
+        return fig
     else:
         return im
 
@@ -286,8 +289,8 @@ def plot_state_3d(
 
     **Returns:**
 
-    - If `ax` is not provided, returns a tuple with the figure, axis, and image
-        object. Otherwise, returns the image object.
+    - If `ax` is not provided, returns the figure. Otherwise, returns the image
+        object.
 
     **Note:**
 
@@ -323,7 +326,8 @@ def plot_state_3d(
     ax.axis("off")
 
     if return_all:
-        return fig, ax, im
+        plt.close(fig)
+        return fig
     else:
         return im
 
@@ -377,8 +381,8 @@ def plot_spatio_temporal_2d(
 
     **Returns:**
 
-    - If `ax` is not provided, returns a tuple with the figure, axis, and image
-        object. Otherwise, returns the image object.
+    - If `ax` is not provided, returns the figure. Otherwise, returns the image
+        object.
 
     **Note:**
 
@@ -418,6 +422,7 @@ def plot_spatio_temporal_2d(
     ax.axis("off")
 
     if return_all:
-        return fig, ax, im
+        plt.close(fig)
+        return fig
     else:
         return im
