@@ -337,6 +337,9 @@ def plot_spatio_temporal_2d(
     *,
     vlim: tuple[float, float] = (-1.0, 1.0),
     ax=None,
+    domain_extent: float = None,
+    dt: float = None,
+    include_init: bool = False,
     bg_color: Union[
         Literal["black"],
         Literal["white"],
@@ -370,6 +373,9 @@ def plot_spatio_temporal_2d(
         fourth axes the spatial axes.
     - `vlim`: The limits of the color scale.
     - `ax`: The axis to plot on. If not provided, a new figure will be created.
+    - `domain_extent`: (Unused as of now)
+    - `dt`: (Unused as of now)
+    - `include_init`: (Unused as of now)
     - `bg_color`: The background color. Either `"black"`, `"white"`, or a tuple
         of RGBA values.
     - `resolution`: The resolution of the output image (affects render time).
