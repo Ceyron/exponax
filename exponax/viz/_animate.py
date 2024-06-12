@@ -305,3 +305,7 @@ def animate_state_3d(
     plt.close(fig)
 
     return ani
+
+
+def animate_spatio_temporal_2d():
+    raise NotImplementedError("This function is not yet implemented.")
