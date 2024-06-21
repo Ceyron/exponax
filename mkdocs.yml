@@ -112,8 +112,11 @@ nav:
         - Normalized:
             - Linear: 'api/stepper/normalized/linear.md'
     #     - Difficulty
-    # - Initial Conditions
-    # - Utilities
+    - Utilities:
+        - Initial Conditions:
+            - Gaussian Blob: 'api/utilities/initial_conditions/gaussian_blob.md'
+            - Helper: 'api/utilities/initial_conditions/helper.md'
+
     # - Visualization
     # - ETDRK Backbone
     - Additional API:

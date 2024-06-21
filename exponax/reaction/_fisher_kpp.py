@@ -82,10 +82,9 @@ class FisherKPP(BaseStepper):
         **Notes:**
             - The dynamics require initial conditions in the range `[0, 1]`.
                 This can be achieved by combining any of the available IC
-                generators with the
-                [`ClampingICGenerator`](exponax/ic/_clamping.py). Alternatively,
-                a good choice is also the
-                [`GaussianBlobs`](exponax/ic/_gaussian_blob.py)
+                generators with the [`exponax.ic.ClampingICGenerator`].
+                Alternatively, a good choice is also the
+                [`exponax.ic.GaussianBlobs`]
 
         **Good Values:**
             - Use the `ClampingICGenerator` on `RandomTruncatedFourierSeries`
