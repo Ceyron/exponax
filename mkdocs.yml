@@ -110,3 +110,5 @@ nav:
     - Additional API:
         - Base:
             - Base Stepper: 'api/stepper/base_stepper.md'
+    - Background:
+        - Design Decisions: 'background/design_decisions.md'
