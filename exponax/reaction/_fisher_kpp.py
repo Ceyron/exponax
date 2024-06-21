@@ -52,46 +52,48 @@ class FisherKPP(BaseStepper):
         limit of the solution is the constant state `1`.
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `domain_extent`: The size of the domain `L`; in higher dimensions
-                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
-            - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and
-                **excludes** the right boundary point. In higher dimensions; the
-                number of points in each dimension is the same. Hence, the total
-                number of degrees of freedom is `Nᵈ`.
-            - `dt`: The timestep size `Δt` between two consecutive states.
-            - `diffusivity`: The diffusivity `ν`.
-            - `reactivity`: The reactivity `r`.
-            - `order`: The order of the Exponential Time Differencing Runge
-                Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0`
-                only solves the linear part of the equation. Use higher values
-                for higher accuracy and stability. The default choice of `2` is
-                a good compromise for single precision floats.
-            - `dealiasing_fraction`: The fraction of the wavenumbers to keep
-                before evaluating the nonlinearity. The default 2/3 corresponds
-                to Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2.
-                Default: 2/3.
-            - `num_circle_points`: How many points to use in the complex contour
-                integral method to compute the coefficients of the exponential
-                time differencing Runge Kutta method. Default: 16.
-            - `circle_radius`: The radius of the contour used to compute the
-                coefficients of the exponential time differencing Runge Kutta
-                method. Default: 1.0.
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `domain_extent`: The size of the domain `L`; in higher dimensions
+            the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same. Hence, the total number of degrees of
+            freedom is `Nᵈ`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `diffusivity`: The diffusivity `ν`.
+        - `reactivity`: The reactivity `r`.
+        - `order`: The order of the Exponential Time Differencing Runge
+            Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
+            solves the linear part of the equation. Use higher values for higher
+            accuracy and stability. The default choice of `2` is a good
+            compromise for single precision floats.
+        - `dealiasing_fraction`: The fraction of the wavenumbers to keep
+            before evaluating the nonlinearity. The default 2/3 corresponds to
+            Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2. Default:
+            2/3.
+        - `num_circle_points`: How many points to use in the complex contour
+            integral method to compute the coefficients of the exponential time
+            differencing Runge Kutta method. Default: 16.
+        - `circle_radius`: The radius of the contour used to compute the
+            coefficients of the exponential time differencing Runge Kutta
+            method. Default: 1.0.
 
         **Notes:**
-            - The dynamics require initial conditions in the range `[0, 1]`.
-                This can be achieved by combining any of the available IC
-                generators with the [`exponax.ic.ClampingICGenerator`].
-                Alternatively, a good choice is also the
-                [`exponax.ic.GaussianBlobs`]
+
+        - The dynamics require initial conditions in the range `[0, 1]`.
+            This can be achieved by combining any of the available IC generators
+            with the [`exponax.ic.ClampingICGenerator`]. Alternatively, a good
+            choice is also the [`exponax.ic.GaussianBlobs`]
 
         **Good Values:**
-            - Use the `ClampingICGenerator` on `RandomTruncatedFourierSeries`
-                with limits `[0, 1]` to generate initial conditions. Set
-                `domain_extent = 1.0`, `num_points = 100`, `dt = 0.001`, and
-                produce a trajectory of 500 steps. The final state of almost
-                constant `1` will be reached after 200-400 steps.
+
+        - Use the `ClampingICGenerator` on `RandomTruncatedFourierSeries`
+            with limits `[0, 1]` to generate initial conditions. Set
+            `domain_extent = 1.0`, `num_points = 100`, `dt = 0.001`, and produce
+            a trajectory of 500 steps. The final state of almost constant `1`
+            will be reached after 200-400 steps.
         """
         self.dealiasing_fraction = dealiasing_fraction
         self.diffusivity = diffusivity
