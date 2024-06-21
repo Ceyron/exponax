@@ -104,6 +104,11 @@ nav:
                 - Advection-Diffusion: 'api/stepper/physical/linear/advection_diffusion.md'
                 - Dispersion: 'api/stepper/physical/linear/dispersion.md'
                 - Hyper-Diffusion: 'api/stepper/physical/linear/hyper_diffusion.md'
+            - Burgers: 'api/stepper/physical/burgers.md'
+            - Korteweg-de Vries: 'api/stepper/physical/kdv.md'
+            - Kuramoto-Sivashinsky: 'api/stepper/physical/ks.md'
+            - Kuramoto-Sivashinsky (Conservative): 'api/stepper/physical/ks_cons.md'
+            - Navier-Stokes: 'api/stepper/physical/navier_stokes.md'
         - Normalized:
             - Linear: 'api/stepper/normalized/linear.md'
     #     - Difficulty
