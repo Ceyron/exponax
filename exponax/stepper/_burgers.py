@@ -57,54 +57,57 @@ class Burgers(BaseStepper):
         state.
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `domain_extent`: The size of the domain `L`; in higher dimensions
-                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
-            - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and
-                **excludes** the right boundary point. In higher dimensions; the
-                number of points in each dimension is the same. Hence, the total
-                number of degrees of freedom is `Nᵈ`.
-            - `dt`: The timestep size `Δt` between two consecutive states.
-            - `diffusivity`: The diffusivity `ν` in the Burgers equation.
-                Default: 0.1.
-            - `convection_scale`: The scaling factor for the convection term.
-                Note that the scaling by 1/2 is always performed. Default: 1.0.
-            - `single_channel`: Whether to use the single channel mode in higher
-                dimensions. In this case the the convection is `b₁ (∇ ⋅ 1)(u²)`.
-                In this case, the state always has a single channel, no matter
-                the spatial dimension. Default: False.
-            - `order`: The order of the Exponential Time Differencing Runge
-                Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0`
-                only solves the linear part of the equation. Use higher values
-                for higher accuracy and stability. The default choice of `2` is
-                a good compromise for single precision floats.
-            - `dealiasing_fraction`: The fraction of the wavenumbers to keep
-                before evaluating the nonlinearity. The default 2/3 corresponds
-                to Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2.
-                Default: 2/3.
-            - `num_circle_points`: How many points to use in the complex contour
-                integral method to compute the coefficients of the exponential
-                time differencing Runge Kutta method. Default: 16.
-            - `circle_radius`: The radius of the contour used to compute the
-                coefficients of the exponential time differencing Runge Kutta
-                method. Default: 1.0.
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `domain_extent`: The size of the domain `L`; in higher dimensions
+            the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same. Hence, the total number of degrees of
+            freedom is `Nᵈ`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `diffusivity`: The diffusivity `ν` in the Burgers equation.
+            Default: 0.1.
+        - `convection_scale`: The scaling factor for the convection term.
+            Note that the scaling by 1/2 is always performed. Default: 1.0.
+        - `single_channel`: Whether to use the single channel mode in higher
+            dimensions. In this case the the convection is `b₁ (∇ ⋅ 1)(u²)`. In
+            this case, the state always has a single channel, no matter the
+            spatial dimension. Default: False.
+        - `order`: The order of the Exponential Time Differencing Runge
+            Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
+            solves the linear part of the equation. Use higher values for higher
+            accuracy and stability. The default choice of `2` is a good
+            compromise for single precision floats.
+        - `dealiasing_fraction`: The fraction of the wavenumbers to keep
+            before evaluating the nonlinearity. The default 2/3 corresponds to
+            Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2. Default:
+            2/3.
+        - `num_circle_points`: How many points to use in the complex contour
+            integral method to compute the coefficients of the exponential time
+            differencing Runge Kutta method. Default: 16.
+        - `circle_radius`: The radius of the contour used to compute the
+            coefficients of the exponential time differencing Runge Kutta
+            method. Default: 1.0.
 
         **Notes:**
-            - If the `diffusivity` is set too low, spurious oscillations may
-                occur because the solution becomes "too discontinous". Such
-                simulations are not possible with Fourier pseudospectral
-                methods. Sometimes increasing the number of points `N` can help.
+
+        - If the `diffusivity` is set too low, spurious oscillations may
+            occur because the solution becomes "too discontinous". Such
+            simulations are not possible with Fourier pseudospectral methods.
+            Sometimes increasing the number of points `N` can help.
 
         **Good Values:**
-            - Next to the defaults of `diffusivity=0.1` and
-              `convection_scale=1.0`, the following values are good starting
-              points:
-                - `num_points=100` for 1d.
-                - `domain_extent=1`
-                - `dt=0.1`
-                - A bandlimited initial condition with maximum absolute value of
-                  ~1.0
+
+        - Next to the defaults of `diffusivity=0.1` and
+            `convection_scale=1.0`, the following values are good starting
+            points:
+            - `num_points=100` for 1d.
+            - `domain_extent=1`
+            - `dt=0.1`
+            - A bandlimited initial condition with maximum absolute value of
+                ~1.0
         """
         self.diffusivity = diffusivity
         self.convection_scale = convection_scale
