@@ -1,6 +1,6 @@
 
 <h1 align="center">
-  <img src="img/exponax_logo.png" width="200">
+  <img src="docs/imgs/exponax_logo.png" width="200">
   <br>
     Exponax
   <br>
@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-    <img src="img/teaser_demo.gif">
+    <img src="docs/imgs/teaser_demo.gif">
 </p>
 
 ## Installation
@@ -57,7 +57,7 @@ plt.imshow(trajectory[:, 0, :].T, aspect='auto', cmap='RdBu', vmin=-2, vmax=2, o
 plt.xlabel("Time"); plt.ylabel("Space"); plt.show()
 ```
 
-![](img/ks_rollout.png)
+![](docs/imgs/ks_rollout.png)
 
 For a next step, check out the [simple_advection_example_1d.ipynb](examples/simple_advection_example_1d.ipynb) notebook in the `examples` folder, and check out the <a href="#documentation">Documentation</a>.
 
@@ -95,7 +95,7 @@ For a next step, check out the [simple_advection_example_1d.ipynb](examples/simp
 
 The following Jupyter notebooks showcase the usage of the package:
 
-1. [Simple Advection Example in 1d](examples/simple_advection_example_1d.ipynb)
+1. [Simple Advection Example in 1d](docs/examples/simple_advection_example_1d.ipynb)
 2. ...
 
 The documentation is still in progress. For now, the best way to get started is
