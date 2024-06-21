@@ -109,6 +109,12 @@ nav:
             - Kuramoto-Sivashinsky: 'api/stepper/physical/ks.md'
             - Kuramoto-Sivashinsky (Conservative): 'api/stepper/physical/ks_cons.md'
             - Navier-Stokes: 'api/stepper/physical/navier_stokes.md'
+            - Reaction-Diffusion:
+                - Fisher-KPP: 'api/stepper/physical/reaction_diffusion/fisher_kpp.md'
+                - Allen-Cahn: 'api/stepper/physical/reaction_diffusion/allen_cahn.md'
+                - Cahn-Hilliard: 'api/stepper/physical/reaction_diffusion/cahn_hilliard.md'
+                - Swift-Hohenberg: 'api/stepper/physical/reaction_diffusion/swift_hohenberg.md'
+                - Gray-Scott: 'api/stepper/physical/reaction_diffusion/gray_scott.md'
         - Normalized:
             - Linear: 'api/stepper/normalized/linear.md'
     #     - Difficulty
