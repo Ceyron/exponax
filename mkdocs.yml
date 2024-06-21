@@ -100,6 +100,10 @@ nav:
         - Physical:
             - Linear:
                 - Advection: 'api/stepper/physical/linear/advection.md'
+                - Diffusion: 'api/stepper/physical/linear/diffusion.md'
+                - Advection-Diffusion: 'api/stepper/physical/linear/advection_diffusion.md'
+                - Dispersion: 'api/stepper/physical/linear/dispersion.md'
+                - Hyper-Diffusion: 'api/stepper/physical/linear/hyper_diffusion.md'
         - Normalized:
             - Linear: 'api/stepper/normalized/linear.md'
     #     - Difficulty
