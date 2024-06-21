@@ -1,51 +1,34 @@
-name: Build documentation
-
 on:
-  # only run on PRs, not on pushes to main
-  # (this is handled by deploy_docs.yml)
-  pull_request:
-
-  workflow_call:
-    inputs:
-      artifact_name:
-        description: "Name of the artifact to upload"
-        required: false
-        type: string
-
+  push:
+    branches:
+      - main
+permissions:
+  contents: write
 jobs:
-  test-docs:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install system requirements
+      - uses: actions/checkout@v4
+      - name: Configure Git Credentials
         run: |
-          sudo apt-get update
-          sudo apt-get install -y pandoc
-
-      - name: Setup Python environment
-        uses: actions/setup-python@v4
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
 
-      - name: Install doc requirements
+      - name: Install dependencies
         run: |
-          pip install jax[cpu]
-          pip install .
-          pip install -r docs/requirements.txt
+          python -m pip install --upgrade pip
+          python -m pip install .
+          python -m pip install -r docs/requirements.txt
 
-      - name: Build docs
-        run: |
-          cd docs
-          export SPHINXOPTS="-W"  # treat warnings as errors
-          make html
-
-      - name: Upload HTML files
-        uses: actions/upload-artifact@v3
-        if: ${{ inputs.artifact_name }}
+      - uses: actions/cache@v4
         with:
-          name: ${{ inputs.artifact_name }}
-          path: docs/build/html
-          if-no-files-found: error
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+      - run: pip install mkdocs-material 
+      - run: mkdocs gh-deploy --force
