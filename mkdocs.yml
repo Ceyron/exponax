@@ -115,6 +115,13 @@ nav:
                 - Cahn-Hilliard: 'api/stepper/physical/reaction_diffusion/cahn_hilliard.md'
                 - Swift-Hohenberg: 'api/stepper/physical/reaction_diffusion/swift_hohenberg.md'
                 - Gray-Scott: 'api/stepper/physical/reaction_diffusion/gray_scott.md'
+            - General:
+                - General Linear: 'api/stepper/physical/general/general_linear.md'
+                - General Convection: 'api/stepper/physical/general/general_convection.md'
+                - General Gradient Norm: 'api/stepper/physical/general/general_gradient_norm.md'
+                - General Polynomial: 'api/stepper/physical/general/general_polynomial.md'
+                - General Nonlinear: 'api/stepper/physical/general/general_nonlinear.md'
+                - General Vorticity Convection: 'api/stepper/physical/general/general_vorticity_convection.md'
         - Normalized:
             - Linear: 'api/stepper/normalized/linear.md'
     #     - Difficulty
