@@ -122,6 +122,7 @@ nav:
         - Initial Conditions:
             - Gaussian Blob: 'api/utilities/initial_conditions/gaussian_blob.md'
             - Helper: 'api/utilities/initial_conditions/helper.md'
+        - Normalized & Difficulty: 'api/utilities/normalized_and_difficulty.md'
 
     # - Visualization
     # - ETDRK Backbone
