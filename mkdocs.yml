@@ -145,7 +145,11 @@ nav:
             - Discontinuities: 'api/utilities/initial_conditions/discontinuities.md'
             - Helper: 'api/utilities/initial_conditions/helper.md'
         - Normalized & Difficulty: 'api/utilities/normalized_and_difficulty.md'
-
+        - Metrics:
+            - MSE-based: 'api/utilities/metrics/mse_based.md'
+            - RMSE-based: 'api/utilities/metrics/rmse_based.md'
+            - Correlation: 'api/utilities/metrics/correlation.md'
+            - Fourier nRMSE: 'api/utilities/metrics/fourier_nrmse.md'
     # - Visualization
     # - ETDRK Backbone
     - Additional API:
