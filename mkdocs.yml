@@ -124,6 +124,11 @@ nav:
                 - General Vorticity Convection: 'api/stepper/physical/general/general_vorticity_convection.md'
         - Normalized:
             - Linear: 'api/stepper/normalized/linear.md'
+            - Convection: 'api/stepper/normalized/convection.md'
+            - Gradient Norm: 'api/stepper/normalized/gradient_norm.md'
+            - Polynomial: 'api/stepper/normalized/polynomial.md'
+            - Nonlinear: 'api/stepper/normalized/nonlinear.md'
+            - Vorticity Convection: 'api/stepper/normalized/vorticity_convection.md'
     #     - Difficulty
     - Utilities:
         - Initial Conditions:
