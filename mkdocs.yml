@@ -137,6 +137,13 @@ nav:
             - Polynomial: 'api/stepper/difficulty/polynomial.md'
             - Nonlinear: 'api/stepper/difficulty/nonlinear.md'
     - Utilities:
+        - Nonlinear Functions:
+            - Zero: 'api/utilities/nonlin_fun/zero.md'
+            - Convection: 'api/utilities/nonlin_fun/convection.md'
+            - Gradient Norm: 'api/utilities/nonlin_fun/gradient_norm.md'
+            - Polynomial: 'api/utilities/nonlin_fun/polynomial.md'
+            - Vorticity Convection: 'api/utilities/nonlin_fun/vorticity_convection.md'
+            - Nonlinear: 'api/utilities/nonlin_fun/nonlinear.md'
         - Repeated Stepper: 'api/utilities/repeated_stepper.md'
         - Forced Stepper: 'api/utilities/forced_stepper.md'
         - Initial Conditions:
@@ -168,6 +175,7 @@ nav:
     - Additional API:
         - Base:
             - Base Stepper: 'api/stepper/base_stepper.md'
+            - Base Nonlinear Function: 'api/utilities/nonlin_fun/base.md'
             - Base Initial Condition: 'api/utilities/initial_conditions/base_initial_condition.md'
         - ETDRK Backbone: 'api/etdrk_backbone.md'
     - Background:
