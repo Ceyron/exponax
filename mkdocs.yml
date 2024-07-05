@@ -150,7 +150,15 @@ nav:
             - RMSE-based: 'api/utilities/metrics/rmse_based.md'
             - Correlation: 'api/utilities/metrics/correlation.md'
             - Fourier nRMSE: 'api/utilities/metrics/fourier_nrmse.md'
-    # - Visualization
+        - Visualization:
+            - Plot States: 'api/utilities/visualization/plot_states.md'
+            - Plot Spatio-Temporal: 'api/utilities/visualization/plot_spatio_temporal.md'
+            - Plot States Facet: 'api/utilities/visualization/plot_states_facet.md'
+            - Plot Spatio-Temporal Facet: 'api/utilities/visualization/plot_spatio_temporal_facet.md'
+            - Animate States: 'api/utilities/visualization/animate_states.md'
+            - Animate Spatio-Temporal: 'api/utilities/visualization/animate_spatio_temporal.md'
+            - Animate States Facet: 'api/utilities/visualization/animate_states_facet.md'
+            - Animate Spatio-Temporal Facet: 'api/utilities/visualization/animate_spatio_temporal_facet.md'
     # - ETDRK Backbone
     - Additional API:
         - Base:
