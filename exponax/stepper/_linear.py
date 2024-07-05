@@ -44,31 +44,33 @@ class Advection(BaseStepper):
         with `c ∈ ℝᵈ` being the velocity/advection vector.
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `domain_extent`: The size of the domain `L`; in higher dimensions
-                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
-            - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and
-                **excludes** the right boundary point. In higher dimensions; the
-                number of points in each dimension is the same. Hence, the total
-                number of degrees of freedom is `Nᵈ`.
-            - `dt`: The timestep size `Δt` between two consecutive states.
-            - `velocity` (keyword-only): The advection speed `c`. In higher
-                dimensions, this can be a scalar (=float) or a vector of length
-                `d`. If a scalar is given, the advection speed is assumed to be
-                the same in all spatial dimensions. Default: `1.0`.
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `domain_extent`: The size of the domain `L`; in higher dimensions
+            the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same. Hence, the total number of degrees of
+            freedom is `Nᵈ`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `velocity` (keyword-only): The advection speed `c`. In higher
+            dimensions, this can be a scalar (=float) or a vector of length `d`.
+            If a scalar is given, the advection speed is assumed to be the same
+            in all spatial dimensions. Default: `1.0`.
 
         **Notes:**
-            - The stepper is unconditionally stable, not matter the choice of
-                any argument because the equation is solved analytically in
-                Fourier space. **However**, note that initial conditions with
-                modes higher than the Nyquist freuency (`(N//2)+1` with `N`
-                being the `num_points`) lead to spurious oscillations.
-            - Ultimately, only the factor `c Δt / L` affects the characteristic
-                of the dynamics. See also
-                [`exponax.normalized.NormalizedLinearStepper`][] with
-                `normalized_coefficients = [0, alpha_1]` with `alpha_1 =
-                - velocity * dt / domain_extent`.
+
+        - The stepper is unconditionally stable, not matter the choice of
+            any argument because the equation is solved analytically in Fourier
+            space. **However**, note that initial conditions with modes higher
+            than the Nyquist freuency (`(N//2)+1` with `N` being the
+            `num_points`) lead to spurious oscillations.
+        - Ultimately, only the factor `c Δt / L` affects the characteristic
+            of the dynamics. See also
+            [`exponax.normalized.NormalizedLinearStepper`][] with
+            `normalized_coefficients = [0, alpha_1]` with `alpha_1 = - velocity
+            * dt / domain_extent`.
         """
         # TODO: better checks on the desired type of velocity
         if isinstance(velocity, float):
@@ -145,36 +147,38 @@ class Diffusion(BaseStepper):
         ```
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `domain_extent`: The size of the domain `L`; in higher dimensions
-                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
-            - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and
-                **excludes** the right boundary point. In higher dimensions; the
-                number of points in each dimension is the same. Hence, the total
-                number of degrees of freedom is `Nᵈ`.
-            - `dt`: The timestep size `Δt` between two consecutive states.
-            - `diffusivity` (keyword-only): The diffusivity `ν`. In higher
-                dimensions, this can be a scalar (=float), a vector of length
-                `d`, or a matrix of shape `d ˣ d`. If a scalar is given, the
-                diffusivity is assumed to be the same in all spatial dimensions.
-                If a vector (of length `d`) is given, the diffusivity varies
-                across dimensions (=> diagonal diffusion). For a matrix, there
-                is fully anisotropic diffusion. In this case, `A` must be
-                symmetric positive definite (SPD). Default: `0.01`.
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `domain_extent`: The size of the domain `L`; in higher dimensions
+            the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same. Hence, the total number of degrees of
+            freedom is `Nᵈ`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `diffusivity` (keyword-only): The diffusivity `ν`. In higher
+            dimensions, this can be a scalar (=float), a vector of length `d`,
+            or a matrix of shape `d ˣ d`. If a scalar is given, the diffusivity
+            is assumed to be the same in all spatial dimensions. If a vector (of
+            length `d`) is given, the diffusivity varies across dimensions (=>
+            diagonal diffusion). For a matrix, there is fully anisotropic
+            diffusion. In this case, `A` must be symmetric positive definite
+            (SPD). Default: `0.01`.
 
         **Notes:**
-            - The stepper is unconditionally stable, not matter the choice of
-                any argument because the equation is solved analytically in
-                Fourier space.
-            - A `ν > 0` leads to stable and decaying solutions (i.e., energy is
-                removed from the system). A `ν < 0` leads to unstable and
-                growing solutions (i.e., energy is added to the system).
-            - Ultimately, only the factor `ν Δt / L²` affects the characteristic
-                of the dynamics. See also
-                [`exponax.normalized.NormalizedLinearStepper`][] with
-                `normalized_coefficients = [0, 0, alpha_2]` with `alpha_2 =
-                diffusivity * dt / domain_extent**2`.
+
+        - The stepper is unconditionally stable, not matter the choice of
+            any argument because the equation is solved analytically in Fourier
+            space.
+        - A `ν > 0` leads to stable and decaying solutions (i.e., energy is
+            removed from the system). A `ν < 0` leads to unstable and growing
+            solutions (i.e., energy is added to the system).
+        - Ultimately, only the factor `ν Δt / L²` affects the characteristic
+            of the dynamics. See also
+            [`exponax.normalized.NormalizedLinearStepper`][] with
+            `normalized_coefficients = [0, 0, alpha_2]` with `alpha_2 =
+            diffusivity * dt / domain_extent**2`.
         """
         # ToDo: more sophisticated checks here
         if isinstance(diffusivity, float):
@@ -260,40 +264,42 @@ class AdvectionDiffusion(BaseStepper):
         anisotropic diffusion.
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `domain_extent`: The size of the domain `L`; in higher dimensions
-                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
-            - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and
-                **excludes** the right boundary point. In higher dimensions; the
-                number of points in each dimension is the same. Hence, the total
-                number of degrees of freedom is `Nᵈ`.
-            - `dt`: The timestep size `Δt` between two consecutive states.
-            - `velocity` (keyword-only): The advection speed `c`. In higher
-                dimensions, this can be a scalar (=float) or a vector of length
-                `d`. If a scalar is given, the advection speed is assumed to be
-                the same in all spatial dimensions. Default: `1.0`.
-            - `diffusivity` (keyword-only): The diffusivity `ν`. In higher
-                dimensions, this can be a scalar (=float), a vector of length
-                `d`, or a matrix of shape `d ˣ d`. If a scalar is given, the
-                diffusivity is assumed to be the same in all spatial dimensions.
-                If a vector (of length `d`) is given, the diffusivity varies
-                across dimensions (=> diagonal diffusion). For a matrix, there
-                is fully anisotropic diffusion. In this case, `A` must be
-                symmetric positive definite (SPD). Default: `0.01`.
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `domain_extent`: The size of the domain `L`; in higher dimensions
+            the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same. Hence, the total number of degrees of
+            freedom is `Nᵈ`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `velocity` (keyword-only): The advection speed `c`. In higher
+            dimensions, this can be a scalar (=float) or a vector of length `d`.
+            If a scalar is given, the advection speed is assumed to be the same
+            in all spatial dimensions. Default: `1.0`.
+        - `diffusivity` (keyword-only): The diffusivity `ν`. In higher
+            dimensions, this can be a scalar (=float), a vector of length `d`,
+            or a matrix of shape `d ˣ d`. If a scalar is given, the diffusivity
+            is assumed to be the same in all spatial dimensions. If a vector (of
+            length `d`) is given, the diffusivity varies across dimensions (=>
+            diagonal diffusion). For a matrix, there is fully anisotropic
+            diffusion. In this case, `A` must be symmetric positive definite
+            (SPD). Default: `0.01`.
 
         **Notes:**
-            - The stepper is unconditionally stable, not matter the choice of
-                any argument because the equation is solved analytically in
-                Fourier space. **However**, note that initial conditions with
-                modes higher than the Nyquist freuency (`(N//2)+1` with `N`
-                being the `num_points`) lead to spurious oscillations.
-            - Ultimately, only the factors `c Δt / L` and `ν Δt / L²` affect the
-                characteristic of the dynamics. See also
-                [`exponax.normalized.NormalizedLinearStepper`][] with
-                `normalized_coefficients = [0, alpha_1, alpha_2]` with `alpha_1 =
-                - velocity * dt / domain_extent` and `alpha_2 = diffusivity * dt /
-                domain_extent**2`.
+
+        - The stepper is unconditionally stable, not matter the choice of
+            any argument because the equation is solved analytically in Fourier
+            space. **However**, note that initial conditions with modes higher
+            than the Nyquist freuency (`(N//2)+1` with `N` being the
+            `num_points`) lead to spurious oscillations.
+        - Ultimately, only the factors `c Δt / L` and `ν Δt / L²` affect the
+            characteristic of the dynamics. See also
+            [`exponax.normalized.NormalizedLinearStepper`][] with
+            `normalized_coefficients = [0, alpha_1, alpha_2]` with `alpha_1 = -
+            velocity * dt / domain_extent` and `alpha_2 = diffusivity * dt /
+            domain_extent**2`.
         """
         # TODO: more sophisticated checks here
         if isinstance(velocity, float):
@@ -390,35 +396,37 @@ class Dispersion(BaseStepper):
         with `𝒸 ∈ ℝᵈ` being the dispersivity vector
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `domain_extent`: The size of the domain `L`; in higher dimensions
-                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
-            - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and
-                **excludes** the right boundary point. In higher dimensions; the
-                number of points in each dimension is the same. Hence, the total
-                number of degrees of freedom is `Nᵈ`.
-            - `dt`: The timestep size `Δt` between two consecutive states.
-            - `dispersivity` (keyword-only): The dispersivity `𝒸`. In higher
-                dimensions, this can be a scalar (=float) or a vector of length
-                `d`. If a scalar is given, the dispersivity is assumed to be the
-                same in all spatial dimensions. Default: `1.0`.
-            - `advect_on_diffusion` (keyword-only): If `True`, the second form
-                of the dispersion equation in higher dimensions is used. As a
-                consequence, there will be mixing in the spatial derivatives.
-                Default: `False`.
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `domain_extent`: The size of the domain `L`; in higher dimensions
+            the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same. Hence, the total number of degrees of
+            freedom is `Nᵈ`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `dispersivity` (keyword-only): The dispersivity `𝒸`. In higher
+            dimensions, this can be a scalar (=float) or a vector of length `d`.
+            If a scalar is given, the dispersivity is assumed to be the same in
+            all spatial dimensions. Default: `1.0`.
+        - `advect_on_diffusion` (keyword-only): If `True`, the second form
+            of the dispersion equation in higher dimensions is used. As a
+            consequence, there will be mixing in the spatial derivatives.
+            Default: `False`.
 
         **Notes:**
-            - The stepper is unconditionally stable, not matter the choice of
-                any argument because the equation is solved analytically in
-                Fourier space. **However**, note that initial conditions with
-                modes higher than the Nyquist freuency (`(N//2)+1` with `N`
-                being the `num_points`) lead to spurious oscillations.
-            - Ultimately, only the factor `𝒸 Δt / L³` affects the characteristic
-                of the dynamics. See also
-                [`exponax.normalized.NormalizedLinearStepper`][] with
-                `normalized_coefficients = [0, 0, 0, alpha_3]` with `alpha_3 =
-                dispersivity * dt / domain_extent**3`.
+
+        - The stepper is unconditionally stable, not matter the choice of
+            any argument because the equation is solved analytically in Fourier
+            space. **However**, note that initial conditions with modes higher
+            than the Nyquist freuency (`(N//2)+1` with `N` being the
+            `num_points`) lead to spurious oscillations.
+        - Ultimately, only the factor `𝒸 Δt / L³` affects the
+            characteristic of the dynamics. See also
+            [`exponax.normalized.NormalizedLinearStepper`][] with
+            `normalized_coefficients = [0, 0, 0, alpha_3]` with `alpha_3 =
+            dispersivity * dt / domain_extent**3`.
         """
         if isinstance(dispersivity, float):
             dispersivity = jnp.ones(num_spatial_dims) * dispersivity
@@ -507,32 +515,34 @@ class HyperDiffusion(BaseStepper):
         The latter introduces spatial mixing.
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `domain_extent`: The size of the domain `L`; in higher dimensions
-                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
-            - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and
-                **excludes** the right boundary point. In higher dimensions; the
-                number of points in each dimension is the same. Hence, the total
-                number of degrees of freedom is `Nᵈ`.
-            - `dt`: The timestep size `Δt` between two consecutive states.
-            - `hyper_diffusivity` (keyword-only): The hyper-diffusivity `ν`.
-                This stepper only supports scalar (=isotropic)
-                hyper-diffusivity. Default: 0.0001.
-            - `diffuse_on_diffuse` (keyword-only): If `True`, the second form
-                of the hyper-diffusion equation in higher dimensions is used. As
-                a consequence, there will be mixing in the spatial derivatives.
-                Default: `False`.
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `domain_extent`: The size of the domain `L`; in higher dimensions
+            the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same. Hence, the total number of degrees of
+            freedom is `Nᵈ`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `hyper_diffusivity` (keyword-only): The hyper-diffusivity `ν`.
+            This stepper only supports scalar (=isotropic) hyper-diffusivity.
+            Default: 0.0001.
+        - `diffuse_on_diffuse` (keyword-only): If `True`, the second form
+            of the hyper-diffusion equation in higher dimensions is used. As a
+            consequence, there will be mixing in the spatial derivatives.
+            Default: `False`.
 
         **Notes:**
-            - The stepper is unconditionally stable, not matter the choice of
-                any argument because the equation is solved analytically in
-                Fourier space.
-            - Ultimately, only the factor `μ Δt / L⁴` affects the characteristic
-                of the dynamics. See also
-                [`exponax.normalized.NormalizedLinearStepper`][] with
-                `normalized_coefficients = [0, 0, 0, 0, alpha_4]` with `alpha_4
-                = - hyper_diffusivity * dt / domain_extent**4`.
+
+        - The stepper is unconditionally stable, not matter the choice of
+            any argument because the equation is solved analytically in Fourier
+            space.
+        - Ultimately, only the factor `μ Δt / L⁴` affects the characteristic
+            of the dynamics. See also
+            [`exponax.normalized.NormalizedLinearStepper`][] with
+            `normalized_coefficients = [0, 0, 0, 0, alpha_4]` with `alpha_4 = -
+            hyper_diffusivity * dt / domain_extent**4`.
         """
         self.hyper_diffusivity = hyper_diffusivity
         self.diffuse_on_diffuse = diffuse_on_diffuse

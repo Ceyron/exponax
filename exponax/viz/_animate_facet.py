@@ -112,7 +112,7 @@ def animate_state_1d_facet(
     return ani
 
 
-def animate_spatial_temporal_facet(
+def animate_spatio_temporal_facet(
     trjs: Union[Float[Array, "S T C N"], Float[Array, "B S T 1 N"]],
     *,
     facet_over_channels: bool = True,

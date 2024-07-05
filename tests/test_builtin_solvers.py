@@ -55,7 +55,7 @@ def test_instantiate():
             ex.normalized.NormalizedConvectionStepper,
             ex.normalized.NormalizedGradientNormStepper,
             ex.normalized.NormalizedPolynomialStepper,
-            ex.normalized.NormlizedGeneralNonlinearStepper,
+            ex.normalized.NormalizedGeneralNonlinearStepper,
         ]:
             normalized_simulator(num_spatial_dims, num_points)
 
