@@ -137,7 +137,12 @@ nav:
             - Nonlinear: 'api/stepper/difficulty/nonlinear.md'
     - Utilities:
         - Initial Conditions:
+            - Sine Waves 1d: 'api/utilities/initial_conditions/sine_waves_1d.md'
+            - Truncated Fourier Series: 'api/utilities/initial_conditions/truncated_fourier_series.md'
+            - Gaussian Random Field: 'api/utilities/initial_conditions/gaussian_random_field.md'
+            - Diffused Noise: 'api/utilities/initial_conditions/diffused_noise.md'
             - Gaussian Blob: 'api/utilities/initial_conditions/gaussian_blob.md'
+            - Discontinuities: 'api/utilities/initial_conditions/discontinuities.md'
             - Helper: 'api/utilities/initial_conditions/helper.md'
         - Normalized & Difficulty: 'api/utilities/normalized_and_difficulty.md'
 
