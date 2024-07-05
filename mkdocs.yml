@@ -129,7 +129,12 @@ nav:
             - Polynomial: 'api/stepper/normalized/polynomial.md'
             - Nonlinear: 'api/stepper/normalized/nonlinear.md'
             - Vorticity Convection: 'api/stepper/normalized/vorticity_convection.md'
-    #     - Difficulty
+        - Difficulty:
+            - Linear: 'api/stepper/difficulty/linear.md'
+            - Convection: 'api/stepper/difficulty/convection.md'
+            - Gradient Norm: 'api/stepper/difficulty/gradient_norm.md'
+            - Polynomial: 'api/stepper/difficulty/polynomial.md'
+            - Nonlinear: 'api/stepper/difficulty/nonlinear.md'
     - Utilities:
         - Initial Conditions:
             - Gaussian Blob: 'api/utilities/initial_conditions/gaussian_blob.md'
