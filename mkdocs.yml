@@ -165,9 +165,10 @@ nav:
             - Animate Spatio-Temporal: 'api/utilities/visualization/animate_spatio_temporal.md'
             - Animate States Facet: 'api/utilities/visualization/animate_states_facet.md'
             - Animate Spatio-Temporal Facet: 'api/utilities/visualization/animate_spatio_temporal_facet.md'
-    # - ETDRK Backbone
     - Additional API:
         - Base:
             - Base Stepper: 'api/stepper/base_stepper.md'
+            - Base Initial Condition: 'api/utilities/initial_conditions/base_initial_condition.md'
+        - ETDRK Backbone: 'api/etdrk_backbone.md'
     - Background:
         - Design Decisions: 'background/design_decisions.md'
