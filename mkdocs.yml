@@ -122,6 +122,7 @@ nav:
                 - General Polynomial: 'api/stepper/physical/general/general_polynomial.md'
                 - General Nonlinear: 'api/stepper/physical/general/general_nonlinear.md'
                 - General Vorticity Convection: 'api/stepper/physical/general/general_vorticity_convection.md'
+            - Poisson: 'api/stepper/physical/poisson.md'
         - Normalized:
             - Linear: 'api/stepper/normalized/linear.md'
             - Convection: 'api/stepper/normalized/convection.md'
