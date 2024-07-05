@@ -9,7 +9,7 @@ from ._utils import (
 )
 
 
-class NormlizedGeneralNonlinearStepper(BaseStepper):
+class NormalizedGeneralNonlinearStepper(BaseStepper):
     normalized_coefficients_linear: tuple[float, ...]
     normalized_coefficients_nonlinear: tuple[float, ...]
     dealiasing_fraction: float
@@ -74,7 +74,7 @@ class NormlizedGeneralNonlinearStepper(BaseStepper):
         )
 
 
-class DifficultyGeneralNonlinearStepper(NormlizedGeneralNonlinearStepper):
+class DifficultyGeneralNonlinearStepper(NormalizedGeneralNonlinearStepper):
     linear_difficulties: tuple[float, ...]
     nonlinear_difficulties: tuple[float, ...]
 
