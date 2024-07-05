@@ -1,5 +1,9 @@
 # Helper
 
+::: exponax.build_ic_set
+
+---
+
 ::: exponax.ic.MultiChannelIC
     options:
         members:

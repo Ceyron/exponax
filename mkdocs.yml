@@ -136,6 +136,8 @@ nav:
             - Polynomial: 'api/stepper/difficulty/polynomial.md'
             - Nonlinear: 'api/stepper/difficulty/nonlinear.md'
     - Utilities:
+        - Repeated Stepper: 'api/utilities/repeated_stepper.md'
+        - Forced Stepper: 'api/utilities/forced_stepper.md'
         - Initial Conditions:
             - Sine Waves 1d: 'api/utilities/initial_conditions/sine_waves_1d.md'
             - Truncated Fourier Series: 'api/utilities/initial_conditions/truncated_fourier_series.md'
@@ -144,6 +146,9 @@ nav:
             - Gaussian Blob: 'api/utilities/initial_conditions/gaussian_blob.md'
             - Discontinuities: 'api/utilities/initial_conditions/discontinuities.md'
             - Helper: 'api/utilities/initial_conditions/helper.md'
+        - Rollout & Repeat: 'api/utilities/rollout_and_repeat.md'
+        - Grid Generation: 'api/utilities/grid_generation.md'
+        - Derivatives: 'api/utilities/derivatives.md'
         - Normalized & Difficulty: 'api/utilities/normalized_and_difficulty.md'
         - Metrics:
             - MSE-based: 'api/utilities/metrics/mse_based.md'
