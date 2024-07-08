@@ -24,12 +24,9 @@
 
 ## Installation
 
-1. Clone the repository
-2. Change directory to the repository
-3. Install the package
-    ```bash
-    pip install .
-    ```
+```bash
+pip install git+ssh://git@github.com/Ceyron/exponax@main
+```
 
 Requires Python 3.10+ and JAX 0.4.13+ (and Equinox & Matplotlib). 👉 [JAX install guide](https://jax.readthedocs.io/en/latest/installation.html).
 
