@@ -70,7 +70,7 @@ def volume_render_state_3d(
     distance_scale: float = 10.0,
     gamma_correction: float = 2.4,
     chunk_size: int = 64,
-) -> Float[Array, "B resolution resolution 3"]:
+) -> Float[Array, "B resolution resolution 4"]:
     """
     (Batched) rendering using the vape volume renderer.
 
@@ -92,15 +92,20 @@ def volume_render_state_3d(
 
     **Returns:**
 
-    - `imgs`: The rendered images, in terms of RBG-images (channels-last) and a
-        leading batch axis, shape `(B, resolution, resolution, 3)`.
+    - `imgs`: The rendered images, in terms of RBGA-images (channels-last) and a
+        leading batch axis, shape `(B, resolution, resolution, 4)`.
     """
     if states.ndim != 4:
         raise ValueError("state must be a four-axis array.")
     try:
-        import vape
+        import vape4d
     except ImportError:
-        raise ImportError("This function requires the `vape` volume renderer package.")
+        raise ImportError(
+            """
+                          This function requires the `vape4d` volume renderer package.
+                            Please install it via `pip install vape4d`.
+                          """
+        )
 
     if bg_color == "black":
         bg_color = (0, 0, 0, 255)
@@ -120,7 +125,7 @@ def volume_render_state_3d(
             sub_time_steps = [0.0]
         else:
             sub_time_steps = [i / (num_images - 1) for i in time_steps]
-        imgs_this_batch = vape.render(
+        imgs_this_batch = vape4d.render(
             states,
             cmap=cmap_with_alpha_transfer,
             time=sub_time_steps,
@@ -131,6 +136,8 @@ def volume_render_state_3d(
             vmax=vlim[1],
             distance_scale=distance_scale,
         )
+        if num_images == 1:
+            imgs_this_batch = imgs_this_batch[None]
         imgs.append(imgs_this_batch)
 
     imgs = np.concatenate(imgs, axis=0)
