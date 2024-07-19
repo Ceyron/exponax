@@ -238,6 +238,7 @@ def plot_state_2d_facet(
     if facet_over_channels:
         if states.ndim != 3:
             raise ValueError("states must be a three-axis array.")
+        states = states[:, None, :, :]
     else:
         if states.ndim != 4:
             raise ValueError("states must be a four-axis array.")
