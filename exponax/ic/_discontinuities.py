@@ -135,8 +135,8 @@ class RandomDiscontinuities(BaseRandomICGenerator):
             key_1, key_2, key = jr.split(key, 3)
             lim_1 = jr.uniform(key_1, (), minval=0.0, maxval=self.domain_extent)
             lim_2 = jr.uniform(key_2, (), minval=0.0, maxval=self.domain_extent)
-            lower_limits.append(min(lim_1, lim_2))
-            upper_limits.append(max(lim_1, lim_2))
+            lower_limits.append(jnp.minimum(lim_1, lim_2))
+            upper_limits.append(jnp.maximum(lim_1, lim_2))
 
         lower_limits = tuple(lower_limits)
         upper_limits = tuple(upper_limits)
