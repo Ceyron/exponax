@@ -174,27 +174,6 @@ class NormalizedGradientNormStepper(GeneralGradientNormStepper):
             circle_radius=circle_radius,
         )
 
-    # def _build_linear_operator(self, derivative_operator: Array) -> Array:
-    #     linear_operator = sum(
-    #         jnp.sum(
-    #             c * (derivative_operator) ** i,
-    #             axis=0,
-    #             keepdims=True,
-    #         )
-    #         for i, c in enumerate(self.normalized_coefficients)
-    #     )
-    #     return linear_operator
-
-    # def _build_nonlinear_fun(self, derivative_operator: Array):
-    #     return GradientNormNonlinearFun(
-    #         num_spatial_dims=self.num_spatial_dims,
-    #         num_points=self.num_points,
-    #         derivative_operator=derivative_operator,
-    #         dealiasing_fraction=self.dealiasing_fraction,
-    #         scale=self.normalized_gradient_norm_scale,
-    #         zero_mode_fix=True,
-    #     )
-
 
 class DifficultyGradientNormStepper(NormalizedGradientNormStepper):
     linear_difficulties: tuple[float, ...]

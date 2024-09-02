@@ -114,30 +114,6 @@ class NormalizedNonlinearStepper(GeneralNonlinearStepper):
             circle_radius=circle_radius,
         )
 
-    # def _build_linear_operator(self, derivative_operator: Array) -> Array:
-    #     linear_operator = sum(
-    #         jnp.sum(
-    #             c * (derivative_operator) ** i,
-    #             axis=0,
-    #             keepdims=True,
-    #         )
-    #         for i, c in enumerate(self.normalized_coefficients_linear)
-    #     )
-    #     return linear_operator
-
-    # def _build_nonlinear_fun(
-    #     self,
-    #     derivative_operator: Complex[Array, "D ... (N//2)+1"],
-    # ) -> GeneralNonlinearFun:
-    #     return GeneralNonlinearFun(
-    #         self.num_spatial_dims,
-    #         self.num_points,
-    #         derivative_operator=derivative_operator,
-    #         dealiasing_fraction=self.dealiasing_fraction,
-    #         scale_list=self.normalized_coefficients_nonlinear,
-    #         zero_mode_fix=True,  # ToDo: check this
-    #     )
-
 
 class DifficultyNonlinearStepper(NormalizedNonlinearStepper):
     linear_difficulties: tuple[float, ...]

@@ -116,31 +116,6 @@ class NormalizedPolynomialStepper(GeneralPolynomialStepper):
             circle_radius=circle_radius,
         )
 
-    # def _build_linear_operator(
-    #     self,
-    #     derivative_operator: Complex[Array, "D ... (N//2)+1"],
-    # ) -> Complex[Array, "1 ... (N//2)+1"]:
-    #     linear_operator = sum(
-    #         jnp.sum(
-    #             c * (derivative_operator) ** i,
-    #             axis=0,
-    #             keepdims=True,
-    #         )
-    #         for i, c in enumerate(self.normalized_coefficients)
-    #     )
-    #     return linear_operator
-
-    # def _build_nonlinear_fun(
-    #     self,
-    #     derivative_operator: Complex[Array, "D ... (N//2)+1"],
-    # ) -> PolynomialNonlinearFun:
-    #     return PolynomialNonlinearFun(
-    #         self.num_spatial_dims,
-    #         self.num_points,
-    #         coefficients=self.normalized_polynomial_scales,
-    #         dealiasing_fraction=self.dealiasing_fraction,
-    #     )
-
 
 class DifficultyPolynomialStepper(NormalizedPolynomialStepper):
     linear_difficulties: tuple[float, ...]

@@ -189,27 +189,6 @@ class NormalizedConvectionStepper(GeneralConvectionStepper):
             single_channel=single_channel,
         )
 
-    # def _build_linear_operator(self, derivative_operator: Array) -> Array:
-    #     # Now the linear operator is unscaled
-    #     linear_operator = sum(
-    #         jnp.sum(
-    #             c * (derivative_operator) ** i,
-    #             axis=0,
-    #             keepdims=True,
-    #         )
-    #         for i, c in enumerate(self.normalized_coefficients)
-    #     )
-    #     return linear_operator
-
-    # def _build_nonlinear_fun(self, derivative_operator: Array):
-    #     return ConvectionNonlinearFun(
-    #         self.num_spatial_dims,
-    #         self.num_points,
-    #         derivative_operator=derivative_operator,
-    #         dealiasing_fraction=self.dealiasing_fraction,
-    #         scale=self.normalized_convection_scale,
-    #     )
-
 
 class DifficultyConvectionStepper(NormalizedConvectionStepper):
     linear_difficulties: tuple[float, ...]
