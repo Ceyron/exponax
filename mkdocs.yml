@@ -1,3 +1,5 @@
+# Settings are inspired by
+# https://github.com/patrick-kidger/equinox/blob/main/mkdocs.yml
 site_name: Exponax
 site_description: Fast & Differentiable PDE solvers in JAX.
 site_author: Felix Koehler
@@ -5,14 +7,14 @@ site_url: https://fkoehler.site/exponax
 
 repo_url: https://github.com/Ceyron/exponax
 repo_name: Ceyron/exponax
-edit_uri: ""  # No edit button, as some of our pages are in /docs and some in /examples via symlink, so it's impossible for them all to be accurate
+edit_uri: ""  # No edit button
 
 theme:
     name: material
     features:
-        - navigation.sections  # Sections are included in the navigation on the left.
-        - toc.integrate  # Table of contents is integrated on the left; does not appear separately on the right.
+        - navigation.sections
         - header.autohide  # header disappears as you scroll
+        # - navigation.top  # render button to quickly scroll up
     palette:
         - scheme: default
           primary: teal
@@ -61,7 +63,7 @@ extra_javascript:
     - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 plugins:
-    - search  # default search plugin; needs manually re-enabling when using any other plugins
+    - search  # requires re-enabling
     - autorefs  # Cross-links to headings
     - mknotebooks  # Jupyter notebooks
     - mkdocstrings:
