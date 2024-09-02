@@ -8,9 +8,10 @@
 # jinja2==3.0.3            # Older version. After 3.1.0 seems to be incompatible with current versions of mkdocstrings.
 # pygments==2.14.0
 # nbconvert==6.5.0         # Fix https://github.com/patrick-kidger/equinox/issues/428
-mkdocs==1.6.0
+mkdocs==1.6.1
 black==24.4.2
-mkdocs-material==9.5.27
-mkdocstrings==0.25.1
-mkdocstrings-python==1.10.5
+mkdocs-material==9.5.34
+mkdocstrings==0.26.0
+mkdocstrings-python==1.10.9
 mknotebooks==0.8.0
+griffe==1.2.0
