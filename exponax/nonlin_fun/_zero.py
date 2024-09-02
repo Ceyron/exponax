@@ -19,11 +19,12 @@ class ZeroNonlinearFun(BaseNonlinearFun):
         ```
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and
-                **excludes** the right boundary point. In higher dimensions; the
-                number of points in each dimension is the same.
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `num_points`: The number of points `N` used to discretize the domain.
+            This **includes** the left boundary point and **excludes** the right
+            boundary point. In higher dimensions; the number of points in each
+            dimension is the same.
         """
         super().__init__(
             num_spatial_dims,
