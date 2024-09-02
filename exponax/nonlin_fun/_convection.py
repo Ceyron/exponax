@@ -24,14 +24,20 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         found in the Burgers equation. In 1d and state space, this reads
 
         ```
-            𝒩(u) = b₁ 1/2 (u²)ₓ
+            𝒩(u) = - b₁ 1/2 (u²)ₓ
         ```
 
-        with a scale `b₁`. The typical extension to higher dimensions requires u
-        to have as many channels as spatial dimensions and then gives
+        with a scale `b₁`. The minus arises because `Exponax` follows the
+        convention that all nonlinear and linear differential operators are on
+        the right-hand side of the equation. Typically, the convection term is
+        on the left-hand side. Hence, the minus is required to move the term to
+        the right-hand side.
+
+        The typical extension to higher dimensions requires u to have as many
+        channels as spatial dimensions and then gives
 
         ```
-            𝒩(u) = b₁ 1/2 ∇ ⋅ (u ⊗ u)
+            𝒩(u) = - b₁ 1/2 ∇ ⋅ (u ⊗ u)
         ```
 
         with `∇ ⋅` the divergence operator and the outer product `u ⊗ u`.
@@ -39,7 +45,7 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         matter the spatial dimensions. This reads
 
         ```
-            𝒩(u) = b₁ 1/2 (1⃗ ⋅ ∇)(u²)
+            𝒩(u) = - b₁ 1/2 (1⃗ ⋅ ∇)(u²)
         ```
 
         **Arguments:**
