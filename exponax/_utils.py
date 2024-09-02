@@ -17,28 +17,31 @@ def make_grid(
     indexing: str = "ij",
 ) -> Float[Array, "D ... N"]:
     """
-    Return a grid in the spatial domain. A grid in d dimensions is an array of
-    shape (d,) + (num_points,)*d with the first axis representing all coordiate
-    inidices.
+    Return a grid in the spatial domain. A grid in D dimensions is an array of
+    shape (D,) + (num_points,)*D with the leading axis representing all
+    coordiate inidices.
 
     Notice, that if `num_spatial_dims = 1`, the returned array has a singleton
     dimension in the first axis, i.e., the shape is `(1, num_points)`.
 
     **Arguments:**
-        - `num_spatial_dims`: The number of spatial dimensions.
-        - `domain_extent`: The extent of the domain in each spatial dimension.
-        - `num_points`: The number of points in each spatial dimension.
-        - `full`: Whether to include the right boundary point in the grid.
-            Default: `False`. The right point is redundant for periodic boundary
-            conditions and is not considered a degree of freedom. Use this
-            option, for example, if you need a full grid for plotting.
-        - `zero_centered`: Whether to center the grid around zero. Default:
-            `False`. By default the grid considers a domain of (0,
-            domain_extent)^(num_spatial_dims).
-        - `indexing`: The indexing convention to use. Default: `'ij'`.
+
+    - `num_spatial_dims`: The number of spatial dimensions.
+    - `domain_extent`: The extent of the domain in each spatial dimension.
+    - `num_points`: The number of points in each spatial dimension.
+    - `full`: Whether to include the right boundary point in the grid.
+        Default: `False`. The right point is redundant for periodic boundary
+        conditions and is not considered a degree of freedom. Use this option,
+        for example, if you need a full grid for plotting.
+    - `zero_centered`: Whether to center the grid around zero. Default:
+        `False`. By default the grid considers a domain of (0,
+        domain_extent)^(num_spatial_dims).
+    - `indexing`: The indexing convention to use. Default: `'ij'`.
 
     **Returns:**
-        - `grid`: The grid in the spatial domain. Shape: `(num_spatial_dims, ..., num_points)`.
+
+    - `grid`: The grid in the spatial domain. Shape: `(num_spatial_dims,
+        ..., num_points)`.
     """
     if full:
         grid_1d = jnp.linspace(0, domain_extent, num_points + 1, endpoint=True)
@@ -59,18 +62,23 @@ def make_grid(
     return grid
 
 
-def wrap_bc(u):
+def wrap_bc(u: Float[Array, "C N"]) -> Float[Array, "C N+1"]:
     """
     Wraps the periodic boundary conditions around the array `u`.
 
     This can be used to plot the solution of a periodic problem on the full
-    interval [0, L] by plotting `wrap_bc(u)` instead of `u`.
+    interval [0, L] by plotting `wrap_bc(u)` instead of `u`. Consider using
+    `exponax.make_grid` with the `full=True` option to create a full grid. Note
+    that all routines in `exponax.viz` already correctly wrap the boundary
+    conditions.
 
-    **Parameters:**
-        - `u`: The array to wrap, shape `(N,)`.
+    **Arguments:**
+
+    - `u`: The array to wrap, shape `(C, N,)`.
 
     **Returns:**
-        - `u_wrapped`: The wrapped array, shape `(N + 1,)`.
+
+    - `u_wrapped`: The wrapped array, shape `(C, N + 1,)`.
     """
     _, *spatial_shape = u.shape
     num_spatial_dims = len(spatial_shape)
@@ -98,33 +106,32 @@ def rollout(
     a force/control or additional metadata (like physical parameters, or time
     for non-autonomous systems).
 
-    Args:
-        - `stepper_fn`: The time stepper to transform. If `takes_aux = False`
-            (default), expected signature is `u_next = stepper_fn(u)`, else
-            `u_next = stepper_fn(u, aux)`. `u` and `u_next` need to be PyTrees
-            of identical structure, in the easiest case just arrays of same
-            shape.
-        - `n`: The number of time steps to rollout the trajectory into the
-            future. If `include_init = False` (default) produces the `n` steps
-            into the future.
-        - `include_init`: Whether to include the initial condition in the
-            trajectory. If `True`, the arrays in the returning PyTree have shape
-            `(n + 1, ...)`, else `(n, ...)`. Default: `False`.
-        - `takes_aux`: Whether the stepper function takes an additional PyTree
-            as second argument.
-        - `constant_aux`: Whether the auxiliary input is constant over the
-            trajectory. If `True`, the auxiliary input is repeated `n` times,
-            otherwise the leading axis in the PyTree arrays has to be of length
-            `n`.
+    **Arguments:**
 
-    Returns:
-        - `rollout_stepper_fn`: A function that takes an initial condition `u_0`
-            and an auxiliary input `aux` (if `takes_aux = True`) and produces
-            the trajectory by autoregressively applying the stepper `n` times.
-            If `include_init = True`, the trajectory has shape `(n + 1, ...)`,
-            else `(n, ...)`. Returns a PyTree of the same structure as the
-            initial condition, but with an additional leading axis of length
-            `n`.
+    - `stepper_fn`: The time stepper to transform. If `takes_aux = False`
+        (default), expected signature is `u_next = stepper_fn(u)`, else `u_next
+        = stepper_fn(u, aux)`. `u` and `u_next` need to be PyTrees of identical
+        structure, in the easiest case just arrays of same shape.
+    - `n`: The number of time steps to rollout the trajectory into the
+        future. If `include_init = False` (default) produces the `n` steps into
+        the future.
+    - `include_init`: Whether to include the initial condition in the
+        trajectory. If `True`, the arrays in the returning PyTree have shape `(n
+        + 1, ...)`, else `(n, ...)`. Default: `False`.
+    - `takes_aux`: Whether the stepper function takes an additional PyTree
+        as second argument.
+    - `constant_aux`: Whether the auxiliary input is constant over the
+        trajectory. If `True`, the auxiliary input is repeated `n` times,
+        otherwise the leading axis in the PyTree arrays has to be of length `n`.
+
+    **Returns:**
+
+    - `rollout_stepper_fn`: A function that takes an initial condition `u_0`
+        and an auxiliary input `aux` (if `takes_aux = True`) and produces the
+        trajectory by autoregressively applying the stepper `n` times. If
+        `include_init = True`, the trajectory has shape `(n + 1, ...)`, else
+        `(n, ...)`. Returns a PyTree of the same structure as the initial
+        condition, but with an additional leading axis of length `n`.
     """
 
     if takes_aux:
@@ -196,26 +203,25 @@ def repeat(
     a force/control or additional metadata (like physical parameters, or time
     for non-autonomous systems).
 
-    Args:
-        - `stepper_fn`: The time stepper to transform. If `takes_aux = False`
-            (default), expected signature is `u_next = stepper_fn(u)`, else
-            `u_next = stepper_fn(u, aux)`. `u` and `u_next` need to be PyTrees
-            of identical structure, in the easiest case just arrays of same
-            shape.
-        - `n`: The number of times to apply the stepper.
-        - `takes_aux`: Whether the stepper function takes an additional PyTree
-            as second argument.
-        - `constant_aux`: Whether the auxiliary input is constant over the
-            trajectory. If `True`, the auxiliary input is repeated `n` times,
-            otherwise the leading axis in the PyTree arrays has to be of length
-            `n`.
+    **Arguments:**
 
-    Returns:
-        - `repeated_stepper_fn`: A function that takes an initial condition
-            `u_0` and an auxiliary input `aux` (if `takes_aux = True`) and
-            produces the final state by autoregressively applying the stepper
-            `n` times. Returns a PyTree of the same structure as the initial
-            condition.
+    - `stepper_fn`: The time stepper to transform. If `takes_aux = False`
+        (default), expected signature is `u_next = stepper_fn(u)`, else `u_next
+        = stepper_fn(u, aux)`. `u` and `u_next` need to be PyTrees of identical
+        structure, in the easiest case just arrays of same shape.
+    - `n`: The number of times to apply the stepper.
+    - `takes_aux`: Whether the stepper function takes an additional PyTree
+        as second argument.
+    - `constant_aux`: Whether the auxiliary input is constant over the
+        trajectory. If `True`, the auxiliary input is repeated `n` times,
+        otherwise the leading axis in the PyTree arrays has to be of length `n`.
+
+    **Returns:**
+
+    - `repeated_stepper_fn`: A function that takes an initial condition
+        `u_0` and an auxiliary input `aux` (if `takes_aux = True`) and produces
+        the final state by autoregressively applying the stepper `n` times.
+        Returns a PyTree of the same structure as the initial condition.
     """
 
     if takes_aux:
@@ -256,18 +262,22 @@ def stack_sub_trajectories(
     Slice a trajectory into subtrajectories of length `n` and stack them
     together. Useful for rollout training neural operators with temporal mixing.
 
-    !!! Note that this function can produce very large arrays.
+    !!! warning
+        This function can produce very large arrays, especially if `sub_le >>
+        1`.
 
     **Arguments:**
-        - `trj`: The trajectory to slice. Expected shape: `(n_timesteps, ...)`.
-        - `sub_len`: The length of the subtrajectories. If you want to perform rollout
-            training with k steps, note that `n=k+1` to also have an initial
-            condition in the subtrajectories.
+
+    - `trj`: The trajectory to slice. Expected shape: `(n_timesteps, ...)`.
+    - `sub_len`: The length of the subtrajectories. If you want to perform
+        rollout training with k steps, note that `n=k+1` to also have an initial
+        condition in the subtrajectories.
 
     **Returns:**
-        - `sub_trjs`: The stacked subtrajectories. Expected shape: `(n_stacks, n, ...)`.
-           `n_stacks` is the number of subtrajectories stacked together, i.e.,
-           `n_timesteps - n + 1`.
+
+    - `sub_trjs`: The stacked subtrajectories. Expected shape: `(n_stacks,
+        n, ...)`. `n_stacks` is the number of subtrajectories stacked together,
+        i.e., `n_timesteps - n + 1`.
     """
     n_time_steps = [leaf.shape[0] for leaf in jtu.tree_leaves(trj)]
 
@@ -303,26 +313,28 @@ def stack_sub_trajectories(
 
 
 def build_ic_set(
-    ic_generator,
+    ic_generator: Callable[[int, PRNGKeyArray], Float[Array, "C ... N"]],
     *,
     num_points: int,
     num_samples: int,
     key: PRNGKeyArray,
-) -> Float[Array, "S 1 ... N"]:
+) -> Float[Array, "S C ... N"]:
     """
     Generate a set of initial conditions by sampling from a given initial
     condition distribution and evaluating the function on the given grid.
 
     **Arguments:**
-        - `ic_generator`: A function that takes a PRNGKey and returns a
-            function that takes a grid and returns a sample from the initial
-            condition distribution.
-        - `num_samples`: The number of initial conditions to sample.
-        - `key`: The PRNGKey to use for sampling.
+
+    - `ic_generator`: A function that takes a number of points and a PRNGKey
+        and returns an array representing the discrete state of an initial
+        condition. The shape of the returned array is `(C, ..., N)`.
+    - `num_samples`: The number of initial conditions to sample.
+    - `key`: The PRNGKey to use for sampling.
 
     **Returns:**
-        - `ic_set`: The set of initial conditions. Shape: `(S, 1, ..., N)`.
-            `S = num_samples`.
+
+    - `ic_set`: The set of initial conditions. Shape: `(S, C, ..., N)`.
+        `S = num_samples`.
     """
 
     def scan_fn(k, _):
