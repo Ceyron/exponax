@@ -399,7 +399,7 @@ def ifft(
     field_hat: Complex[Array, "C ... (N//2)+1"],
     *,
     num_spatial_dims: Optional[int] = None,
-    num_points: int = None,
+    num_points: Optional[int] = None,
 ) -> Float[Array, "C ... N"]:
     """
     Perform the inverse **real-valued** FFT of a field. This is the inverse
