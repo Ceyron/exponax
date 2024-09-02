@@ -1,4 +1,4 @@
-from typing import TypeVar, Union
+from typing import TypeVar, Union, Optional
 
 import jax.numpy as jnp
 from jaxtyping import Array, Bool, Complex, Float
@@ -368,7 +368,7 @@ def build_scaling_array(
 def fft(
     field: Float[Array, "C ... N"],
     *,
-    num_spatial_dims: int,
+    num_spatial_dims: Optional[int] = None,
 ) -> Complex[Array, "C ... (N//2)+1"]:
     """
     Perform a **real-valued** FFT of a field. This function is designed for
@@ -381,18 +381,24 @@ def fft(
     **Arguments:**
         - `field`: The field to transform, shape `(C, ..., N,)`.
         - `num_spatial_dims`: The number of spatial dimensions, i.e., how many
-            spatial axes follow the channel axis.
+            spatial axes follow the channel axis. Can be inferred from the array
+            if it follows the Exponax convention. For example, it is not allowed
+            to have a leading batch axis, in such a case use `jax.vmap` on this
+            function.
 
     **Returns:**
         - `field_hat`: The transformed field, shape `(C, ..., N//2+1)`.
     """
+    if num_spatial_dims is None:
+        num_spatial_dims = field.ndim - 1
+
     return jnp.fft.rfftn(field, axes=space_indices(num_spatial_dims))
 
 
 def ifft(
     field_hat: Complex[Array, "C ... (N//2)+1"],
     *,
-    num_spatial_dims: int,
+    num_spatial_dims: Optional[int] = None,
     num_points: int = None,
 ) -> Float[Array, "C ... N"]:
     """
@@ -411,13 +417,20 @@ def ifft(
 
     **Arguments:**
         - `field_hat`: The transformed field, shape `(C, ..., N//2+1)`.
-        - `num_spatial_dims`: The number of spatial dimensions.
+        - `num_spatial_dims`: The number of spatial dimensions, i.e., how many
+            spatial axes follow the channel axis. Can be inferred from the array
+            if it follows the Exponax convention. For example, it is not allowed
+            to have a leading batch axis, in such a case use `jax.vmap` on this
+            function.
         - `num_points`: The number of points in each spatial dimension. Can be
           inferred if `num_spatial_dims` >= 2
 
     **Returns:**
         - `field`: The transformed field, shape `(C, ..., N,)`.
     """
+    if num_spatial_dims is None:
+        num_spatial_dims = field_hat.ndim - 1
+
     if num_points is None:
         if num_spatial_dims >= 2:
             num_points = field_hat.shape[-2]
