@@ -1,6 +1,6 @@
-# General Convection Stepper
+# Nonlinear
 
-::: exponax.stepper.GeneralConvectionStepper
+::: exponax.stepper.generic.DifficultyNonlinearStepper
     options:
         members:
             - __init__

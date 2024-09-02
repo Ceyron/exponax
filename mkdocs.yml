@@ -99,45 +99,47 @@ nav:
             - Nice Features: 'examples/additional_features.ipynb'
             - Performance Hints: 'examples/performance_hints.ipynb'
     - Stepper:
-        - Physical:
-            - Linear:
-                - Advection: 'api/stepper/physical/linear/advection.md'
-                - Diffusion: 'api/stepper/physical/linear/diffusion.md'
-                - Advection-Diffusion: 'api/stepper/physical/linear/advection_diffusion.md'
-                - Dispersion: 'api/stepper/physical/linear/dispersion.md'
-                - Hyper-Diffusion: 'api/stepper/physical/linear/hyper_diffusion.md'
-            - Burgers: 'api/stepper/physical/burgers.md'
-            - Korteweg-de Vries: 'api/stepper/physical/kdv.md'
-            - Kuramoto-Sivashinsky: 'api/stepper/physical/ks.md'
-            - Kuramoto-Sivashinsky (Conservative): 'api/stepper/physical/ks_cons.md'
-            - Navier-Stokes: 'api/stepper/physical/navier_stokes.md'
-            - Reaction-Diffusion:
-                - Fisher-KPP: 'api/stepper/physical/reaction_diffusion/fisher_kpp.md'
-                - Allen-Cahn: 'api/stepper/physical/reaction_diffusion/allen_cahn.md'
-                - Cahn-Hilliard: 'api/stepper/physical/reaction_diffusion/cahn_hilliard.md'
-                - Swift-Hohenberg: 'api/stepper/physical/reaction_diffusion/swift_hohenberg.md'
-                - Gray-Scott: 'api/stepper/physical/reaction_diffusion/gray_scott.md'
-            - General:
-                - General Linear: 'api/stepper/physical/general/general_linear.md'
-                - General Convection: 'api/stepper/physical/general/general_convection.md'
-                - General Gradient Norm: 'api/stepper/physical/general/general_gradient_norm.md'
-                - General Polynomial: 'api/stepper/physical/general/general_polynomial.md'
-                - General Nonlinear: 'api/stepper/physical/general/general_nonlinear.md'
-                - General Vorticity Convection: 'api/stepper/physical/general/general_vorticity_convection.md'
-            - Poisson: 'api/stepper/physical/poisson.md'
-        - Normalized:
-            - Linear: 'api/stepper/normalized/linear.md'
-            - Convection: 'api/stepper/normalized/convection.md'
-            - Gradient Norm: 'api/stepper/normalized/gradient_norm.md'
-            - Polynomial: 'api/stepper/normalized/polynomial.md'
-            - Nonlinear: 'api/stepper/normalized/nonlinear.md'
-            - Vorticity Convection: 'api/stepper/normalized/vorticity_convection.md'
-        - Difficulty:
-            - Linear: 'api/stepper/difficulty/linear.md'
-            - Convection: 'api/stepper/difficulty/convection.md'
-            - Gradient Norm: 'api/stepper/difficulty/gradient_norm.md'
-            - Polynomial: 'api/stepper/difficulty/polynomial.md'
-            - Nonlinear: 'api/stepper/difficulty/nonlinear.md'
+        - Overview: 'api/stepper/overview.md'
+        - Linear:
+            - Advection: 'api/stepper/linear/advection.md'
+            - Diffusion: 'api/stepper/linear/diffusion.md'
+            - Advection-Diffusion: 'api/stepper/linear/advection_diffusion.md'
+            - Dispersion: 'api/stepper/linear/dispersion.md'
+            - Hyper-Diffusion: 'api/stepper/linear/hyper_diffusion.md'
+        - Nonlinear:
+            - Burgers: 'api/stepper/nonlinear/burgers.md'
+            - Korteweg-de Vries: 'api/stepper/nonlinear/kdv.md'
+            - Kuramoto-Sivashinsky: 'api/stepper/nonlinear/ks.md'
+            - Kuramoto-Sivashinsky (Conservative): 'api/stepper/nonlinear/ks_cons.md'
+            - Navier-Stokes: 'api/stepper/nonlinear/navier_stokes.md'
+        - Reaction:
+            - Fisher-KPP: 'api/stepper/reaction/fisher_kpp.md'
+            - Allen-Cahn: 'api/stepper/reaction/allen_cahn.md'
+            - Cahn-Hilliard: 'api/stepper/reaction/cahn_hilliard.md'
+            - Swift-Hohenberg: 'api/stepper/reaction/swift_hohenberg.md'
+            - Gray-Scott: 'api/stepper/reaction/gray_scott.md'
+        - Generic:
+            - Physical:
+                - General Linear: 'api/stepper/generic/physical/general_linear.md'
+                - General Convection: 'api/stepper/generic/physical/general_convection.md'
+                - General Gradient Norm: 'api/stepper/generic/physical/general_gradient_norm.md'
+                - General Polynomial: 'api/stepper/generic/physical/general_polynomial.md'
+                - General Nonlinear: 'api/stepper/generic/physical/general_nonlinear.md'
+                - General Vorticity Convection: 'api/stepper/generic/physical/general_vorticity_convection.md'
+            - Normalized:
+                - Linear: 'api/stepper/generic/normalized/normalized_linear.md'
+                - Convection: 'api/stepper/generic/normalized/normalized_convection.md'
+                - Gradient Norm: 'api/stepper/generic/normalized/normalized_gradient_norm.md'
+                - Polynomial: 'api/stepper/generic/normalized/normalized_polynomial.md'
+                - Nonlinear: 'api/stepper/generic/normalized/normalized_nonlinear.md'
+            - Difficulty:
+                - Linear: 'api/stepper/generic/difficulty/difficulty_linear.md'
+                - Convection: 'api/stepper/generic/difficulty/difficulty_convection.md'
+                - Gradient Norm: 'api/stepper/generic/difficulty/difficulty_gradient_norm.md'
+                - Polynomial: 'api/stepper/generic/difficulty/difficulty_polynomial.md'
+                - Nonlinear: 'api/stepper/generic/difficulty/difficulty_nonlinear.md'
+        - Additional:
+            - Poisson: 'api/stepper/additional/poisson.md'
     - Utilities:
         - Nonlinear Functions:
             - Zero: 'api/utilities/nonlin_fun/zero.md'

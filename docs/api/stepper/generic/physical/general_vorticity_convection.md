@@ -1,6 +1,6 @@
 # General Vorticity Convection Stepper
 
-::: exponax.stepper.GeneralVorticityConvectionStepper
+::: exponax.stepper.generic.GeneralVorticityConvectionStepper
     options:
         members:
             - __init__

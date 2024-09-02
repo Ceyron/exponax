@@ -1,6 +1,6 @@
-# Cahn-Hilliad
+# Swift-Hohenberg
 
-::: exponax.reaction.CahnHilliard
+::: exponax.stepper.reaction.SwiftHohenberg
     options:
         members:
             - __init__

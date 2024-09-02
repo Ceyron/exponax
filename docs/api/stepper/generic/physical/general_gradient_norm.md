@@ -1,6 +1,6 @@
 # General Gradient Norm Stepper
 
-::: exponax.stepper.GeneralGradientNormStepper
+::: exponax.stepper.generic.GeneralGradientNormStepper
     options:
         members:
             - __init__

@@ -1,6 +1,6 @@
-# Gradient NormA
+# Linear
 
-::: exponax.normalized.NormalizedGradientNormStepper  
+::: exponax.stepper.generic.DifficultyLinearStepper  
     options:
         members:
             - __init__

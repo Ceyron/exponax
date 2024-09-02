@@ -1,6 +1,6 @@
-# Linear
+# Fisher-KPP
 
-::: exponax.normalized.DifficultyLinearStepper  
+::: exponax.stepper.reaction.FisherKPP
     options:
         members:
             - __init__

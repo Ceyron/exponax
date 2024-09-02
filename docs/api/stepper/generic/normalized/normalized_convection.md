@@ -1,6 +1,6 @@
-# Polynomial
+# Convection
 
-::: exponax.normalized.DifficultyPolynomialStepper  
+::: exponax.stepper.generic.NormalizedConvectionStepper  
     options:
         members:
             - __init__

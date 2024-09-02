@@ -1,6 +1,6 @@
 # General Nonlinear Stepper
 
-::: exponax.stepper.GeneralNonlinearStepper
+::: exponax.stepper.generic.GeneralNonlinearStepper
     options:
         members:
             - __init__

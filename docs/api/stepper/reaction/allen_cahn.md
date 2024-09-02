@@ -1,6 +1,6 @@
-# Gray-Scott
+# Allen-Cahn
 
-::: exponax.reaction.GrayScott
+::: exponax.stepper.reaction.AllenCahn
     options:
         members:
             - __init__

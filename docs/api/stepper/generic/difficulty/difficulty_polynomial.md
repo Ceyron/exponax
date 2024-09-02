@@ -1,6 +1,6 @@
-# Nonlinear
+# Polynomial
 
-::: exponax.normalized.NormalizedGeneralNonlinearStepper  
+::: exponax.stepper.generic.DifficultyPolynomialStepper  
     options:
         members:
             - __init__

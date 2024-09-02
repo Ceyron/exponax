@@ -1,6 +1,6 @@
-# Fisher-KPP
+# General Linear Stepper
 
-::: exponax.reaction.FisherKPP
+::: exponax.stepper.generic.GeneralLinearStepper
     options:
         members:
             - __init__

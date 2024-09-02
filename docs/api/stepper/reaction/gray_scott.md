@@ -1,6 +1,6 @@
-# Polynomial
+# Gray-Scott
 
-::: exponax.normalized.NormalizedPolynomialStepper  
+::: exponax.stepper.reaction.GrayScott
     options:
         members:
             - __init__

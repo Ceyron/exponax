@@ -1,6 +1,5 @@
-# Swift-Hohenberg
 
-::: exponax.reaction.SwiftHohenberg
+::: exponax.stepper.generic.NormalizedLinearStepper
     options:
         members:
             - __init__

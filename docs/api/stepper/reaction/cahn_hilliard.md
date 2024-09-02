@@ -1,5 +1,6 @@
+# Cahn-Hilliad
 
-::: exponax.normalized.NormalizedLinearStepper
+::: exponax.stepper.reaction.CahnHilliard
     options:
         members:
             - __init__
