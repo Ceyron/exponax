@@ -116,6 +116,7 @@ class GeneralConvectionStepper(BaseStepper):
             dt=dt,
             num_channels=num_channels,
             order=order,
+            dealiasing_fraction=dealiasing_fraction,
             num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )

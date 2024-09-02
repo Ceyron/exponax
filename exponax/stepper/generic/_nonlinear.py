@@ -110,6 +110,7 @@ class NormalizedNonlinearStepper(GeneralNonlinearStepper):
             coefficients_linear=normalized_coefficients_linear,
             coefficients_nonlinear=normalized_coefficients_nonlinear,
             order=order,
+            dealiasing_fraction=dealiasing_fraction,
             num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
