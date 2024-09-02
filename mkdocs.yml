@@ -161,6 +161,7 @@ nav:
         - Rollout & Repeat: 'api/utilities/rollout_and_repeat.md'
         - Grid Generation: 'api/utilities/grid_generation.md'
         - Derivatives: 'api/utilities/derivatives.md'
+        - Spectral: 'api/utilities/spectral.md'
         - Normalized & Difficulty: 'api/utilities/normalized_and_difficulty.md'
         - Metrics:
             - MSE-based: 'api/utilities/metrics/mse_based.md'

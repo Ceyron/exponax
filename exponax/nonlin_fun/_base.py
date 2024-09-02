@@ -2,10 +2,9 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 import equinox as eqx
-import jax.numpy as jnp
 from jaxtyping import Array, Bool, Complex, Float
 
-from .._spectral import low_pass_filter_mask, space_indices, spatial_shape
+from .._spectral import fft, ifft, low_pass_filter_mask
 
 
 class BaseNonlinearFun(eqx.Module, ABC):
@@ -45,13 +44,11 @@ class BaseNonlinearFun(eqx.Module, ABC):
         return self.dealiasing_mask * u_hat
 
     def fft(self, u: Float[Array, "C ... N"]) -> Complex[Array, "C ... (N//2)+1"]:
-        return jnp.fft.rfftn(u, axes=space_indices(self.num_spatial_dims))
+        return fft(u, num_spatial_dims=self.num_spatial_dims)
 
     def ifft(self, u_hat: Complex[Array, "C ... (N//2)+1"]) -> Float[Array, "C ... N"]:
-        return jnp.fft.irfftn(
-            u_hat,
-            s=spatial_shape(self.num_spatial_dims, self.num_points),
-            axes=space_indices(self.num_spatial_dims),
+        return ifft(
+            u_hat, num_spatial_dims=self.num_spatial_dims, num_points=self.num_points
         )
 
     @abstractmethod
