@@ -1,13 +1,29 @@
-from ._convection import GeneralConvectionStepper
-from ._gradient_norm import GeneralGradientNormStepper
+from ._convection import (
+    DifficultyConvectionStepper,
+    GeneralConvectionStepper,
+    NormalizedConvectionStepper,
+)
+from ._gradient_norm import (
+    DifficultyGradientNormStepper,
+    GeneralGradientNormStepper,
+    NormalizedGradientNormStepper,
+)
 from ._linear import (
     DifficultyLinearStepper,
     DiffultyLinearStepperSimple,
     GeneralLinearStepper,
     NormalizedLinearStepper,
 )
-from ._nonlinear import GeneralNonlinearStepper
-from ._polynomial import GeneralPolynomialStepper
+from ._nonlinear import (
+    DifficultyNonlinearStepper,
+    GeneralNonlinearStepper,
+    NormalizedNonlinearStepper,
+)
+from ._polynomial import (
+    DifficultyPolynomialStepper,
+    GeneralPolynomialStepper,
+    NormalizedPolynomialStepper,
+)
 from ._utils import (
     denormalize_coefficients,
     denormalize_convection_scale,
@@ -28,13 +44,21 @@ from ._vorticity_convection import GeneralVorticityConvectionStepper
 
 __all__ = [
     "GeneralLinearStepper",
-    "GeneralConvectionStepper",
-    "GeneralGradientNormStepper",
-    "GeneralVorticityConvectionStepper",
-    "GeneralPolynomialStepper",
-    "GeneralNonlinearStepper",
     "NormalizedLinearStepper",
     "DifficultyLinearStepper",
+    "GeneralConvectionStepper",
+    "NormalizedConvectionStepper",
+    "DifficultyConvectionStepper",
+    "GeneralGradientNormStepper",
+    "NormalizedGradientNormStepper",
+    "DifficultyGradientNormStepper",
+    "GeneralVorticityConvectionStepper",
+    "GeneralPolynomialStepper",
+    "NormalizedPolynomialStepper",
+    "DifficultyPolynomialStepper",
+    "GeneralNonlinearStepper",
+    "NormalizedNonlinearStepper",
+    "DifficultyNonlinearStepper",
     "DiffultyLinearStepperSimple",
     "denormalize_coefficients",
     "denormalize_convection_scale",
