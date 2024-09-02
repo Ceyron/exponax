@@ -82,7 +82,7 @@ class Dispersion(BaseStepper):
             `num_points`) lead to spurious oscillations.
         - Ultimately, only the factor `𝒸 Δt / L³` affects the
             characteristic of the dynamics. See also
-            [`exponax.normalized.NormalizedLinearStepper`][] with
+            [`exponax.stepper.generic.NormalizedLinearStepper`][] with
             `normalized_coefficients = [0, 0, 0, alpha_3]` with `alpha_3 =
             dispersivity * dt / domain_extent**3`.
         """

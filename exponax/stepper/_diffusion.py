@@ -81,7 +81,7 @@ class Diffusion(BaseStepper):
             solutions (i.e., energy is added to the system).
         - Ultimately, only the factor `ν Δt / L²` affects the characteristic
             of the dynamics. See also
-            [`exponax.normalized.NormalizedLinearStepper`][] with
+            [`exponax.stepper.generic.NormalizedLinearStepper`][] with
             `normalized_coefficients = [0, 0, alpha_2]` with `alpha_2 =
             diffusivity * dt / domain_extent**2`.
         """

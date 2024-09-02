@@ -85,7 +85,7 @@ class AdvectionDiffusion(BaseStepper):
             `num_points`) lead to spurious oscillations.
         - Ultimately, only the factors `c Δt / L` and `ν Δt / L²` affect the
             characteristic of the dynamics. See also
-            [`exponax.normalized.NormalizedLinearStepper`][] with
+            [`exponax.stepper.generic.NormalizedLinearStepper`][] with
             `normalized_coefficients = [0, alpha_1, alpha_2]` with `alpha_1 = -
             velocity * dt / domain_extent` and `alpha_2 = diffusivity * dt /
             domain_extent**2`.

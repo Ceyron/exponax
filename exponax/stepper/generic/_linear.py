@@ -131,10 +131,10 @@ class GeneralLinearStepper(BaseStepper):
                 chance spurious oscillations can occur.
             - Ultimately, only the factors `a_j Δt / Lʲ` affect the
                 characteristic of the dynamics. See also
-                [`exponax.normalized.NormalizedLinearStepper`][] with
+                [`exponax.stepper.generic.NormalizedLinearStepper`][] with
                 `normalized_coefficients = [0, alpha_1, alpha_2, ...]` with
                 `alpha_j = coefficients[j] * dt / domain_extent**j`. You can use
-                the function [`exponax.normalized.normalize_coefficients`][] to
+                the function [`exponax.stepper.generic.normalize_coefficients`][] to
                 obtain the normalized coefficients.
         """
         self.coefficients = coefficients

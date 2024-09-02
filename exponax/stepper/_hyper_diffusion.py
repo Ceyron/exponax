@@ -77,7 +77,7 @@ class HyperDiffusion(BaseStepper):
             space.
         - Ultimately, only the factor `μ Δt / L⁴` affects the characteristic
             of the dynamics. See also
-            [`exponax.normalized.NormalizedLinearStepper`][] with
+            [`exponax.stepper.generic.NormalizedLinearStepper`][] with
             `normalized_coefficients = [0, 0, 0, 0, alpha_4]` with `alpha_4 = -
             hyper_diffusivity * dt / domain_extent**4`.
         """
