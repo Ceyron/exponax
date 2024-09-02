@@ -31,12 +31,12 @@ def test_instantiate():
 
     for num_spatial_dims in [1, 2, 3]:
         for simulator in [
-            ex.reaction.FisherKPP,
-            ex.reaction.AllenCahn,
-            ex.reaction.CahnHilliard,
-            ex.reaction.SwiftHohenberg,
-            # ex.reaction.BelousovZhabotinsky,
-            ex.reaction.GrayScott,
+            ex.stepper.reaction.FisherKPP,
+            ex.stepper.reaction.AllenCahn,
+            ex.stepper.reaction.CahnHilliard,
+            ex.stepper.reaction.SwiftHohenberg,
+            # ex.stepper.reaction.BelousovZhabotinsky,
+            ex.stepper.reaction.GrayScott,
         ]:
             simulator(num_spatial_dims, domain_extent, num_points, dt)
 
