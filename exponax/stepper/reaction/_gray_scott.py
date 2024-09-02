@@ -1,9 +1,9 @@
 import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
-from .._base_stepper import BaseStepper
-from .._spectral import build_laplace_operator
-from ..nonlin_fun import BaseNonlinearFun
+from ..._base_stepper import BaseStepper
+from ..._spectral import build_laplace_operator
+from ...nonlin_fun import BaseNonlinearFun
 
 
 class GrayScottNonlinearFun(BaseNonlinearFun):

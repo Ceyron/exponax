@@ -65,6 +65,7 @@ accessiblity for new users. Additinally, some of them also support anisotropic
 modes for the linear terms.
 """
 
+from . import reaction as reaction
 from ._burgers import Burgers
 from ._convection import GeneralConvectionStepper
 from ._general_nonlinear import GeneralNonlinearStepper
@@ -101,4 +102,5 @@ __all__ = [
     "GeneralVorticityConvectionStepper",
     "NavierStokesVorticity",
     "KolmogorovFlowVorticity",
+    "reaction",
 ]

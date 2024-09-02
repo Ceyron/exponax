@@ -1,14 +1,14 @@
 from jaxtyping import Array, Complex
 
-from .._base_stepper import BaseStepper
-from .._spectral import build_laplace_operator
-from ..nonlin_fun import PolynomialNonlinearFun
+from ..._base_stepper import BaseStepper
+from ..._spectral import build_laplace_operator
+from ...nonlin_fun import PolynomialNonlinearFun
 
 
-class AllenCahn(BaseStepper):
-    diffusivity: float
-    first_order_coefficient: float
-    third_order_coefficient: float
+class SwiftHohenberg(BaseStepper):
+    reactivity: float
+    critical_number: float
+    polynomial_coefficients: tuple[float, ...]
     dealiasing_fraction: float
 
     def __init__(
@@ -18,9 +18,9 @@ class AllenCahn(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        diffusivity: float = 5e-3,
-        first_order_coefficient: float = 1.0,
-        third_order_coefficient: float = -1.0,
+        reactivity: float = 0.7,
+        critical_number: float = 1.0,
+        polynomial_coefficients: tuple[float, ...] = (0.0, 0.0, 1.0, -1.0),
         order: int = 2,
         # Needs lower value due to cubic nonlinearity
         dealiasing_fraction: float = 1 / 2,
@@ -28,35 +28,41 @@ class AllenCahn(BaseStepper):
         circle_radius: float = 1.0,
     ):
         """
-        Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) Allen-Cahn
-        reaction-diffusion equation on periodic boundary conditions. This
-        reaction-diffusion equation is a model for phase separation, for example
-        the separation of oil and water.
+        Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) Swift-Hohenberg
+        reaction-diffusion equation on periodic boundary conditions (works best
+        in 2d). This reaction-diffusion equation is a model for pattern
+        formation, for example, the fingerprints on a human finger.
 
-        In 1d, the Allen-Cahn equation is given by
-
-        ```
-            uₜ = ν uₓₓ + c₁ u + c₃ u³
-        ```
-
-        with `ν` the diffusivity, `c₁` the first order coefficient, and `c₃` the
-        third order coefficient. No matter the spatial dimension, the state
-        always only has one channel. In higher dimensions, the equation reads
+        In 1d, the Swift-Hohenberg equation is given by
 
         ```
-            uₜ = ν Δu + c₁ u + c₃ u³
+            uₜ = r u - (k + ∂ₓₓ)² u + g(u)
         ```
 
-        with `Δ` the Laplacian.
+        with `r` the reactivity, `k` the critical number, `∂ₓₓ` the second
+        derivative operator. `g(u)` can be any smooth function. This equation
+        restricts to the case of polynomial functions, i.e.
 
-        The expected temporal behavior is the formation of sharp interfaces
-        between the two phases. The limit of the solution is a step function
-        that separates the two phases.
+        ```
+            g(u) = ∑ᵢ cᵢ uⁱ
+        ```
 
-        Note that the Allen-Cahn is often solved with Dirichlet boundary
-        conditions, but here we use periodic boundary conditions.
+        with `cᵢ` the polynomial coefficients.
 
-        **Arguments:**
+        The state only has one channel, no matter the spatial dimension. The
+        higher dimensional generarlization reads
+
+        ```
+            uₜ = r u - (k + Δ)² u + g(u)
+        ```
+
+        with `Δ` the Laplacian. Since the Laplacian is squared, there will be
+        spatial mixing.
+
+        The expected temporal behavior is a collective pattern formation which
+        will be attained in a steady state.
+
+        **Arguments**:
 
         - `num_spatial_dims`: The number of spatial dimensions `d`.
         - `domain_extent`: The size of the domain `L`; in higher dimensions
@@ -67,11 +73,11 @@ class AllenCahn(BaseStepper):
             in each dimension is the same. Hence, the total number of degrees of
             freedom is `Nᵈ`.
         - `dt`: The timestep size `Δt` between two consecutive states.
-        - `diffusivity`: The diffusivity `ν`. The default value is `5e-3`.
-        - `first_order_coefficient`: The first order coefficient `c₁`. The
-            default value is `1.0`.
-        - `third_order_coefficient`: The third order coefficient `c₃`. The
-            default value is `-1.0`.
+        - `reactivity`: The reactivity `r`. Default is `0.7`.
+        - `critical_number`: The critical number `k`. Default is `1.0`.
+        - `polynomial_coefficients`: The coefficients `cᵢ` of the polynomial
+            function `g(u)`. Default is `(0.0, 0.0, 1.0, -1.0)`. This refers to
+            a polynomial of `u² - u³`.
         - `dealiasing_fraction`: The fraction of the highest wavenumbers to
             dealias. Default is `1/2` because the default polynomial has a
             highest degree of 3.
@@ -86,16 +92,10 @@ class AllenCahn(BaseStepper):
         - `circle_radius`: The radius of the contour used to compute the
             coefficients of the exponential time differencing Runge Kutta
             method. Default: 1.0.
-
-        **Notes:**
-
-        - See
-            https://github.com/chebfun/chebfun/blob/db207bc9f48278ca4def15bf90591bfa44d0801d/spin.m#L48
-            for an example IC of the Allen-Cahn in 1d.
         """
-        self.diffusivity = diffusivity
-        self.first_order_coefficient = first_order_coefficient
-        self.third_order_coefficient = third_order_coefficient
+        self.reactivity = reactivity
+        self.critical_number = critical_number
+        self.polynomial_coefficients = polynomial_coefficients
         self.dealiasing_fraction = dealiasing_fraction
         super().__init__(
             num_spatial_dims=num_spatial_dims,
@@ -113,7 +113,7 @@ class AllenCahn(BaseStepper):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> Complex[Array, "1 ... (N//2)+1"]:
         laplace = build_laplace_operator(derivative_operator, order=2)
-        linear_operator = self.diffusivity * laplace + self.first_order_coefficient
+        linear_operator = self.reactivity - (self.critical_number + laplace) ** 2
         return linear_operator
 
     def _build_nonlinear_fun(
@@ -124,5 +124,5 @@ class AllenCahn(BaseStepper):
             self.num_spatial_dims,
             self.num_points,
             dealiasing_fraction=self.dealiasing_fraction,
-            coefficients=[0.0, 0.0, 0.0, self.third_order_coefficient],
+            coefficients=self.polynomial_coefficients,
         )

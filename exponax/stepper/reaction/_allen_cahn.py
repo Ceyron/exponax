@@ -1,13 +1,14 @@
 from jaxtyping import Array, Complex
 
-from .._base_stepper import BaseStepper
-from .._spectral import build_laplace_operator
-from ..nonlin_fun import PolynomialNonlinearFun
+from ..._base_stepper import BaseStepper
+from ..._spectral import build_laplace_operator
+from ...nonlin_fun import PolynomialNonlinearFun
 
 
-class FisherKPP(BaseStepper):
+class AllenCahn(BaseStepper):
     diffusivity: float
-    reactivity: float
+    first_order_coefficient: float
+    third_order_coefficient: float
     dealiasing_fraction: float
 
     def __init__(
@@ -17,39 +18,43 @@ class FisherKPP(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        diffusivity: float = 0.01,
-        reactivity=1.0,
+        diffusivity: float = 5e-3,
+        first_order_coefficient: float = 1.0,
+        third_order_coefficient: float = -1.0,
         order: int = 2,
-        dealiasing_fraction: float = 2 / 3,
+        # Needs lower value due to cubic nonlinearity
+        dealiasing_fraction: float = 1 / 2,
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         """
-        Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) Fisher-KPP equation
-        on periodic boundary conditions. This reaction-diffusion equation is
-        related to logistic growth and describes the spread of a population.
+        Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) Allen-Cahn
+        reaction-diffusion equation on periodic boundary conditions. This
+        reaction-diffusion equation is a model for phase separation, for example
+        the separation of oil and water.
 
-        In 1d, the Fisher-KPP equation is given by
-
-        ```
-            uₜ = ν uₓₓ + r u (1 - u)
-        ```
-
-        with `ν` the diffusivity and `r` the reactivity. In 1d, the state `u`
-        has only one channel. As such the discretized state is represented by a
-        tensor of shape `(1, num_points)`. For higher dimensions, the number of
-        channels will be constant 1, no matter the dimension. The
-        higher-dimensional equation reads
+        In 1d, the Allen-Cahn equation is given by
 
         ```
-            uₜ = ν Δu + r u (1 - u)
+            uₜ = ν uₓₓ + c₁ u + c₃ u³
+        ```
+
+        with `ν` the diffusivity, `c₁` the first order coefficient, and `c₃` the
+        third order coefficient. No matter the spatial dimension, the state
+        always only has one channel. In higher dimensions, the equation reads
+
+        ```
+            uₜ = ν Δu + c₁ u + c₃ u³
         ```
 
         with `Δ` the Laplacian.
 
-        The dynamics requires initial conditions in the range `[0, 1]`. Then,
-        the expected temporal behavior is a collective spread and growth. The
-        limit of the solution is the constant state `1`.
+        The expected temporal behavior is the formation of sharp interfaces
+        between the two phases. The limit of the solution is a step function
+        that separates the two phases.
+
+        Note that the Allen-Cahn is often solved with Dirichlet boundary
+        conditions, but here we use periodic boundary conditions.
 
         **Arguments:**
 
@@ -62,17 +67,19 @@ class FisherKPP(BaseStepper):
             in each dimension is the same. Hence, the total number of degrees of
             freedom is `Nᵈ`.
         - `dt`: The timestep size `Δt` between two consecutive states.
-        - `diffusivity`: The diffusivity `ν`.
-        - `reactivity`: The reactivity `r`.
+        - `diffusivity`: The diffusivity `ν`. The default value is `5e-3`.
+        - `first_order_coefficient`: The first order coefficient `c₁`. The
+            default value is `1.0`.
+        - `third_order_coefficient`: The third order coefficient `c₃`. The
+            default value is `-1.0`.
+        - `dealiasing_fraction`: The fraction of the highest wavenumbers to
+            dealias. Default is `1/2` because the default polynomial has a
+            highest degree of 3.
         - `order`: The order of the Exponential Time Differencing Runge
             Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
             solves the linear part of the equation. Use higher values for higher
             accuracy and stability. The default choice of `2` is a good
             compromise for single precision floats.
-        - `dealiasing_fraction`: The fraction of the wavenumbers to keep
-            before evaluating the nonlinearity. The default 2/3 corresponds to
-            Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2. Default:
-            2/3.
         - `num_circle_points`: How many points to use in the complex contour
             integral method to compute the coefficients of the exponential time
             differencing Runge Kutta method. Default: 16.
@@ -82,22 +89,14 @@ class FisherKPP(BaseStepper):
 
         **Notes:**
 
-        - The dynamics require initial conditions in the range `[0, 1]`.
-            This can be achieved by combining any of the available IC generators
-            with the [`exponax.ic.ClampingICGenerator`]. Alternatively, a good
-            choice is also the [`exponax.ic.GaussianBlobs`]
-
-        **Good Values:**
-
-        - Use the `ClampingICGenerator` on `RandomTruncatedFourierSeries`
-            with limits `[0, 1]` to generate initial conditions. Set
-            `domain_extent = 1.0`, `num_points = 100`, `dt = 0.001`, and produce
-            a trajectory of 500 steps. The final state of almost constant `1`
-            will be reached after 200-400 steps.
+        - See
+            https://github.com/chebfun/chebfun/blob/db207bc9f48278ca4def15bf90591bfa44d0801d/spin.m#L48
+            for an example IC of the Allen-Cahn in 1d.
         """
-        self.dealiasing_fraction = dealiasing_fraction
         self.diffusivity = diffusivity
-        self.reactivity = reactivity
+        self.first_order_coefficient = first_order_coefficient
+        self.third_order_coefficient = third_order_coefficient
+        self.dealiasing_fraction = dealiasing_fraction
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             domain_extent=domain_extent,
@@ -114,7 +113,7 @@ class FisherKPP(BaseStepper):
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> Complex[Array, "1 ... (N//2)+1"]:
         laplace = build_laplace_operator(derivative_operator, order=2)
-        linear_operator = self.diffusivity * laplace + self.reactivity
+        linear_operator = self.diffusivity * laplace + self.first_order_coefficient
         return linear_operator
 
     def _build_nonlinear_fun(
@@ -125,5 +124,5 @@ class FisherKPP(BaseStepper):
             self.num_spatial_dims,
             self.num_points,
             dealiasing_fraction=self.dealiasing_fraction,
-            coefficients=[0.0, 0.0, -self.reactivity],
+            coefficients=[0.0, 0.0, 0.0, self.third_order_coefficient],
         )
