@@ -1,4 +1,4 @@
-from typing import TypeVar, Union, Optional
+from typing import Optional, TypeVar, Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Bool, Complex, Float
