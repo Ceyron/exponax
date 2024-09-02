@@ -29,17 +29,18 @@ class SineWaves1d(BaseIC):
         A state described by a collection of sine waves. Only works in 1d.
 
         **Arguments**:
-            - `domain_extent`: The extent of the domain.
-            - `amplitudes`: A tuple of amplitudes.
-            - `wavenumbers`: A tuple of wavenumbers.
-            - `phases`: A tuple of phases.
-            - `offset`: A constant offset.
-            - `std_one`: Whether to normalize the state to have a standard
-                deviation of one. Defaults to `False`. Only works if the offset
-                is zero.
-            - `max_one`: Whether to normalize the state to have the maximum
-                absolute value of one. Defaults to `False`. Only one of
-                `std_one` and `max_one` can be `True`.
+
+        - `domain_extent`: The extent of the domain.
+        - `amplitudes`: A tuple of amplitudes.
+        - `wavenumbers`: A tuple of wavenumbers.
+        - `phases`: A tuple of phases.
+        - `offset`: A constant offset.
+        - `std_one`: Whether to normalize the state to have a standard
+            deviation of one. Defaults to `False`. Only works if the offset
+            is zero.
+        - `max_one`: Whether to normalize the state to have the maximum
+            absolute value of one. Defaults to `False`. Only one of
+            `std_one` and `max_one` can be `True`.
         """
         if offset != 0.0 and std_one:
             raise ValueError("Cannot have non-zero offset and `std_one=True`.")
@@ -103,23 +104,29 @@ class RandomSineWaves1d(BaseRandomICGenerator):
         Random generator for initial states described by a collection of sine
         waves. Only works in 1d.
 
+        This is a simplified version of the `RandomTruncatedFourierSeries`
+        generator that works in arbitrary dimensions. However, only this
+        generator can produce a functional representation of the initial
+        condition.
+
         **Arguments**:
-            - `num_spatial_dims`: The number of spatial dimensions.
-            - `domain_extent`: The extent of the domain.
-            - `cutoff`: The cutoff of the wavenumbers. This limits the
-                "complexity" of the initial state. Note that some dynamics are
-                very sensitive to high-frequency information.
-            - `amplitude_range`: The range of the amplitudes. Defaults to
-              `(-1.0, 1.0)`.
-            - `phase_range`: The range of the phases. Defaults to `(0.0, 2π)`.
-            - `offset_range`: The range of the offsets. Defaults to `(0.0,
-                0.0)`, meaning **zero-mean** by default.
-            - `std_one`: Whether to normalize the state to have a standard
-                deviation of one. Defaults to `False`. Only works if the offset
-                is zero.
-            - `max_one`: Whether to normalize the state to have the maximum
-                absolute value of one. Defaults to `False`. Only one of
-                `std_one` and `max_one` can be `True`.
+
+        - `num_spatial_dims`: The number of spatial dimensions.
+        - `domain_extent`: The extent of the domain.
+        - `cutoff`: The cutoff of the wavenumbers. This limits the
+            "complexity" of the initial state. Note that some dynamics are very
+            sensitive to high-frequency information.
+        - `amplitude_range`: The range of the amplitudes. Defaults to
+            `(-1.0, 1.0)`.
+        - `phase_range`: The range of the phases. Defaults to `(0.0, 2π)`.
+        - `offset_range`: The range of the offsets. Defaults to `(0.0,
+            0.0)`, meaning **zero-mean** by default.
+        - `std_one`: Whether to normalize the state to have a standard
+            deviation of one. Defaults to `False`. Only works if the offset is
+            zero.
+        - `max_one`: Whether to normalize the state to have the maximum
+            absolute value of one. Defaults to `False`. Only one of `std_one`
+            and `max_one` can be `True`.
         """
         if num_spatial_dims != 1:
             raise ValueError("RandomSineWaves1d only works in 1d.")

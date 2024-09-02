@@ -24,12 +24,15 @@ class GaussianBlob(eqx.Module):
         one_complement: bool = False,
     ):
         """
-        A state described by a Gaussian blob.
+        A state described by a Gaussian blob. Note that the produced function is
+        not perfectly periodic, especially if the blobs are close to the domain
+        boundaries.
 
         **Arguments**:
-            - `position`: The position of the blob.
-            - `covariance`: The covariance matrix of the blob.
-            - `one_complement`: Whether to return one minus the Gaussian blob.
+
+        - `position`: The position of the blob.
+        - `covariance`: The covariance matrix of the blob.
+        - `one_complement`: Whether to return one minus the Gaussian blob.
         """
         self.position = position
         self.covariance = covariance
@@ -78,7 +81,8 @@ class GaussianBlobs(BaseIC):
         A state described by a collection of Gaussian blobs.
 
         **Arguments**:
-            - `blob_list`: A tuple of Gaussian blobs.
+
+        - `blob_list`: A tuple of Gaussian blobs.
         """
         self.blob_list = blob_list
 
@@ -111,16 +115,17 @@ class RandomGaussianBlobs(BaseRandomICGenerator):
         A random Gaussian blob initial condition generator.
 
         **Arguments**:
-            - `num_spatial_dims`: The number of spatial dimensions.
-            - `domain_extent`: The extent of the domain.
-            - `num_blobs`: The number of blobs.
-            - `position_range`: The range of the position of the blobs. This
-                will be scaled by the domain extent. Hence, this acts as if the
-                domain_extent was 1
-            - `variance_range`: The range of the variance of the blobs. This will
-                be scaled by the domain extent. Hence, this acts as if the
-                domain_extent was 1
-            - `one_complement`: Whether to return one minus the Gaussian blob.
+
+        - `num_spatial_dims`: The number of spatial dimensions.
+        - `domain_extent`: The extent of the domain.
+        - `num_blobs`: The number of blobs.
+        - `position_range`: The range of the position of the blobs. This
+            will be scaled by the domain extent. Hence, this acts as if the
+            domain_extent was 1
+        - `variance_range`: The range of the variance of the blobs. This will
+            be scaled by the domain extent. Hence, this acts as if the
+            domain_extent was 1
+        - `one_complement`: Whether to return one minus the Gaussian blob.
         """
         self.num_spatial_dims = num_spatial_dims
         self.domain_extent = domain_extent
@@ -130,6 +135,9 @@ class RandomGaussianBlobs(BaseRandomICGenerator):
         self.one_complement = one_complement
 
     def gen_blob(self, *, key) -> GaussianBlob:
+        """
+        Generates a single Gaussian blob.
+        """
         position_key, variance_key = jr.split(key)
 
         position = jr.uniform(

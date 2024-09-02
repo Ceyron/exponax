@@ -14,7 +14,8 @@ class MultiChannelIC(eqx.Module):
         A multi-channel initial condition.
 
         **Arguments**:
-            - `initial_conditions`: A tuple of initial conditions.
+
+        - `initial_conditions`: A tuple of initial conditions.
         """
         self.initial_conditions = initial_conditions
 
@@ -23,10 +24,12 @@ class MultiChannelIC(eqx.Module):
         Evaluate the initial condition.
 
         **Arguments**:
-            - `x`: The grid points.
+
+        - `x`: The grid points.
 
         **Returns**:
-            - `u`: The initial condition evaluated at the grid points.
+
+        - `u`: The initial condition evaluated at the grid points.
         """
         return jnp.concatenate([ic(x) for ic in self.initial_conditions], axis=0)
 
@@ -36,10 +39,34 @@ class RandomMultiChannelICGenerator(eqx.Module):
 
     def __init__(self, ic_generators: tuple[BaseRandomICGenerator, ...]):
         """
-        A multi-channel random initial condition generator.
+        A multi-channel random initial condition generator. Use this for
+        problems with multiple channels, like Burgers in higher dimensions or
+        the Gray-Scott dynamics.
 
         **Arguments**:
-            - `ic_generators`: A tuple of initial condition generators.
+
+        - `ic_generators`: A tuple of initial condition generators.
+
+        !!! example
+            Below is an example for generating a random multi-channel initial
+            condition for the three-dimensional Burgers equation which has three
+            channels. For simplicity, we will use the same IC generator for each
+            channel.
+
+            ```python
+            import jax
+            import exponax as ex
+
+            single_channel_ic_gen = ex.ic.RandomTruncatedFourierSeries(
+                3,
+                max_one=True,
+            )
+            multi_channel_ic_gen = ex.ic.RandomMultiChannelICGenerator(
+                [single_channel_ic_gen,] * 3
+            )
+
+            ic = multi_channel_ic_gen(100, key=jax.random.PRNGKey(0))
+            ```
         """
         self.ic_generators = ic_generators
 
