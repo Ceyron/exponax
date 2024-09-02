@@ -116,7 +116,6 @@ class GeneralConvectionStepper(BaseStepper):
             dt=dt,
             num_channels=num_channels,
             order=order,
-            dealiasing_fraction=dealiasing_fraction,
             num_circle_points=num_circle_points,
             circle_radius=circle_radius,
         )
@@ -184,10 +183,10 @@ class NormalizedConvectionStepper(GeneralConvectionStepper):
             coefficients=normalized_coefficients,
             convection_scale=normalized_convection_scale,
             order=order,
+            dealiasing_fraction=dealiasing_fraction,
             num_circle_points=num_circle_points,
             circle_radius=circle_radius,
             single_channel=single_channel,
-            dealiasing_fraction=dealiasing_fraction,
         )
 
     # def _build_linear_operator(self, derivative_operator: Array) -> Array:
