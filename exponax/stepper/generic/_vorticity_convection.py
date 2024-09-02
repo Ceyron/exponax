@@ -1,8 +1,8 @@
 import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
-from .._base_stepper import BaseStepper
-from ..nonlin_fun import VorticityConvection2d, VorticityConvection2dKolmogorov
+from ..._base_stepper import BaseStepper
+from ...nonlin_fun import VorticityConvection2d, VorticityConvection2dKolmogorov
 
 
 class GeneralVorticityConvectionStepper(BaseStepper):

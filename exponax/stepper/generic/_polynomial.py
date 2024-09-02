@@ -1,8 +1,8 @@
 import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
-from .._base_stepper import BaseStepper
-from ..nonlin_fun import PolynomialNonlinearFun
+from ..._base_stepper import BaseStepper
+from ...nonlin_fun import PolynomialNonlinearFun
 
 
 class GeneralPolynomialStepper(BaseStepper):

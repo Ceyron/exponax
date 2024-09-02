@@ -3,8 +3,8 @@ from typing import TypeVar
 import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
-from .._base_stepper import BaseStepper
-from ..nonlin_fun import ZeroNonlinearFun
+from ..._base_stepper import BaseStepper
+from ...nonlin_fun import ZeroNonlinearFun
 
 D = TypeVar("D")
 
