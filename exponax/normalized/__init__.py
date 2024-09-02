@@ -10,7 +10,7 @@ slightly differently.
 from ._convection import DifficultyConvectionStepper, NormalizedConvectionStepper
 from ._general_nonlinear import (
     DifficultyGeneralNonlinearStepper,
-    NormlizedGeneralNonlinearStepper,
+    NormalizedGeneralNonlinearStepper,
 )
 from ._gradient_norm import DifficultyGradientNormStepper, NormalizedGradientNormStepper
 from ._linear import (
@@ -45,7 +45,7 @@ __all__ = [
     "DifficultyPolynomialStepper",
     "DifficultyGeneralNonlinearStepper",
     "NormalizedConvectionStepper",
-    "NormlizedGeneralNonlinearStepper",
+    "NormalizedGeneralNonlinearStepper",
     "NormalizedGradientNormStepper",
     "NormalizedLinearStepper",
     "NormalizedPolynomialStepper",

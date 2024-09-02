@@ -1,3 +1,5 @@
+# Design Decisions
+
 The `Exponax` package targets the fixed time step simulation of semi-linear
 partial differential equations. Those are PDEs of the form
 

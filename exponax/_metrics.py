@@ -73,7 +73,7 @@ def MSE(
 
     This function assumes that the arrays have one leading channel axis and an
     arbitrary number of following spatial dimensions! For batched operation use
-    `jax.vmap` on this function or use the [`mean_MSE`](#mean_MSE) function.
+    `jax.vmap` on this function or use the [`exponax.metrics.mean_MSE`][] function.
 
     **Arguments**:
         - `u_pred` (array): The first field to be used in the error computation.
@@ -103,7 +103,7 @@ def nMSE(
     """
     Compute the normalized mean squared error (nMSE) between two fields.
 
-    In contrast to [`MSE`](#MSE), no `domain_extent` is required, because of the
+    In contrast to [`exponax.metrics.MSE`][], no `domain_extent` is required, because of the
     normalization.
 
     **Arguments**:
@@ -237,7 +237,7 @@ def RMSE(
 
     This function assumes that the arrays have one leading channel axis and an
     arbitrary number of following spatial dimensions! For batched operation use
-    `jax.vmap` on this function or use the [`mean_RMSE`](#mean_RMSE) function.
+    `jax.vmap` on this function or use the [`exponax.metrics.mean_RMSE`][] function.
 
     **Arguments**:
         - `u_pred` (array): The first field to be used in the error computation.
@@ -267,7 +267,7 @@ def nRMSE(
     """
     Compute the normalized root mean squared error (nRMSE) between two fields.
 
-    In contrast to [`RMSE`](#RMSE), no `domain_extent` is required, because of
+    In contrast to [`exponax.metrics.RMSE`][], no `domain_extent` is required, because of
     the normalization.
 
     **Arguments**:

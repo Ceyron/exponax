@@ -62,72 +62,74 @@ class KuramotoSivashinsky(BaseStepper):
         spatially.
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `domain_extent`: The size of the domain `L`; in higher dimensions
-                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
-            - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and
-                **excludes** the right boundary point. In higher dimensions; the
-                number of points in each dimension is the same. Hence, the total
-                number of degrees of freedom is `Nᵈ`.
-            - `dt`: The timestep size `Δt` between two consecutive states.
-            - `gradient_norm_scale`: The gradient-norm coefficient `b₂`. Note
-                that the gradient norm is already scaled by 1/2. This factor
-                allows for further modification. Default: 1.0.
-            - `second_order_diffusivity`: The diffusivity `ν` in the KS
-                equation. The sign of this coefficient is interpreted as if the
-                term was on the left-hand side. Hence it should have a positive
-                value to act destabilizing. Default: 1.0.
-            - `fourth_order_diffusivity`: The hyper viscosity `μ` in the KS
-                equation. The sign of this coefficient is interpreted as if the
-                term was on the left-hand side. Hence it should have a positive
-                value to act stabilizing. Default: 1.0.
-            - `order`: The order of the Exponential Time Differencing Runge
-                Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0`
-                only solves the linear part of the equation. Use higher values
-                for higher accuracy and stability. The default choice of `2` is
-                a good compromise for single precision floats.
-            - `dealiasing_fraction`: The fraction of the wavenumbers to keep
-                before evaluating the nonlinearity. The default 2/3 corresponds
-                to Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2.
-                Default: 2/3.
-            - `num_circle_points`: How many points to use in the complex contour
-                integral method to compute the coefficients of the exponential
-                time differencing Runge Kutta method. Default: 16.
-            - `circle_radius`: The radius of the contour used to compute the
-                coefficients of the exponential time differencing Runge Kutta
-                method. Default: 1.0.
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `domain_extent`: The size of the domain `L`; in higher dimensions
+            the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same. Hence, the total number of degrees of
+            freedom is `Nᵈ`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `gradient_norm_scale`: The gradient-norm coefficient `b₂`. Note
+            that the gradient norm is already scaled by 1/2. This factor allows
+            for further modification. Default: 1.0.
+        - `second_order_diffusivity`: The diffusivity `ν` in the KS
+            equation. The sign of this coefficient is interpreted as if the term
+            was on the left-hand side. Hence it should have a positive value to
+            act destabilizing. Default: 1.0.
+        - `fourth_order_diffusivity`: The hyper viscosity `μ` in the KS
+            equation. The sign of this coefficient is interpreted as if the term
+            was on the left-hand side. Hence it should have a positive value to
+            act stabilizing. Default: 1.0.
+        - `order`: The order of the Exponential Time Differencing Runge
+            Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
+            solves the linear part of the equation. Use higher values for higher
+            accuracy and stability. The default choice of `2` is a good
+            compromise for single precision floats.
+        - `dealiasing_fraction`: The fraction of the wavenumbers to keep
+            before evaluating the nonlinearity. The default 2/3 corresponds to
+            Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2. Default:
+            2/3.
+        - `num_circle_points`: How many points to use in the complex contour
+            integral method to compute the coefficients of the exponential time
+            differencing Runge Kutta method. Default: 16.
+        - `circle_radius`: The radius of the contour used to compute the
+            coefficients of the exponential time differencing Runge Kutta
+            method. Default: 1.0.
 
         **Notes:**
-            - The KS equation enters a chaotic state if the domain extent is
-                chosen large enough. In this chaotic attractor it can run
-                indefinitely. It is in balancing state of the second-order term
-                producing new energy, the nonlinearity transporting it into
-                higher modes where the fourth-order term dissipates it.
-            - If the domain extent is chosen large enough to eventually enter a
-                chaotic state, the initial condition does not really matter.
-                Since the KS "produces its own energy", the energy spectrum for
-                the chaotic attractor is independent of the initial condition.
-            - However, since the KS develops a certain spectrum based on the
-                domain length, make sure to use enough discretization point to
-                capture the highes occuring mode. For a domain extent of 60,
-                this requires at least roughly 100 `num_points` in single
-                precision floats.
-            - For domain lengths smaller than the threshold to enter chaos, the
-                KS equation, exhibits various other patterns like propagating
-                waves, etc.
-            - For higher dimensions (i.e., `num_spatial_dims > 1`), a chaotic
-                state is already entered for smaller domain extents. For more
-                details and the kind of dynamics that can occur see:
-                https://royalsocietypublishing.org/doi/10.1098/rspa.2014.0932
+
+        - The KS equation enters a chaotic state if the domain extent is
+            chosen large enough. In this chaotic attractor it can run
+            indefinitely. It is in balancing state of the second-order term
+            producing new energy, the nonlinearity transporting it into higher
+            modes where the fourth-order term dissipates it.
+        - If the domain extent is chosen large enough to eventually enter a
+            chaotic state, the initial condition does not really matter. Since
+            the KS "produces its own energy", the energy spectrum for the
+            chaotic attractor is independent of the initial condition.
+        - However, since the KS develops a certain spectrum based on the
+            domain length, make sure to use enough discretization point to
+            capture the highes occuring mode. For a domain extent of 60, this
+            requires at least roughly 100 `num_points` in single precision
+            floats.
+        - For domain lengths smaller than the threshold to enter chaos, the
+            KS equation, exhibits various other patterns like propagating waves,
+            etc.
+        - For higher dimensions (i.e., `num_spatial_dims > 1`), a chaotic
+            state is already entered for smaller domain extents. For more
+            details and the kind of dynamics that can occur see:
+            https://royalsocietypublishing.org/doi/10.1098/rspa.2014.0932
 
         **Good Values:**
-            - For a simple spatio-temporal chaos in 1d, set
-                `num_spatial_dims=1`, `domain_extent=60`, `num_points=100`,
-                `dt=0.1`. The initial condition can be anything, important is
-                that it is mean zero. The first 200-500 steps of the trajectory
-                will be the transitional phase, after that the chaotic attractor
-                is reached.
+
+        - For a simple spatio-temporal chaos in 1d, set
+            `num_spatial_dims=1`, `domain_extent=60`, `num_points=100`,
+            `dt=0.1`. The initial condition can be anything, important is that
+            it is mean zero. The first 200-500 steps of the trajectory will be
+            the transitional phase, after that the chaotic attractor is reached.
         """
         self.gradient_norm_scale = gradient_norm_scale
         self.second_order_diffusivity = second_order_diffusivity

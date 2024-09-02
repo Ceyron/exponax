@@ -1,0 +1,182 @@
+site_name: Exponax
+site_description: Fast & Differentiable PDE solvers in JAX.
+site_author: Felix Koehler
+site_url: https://fkoehler.site/exponax
+
+repo_url: https://github.com/Ceyron/exponax
+repo_name: Ceyron/exponax
+edit_uri: ""  # No edit button, as some of our pages are in /docs and some in /examples via symlink, so it's impossible for them all to be accurate
+
+theme:
+    name: material
+    features:
+        - navigation.sections  # Sections are included in the navigation on the left.
+        - toc.integrate  # Table of contents is integrated on the left; does not appear separately on the right.
+        - header.autohide  # header disappears as you scroll
+    palette:
+        - scheme: default
+          primary: teal
+          accent: amber
+          toggle:
+             icon: material/weather-night
+             name: Switch to dark mode
+        - scheme: slate
+          primary: teal
+          accent: amber
+          toggle:
+             icon: material/weather-sunny
+             name: Switch to light mode
+    icon:
+        repo: fontawesome/brands/github  # GitHub logo in top right
+
+extra:
+  social:
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/felix_m_koehler
+    - icon: fontawesome/brands/github
+      link: https://github.com/ceyron
+    - icon: fontawesome/brands/youtube
+      link: https://youtube.com/@MachineLearningSimulation
+
+
+strict: true  # Don't allow warnings during the build process
+
+markdown_extensions:
+    - pymdownx.arithmatex:  # Render LaTeX via MathJax
+        generic: true
+    - pymdownx.superfences  # Seems to enable syntax highlighting when used with the Material theme.
+    - pymdownx.details  # Allowing hidden expandable regions denoted by ???
+    - pymdownx.snippets:  # Include one Markdown file into another
+        base_path: docs
+    - admonition
+    - toc:
+        permalink: "¤"  # Adds a clickable permalink to each section heading
+        toc_depth: 4
+    - pymdownx.arithmatex:
+        generic: true
+
+extra_javascript:
+    - javascripts/mathjax.js
+    - https://polyfill.io/v3/polyfill.min.js?features=es6
+    - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+plugins:
+    - search  # default search plugin; needs manually re-enabling when using any other plugins
+    - autorefs  # Cross-links to headings
+    - mknotebooks  # Jupyter notebooks
+    - mkdocstrings:
+        handlers:
+            python:
+                options:
+                    inherited_members: true  # Allow looking up inherited methods
+                    show_root_heading: true  # actually display anything at all...
+                    show_root_full_path: true  # display "diffrax.asdf" not just "asdf"
+                    show_if_no_docstring: true
+                    show_signature_annotations: true
+                    separate_signature: true
+                    show_source: true  # don't include source code
+                    members_order: source  # order methods according to their order of definition in the source code, not alphabetical order
+                    heading_level: 4
+                    show_symbol_type_heading: true
+                    docstring_style: null
+
+nav:
+    - 'index.md'
+    - Examples:
+        - Basics:
+            - 1D Advection: 'examples/simple_advection_example_1d.ipynb'
+            - 1D Solver Showcase: 'examples/solver_showcase_1d.ipynb'
+            - 1D Initial Condition Showcase: 'examples/initial_condition_showcase_1d.ipynb'
+            - Understanding General and Normalized Stepper: 'examples/understanding_general_and_normalized_stepper.ipynb'
+            - Subclassing a custom Solver: 'examples/creating_your_own_solvers_1d.ipynb'
+            - 2D Advection: 'examples/simple_advection_example_2d.ipynb'
+            - 2D Solver Showcase: 'examples/solver_showcase_2d.ipynb'
+        - Advanced:
+            - 1D Burgers Emulator Training: 'examples/learning_burgers_autoregressive_neural_operator.ipynb'
+        - Additional:
+            - Nice Features: 'examples/additional_features.ipynb'
+            - Performance Hints: 'examples/performance_hints.ipynb'
+    - Stepper:
+        - Physical:
+            - Linear:
+                - Advection: 'api/stepper/physical/linear/advection.md'
+                - Diffusion: 'api/stepper/physical/linear/diffusion.md'
+                - Advection-Diffusion: 'api/stepper/physical/linear/advection_diffusion.md'
+                - Dispersion: 'api/stepper/physical/linear/dispersion.md'
+                - Hyper-Diffusion: 'api/stepper/physical/linear/hyper_diffusion.md'
+            - Burgers: 'api/stepper/physical/burgers.md'
+            - Korteweg-de Vries: 'api/stepper/physical/kdv.md'
+            - Kuramoto-Sivashinsky: 'api/stepper/physical/ks.md'
+            - Kuramoto-Sivashinsky (Conservative): 'api/stepper/physical/ks_cons.md'
+            - Navier-Stokes: 'api/stepper/physical/navier_stokes.md'
+            - Reaction-Diffusion:
+                - Fisher-KPP: 'api/stepper/physical/reaction_diffusion/fisher_kpp.md'
+                - Allen-Cahn: 'api/stepper/physical/reaction_diffusion/allen_cahn.md'
+                - Cahn-Hilliard: 'api/stepper/physical/reaction_diffusion/cahn_hilliard.md'
+                - Swift-Hohenberg: 'api/stepper/physical/reaction_diffusion/swift_hohenberg.md'
+                - Gray-Scott: 'api/stepper/physical/reaction_diffusion/gray_scott.md'
+            - General:
+                - General Linear: 'api/stepper/physical/general/general_linear.md'
+                - General Convection: 'api/stepper/physical/general/general_convection.md'
+                - General Gradient Norm: 'api/stepper/physical/general/general_gradient_norm.md'
+                - General Polynomial: 'api/stepper/physical/general/general_polynomial.md'
+                - General Nonlinear: 'api/stepper/physical/general/general_nonlinear.md'
+                - General Vorticity Convection: 'api/stepper/physical/general/general_vorticity_convection.md'
+            - Poisson: 'api/stepper/physical/poisson.md'
+        - Normalized:
+            - Linear: 'api/stepper/normalized/linear.md'
+            - Convection: 'api/stepper/normalized/convection.md'
+            - Gradient Norm: 'api/stepper/normalized/gradient_norm.md'
+            - Polynomial: 'api/stepper/normalized/polynomial.md'
+            - Nonlinear: 'api/stepper/normalized/nonlinear.md'
+            - Vorticity Convection: 'api/stepper/normalized/vorticity_convection.md'
+        - Difficulty:
+            - Linear: 'api/stepper/difficulty/linear.md'
+            - Convection: 'api/stepper/difficulty/convection.md'
+            - Gradient Norm: 'api/stepper/difficulty/gradient_norm.md'
+            - Polynomial: 'api/stepper/difficulty/polynomial.md'
+            - Nonlinear: 'api/stepper/difficulty/nonlinear.md'
+    - Utilities:
+        - Nonlinear Functions:
+            - Zero: 'api/utilities/nonlin_fun/zero.md'
+            - Convection: 'api/utilities/nonlin_fun/convection.md'
+            - Gradient Norm: 'api/utilities/nonlin_fun/gradient_norm.md'
+            - Polynomial: 'api/utilities/nonlin_fun/polynomial.md'
+            - Vorticity Convection: 'api/utilities/nonlin_fun/vorticity_convection.md'
+            - Nonlinear: 'api/utilities/nonlin_fun/nonlinear.md'
+        - Repeated Stepper: 'api/utilities/repeated_stepper.md'
+        - Forced Stepper: 'api/utilities/forced_stepper.md'
+        - Initial Conditions:
+            - Sine Waves 1d: 'api/utilities/initial_conditions/sine_waves_1d.md'
+            - Truncated Fourier Series: 'api/utilities/initial_conditions/truncated_fourier_series.md'
+            - Gaussian Random Field: 'api/utilities/initial_conditions/gaussian_random_field.md'
+            - Diffused Noise: 'api/utilities/initial_conditions/diffused_noise.md'
+            - Gaussian Blob: 'api/utilities/initial_conditions/gaussian_blob.md'
+            - Discontinuities: 'api/utilities/initial_conditions/discontinuities.md'
+            - Helper: 'api/utilities/initial_conditions/helper.md'
+        - Rollout & Repeat: 'api/utilities/rollout_and_repeat.md'
+        - Grid Generation: 'api/utilities/grid_generation.md'
+        - Derivatives: 'api/utilities/derivatives.md'
+        - Normalized & Difficulty: 'api/utilities/normalized_and_difficulty.md'
+        - Metrics:
+            - MSE-based: 'api/utilities/metrics/mse_based.md'
+            - RMSE-based: 'api/utilities/metrics/rmse_based.md'
+            - Correlation: 'api/utilities/metrics/correlation.md'
+            - Fourier nRMSE: 'api/utilities/metrics/fourier_nrmse.md'
+        - Visualization:
+            - Plot States: 'api/utilities/visualization/plot_states.md'
+            - Plot Spatio-Temporal: 'api/utilities/visualization/plot_spatio_temporal.md'
+            - Plot States Facet: 'api/utilities/visualization/plot_states_facet.md'
+            - Plot Spatio-Temporal Facet: 'api/utilities/visualization/plot_spatio_temporal_facet.md'
+            - Animate States: 'api/utilities/visualization/animate_states.md'
+            - Animate Spatio-Temporal: 'api/utilities/visualization/animate_spatio_temporal.md'
+            - Animate States Facet: 'api/utilities/visualization/animate_states_facet.md'
+            - Animate Spatio-Temporal Facet: 'api/utilities/visualization/animate_spatio_temporal_facet.md'
+    - Additional API:
+        - Base:
+            - Base Stepper: 'api/stepper/base_stepper.md'
+            - Base Nonlinear Function: 'api/utilities/nonlin_fun/base.md'
+            - Base Initial Condition: 'api/utilities/initial_conditions/base_initial_condition.md'
+        - ETDRK Backbone: 'api/etdrk_backbone.md'
+    - Background:
+        - Design Decisions: 'background/design_decisions.md'

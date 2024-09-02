@@ -71,60 +71,61 @@ class KortewegDeVries(BaseStepper):
         Otherwise, the soliton interaction continues indefinitely.
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `domain_extent`: The size of the domain `L`; in higher dimensions
-                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
-            - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and
-                **excludes** the right boundary point. In higher dimensions; the
-                number of points in each dimension is the same. Hence, the total
-                number of degrees of freedom is `Nᵈ`.
-            - `dt`: The timestep size `Δt` between two consecutive states.
-            - `convection_scale`: The convection coefficient `b₁`. Note that the
-                convection is already scaled by 1/2 to account for the
-                conservative evaluation. The value of `b₁` scales it further.
-                Oftentimes `b₁ = -6` to match the analytical soliton solutions.
-                See also
-                https://en.wikipedia.org/wiki/Korteweg%E2%80%93De_Vries_equation#One-soliton_solution
-            - `dispersivity`: The dispersion coefficient `a₃`. Dispersion refers
-                to wavenumber-dependent advection, i.e., higher wavenumbers are
-                advected faster. Default `1.0`,
-            - `advect_over_diffuse`: If `True`, the dispersion is computed as
-                advection over diffusion. This adds spatial mixing. Default is
-                `False`.
-            - `diffusivity`: The rate at which the solution decays.
-            - `single_channel`: Whether to use the single channel mode in higher
-                dimensions. In this case the the convection is `b₁ (∇ ⋅ 1)(u²)`.
-                In this case, the state always has a single channel, no matter
-                the spatial dimension. Default: False.
-            - `order`: The order of the Exponential Time Differencing Runge
-                Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0`
-                only solves the linear part of the equation. Use higher values
-                for higher accuracy and stability. The default choice of `2` is
-                a good compromise for single precision floats.
-            - `dealiasing_fraction`: The fraction of the wavenumbers to keep
-                before evaluating the nonlinearity. The default 2/3 corresponds
-                to Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2.
-                Default: 2/3.
-            - `num_circle_points`: How many points to use in the complex contour
-                integral method to compute the coefficients of the exponential
-                time differencing Runge Kutta method. Default: 16.
-            - `circle_radius`: The radius of the contour used to compute the
-                coefficients of the exponential time differencing Runge Kutta
-                method. Default: 1.0.
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `domain_extent`: The size of the domain `L`; in higher dimensions
+            the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same. Hence, the total number of degrees of
+            freedom is `Nᵈ`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `convection_scale`: The convection coefficient `b₁`. Note that the
+            convection is already scaled by 1/2 to account for the conservative
+            evaluation. The value of `b₁` scales it further. Oftentimes `b₁ =
+            -6` to match the analytical soliton solutions. See also
+            https://en.wikipedia.org/wiki/Korteweg%E2%80%93De_Vries_equation#One-soliton_solution
+        - `dispersivity`: The dispersion coefficient `a₃`. Dispersion refers
+            to wavenumber-dependent advection, i.e., higher wavenumbers are
+            advected faster. Default `1.0`,
+        - `advect_over_diffuse`: If `True`, the dispersion is computed as
+            advection over diffusion. This adds spatial mixing. Default is
+            `False`.
+        - `diffusivity`: The rate at which the solution decays.
+        - `single_channel`: Whether to use the single channel mode in higher
+            dimensions. In this case the the convection is `b₁ (∇ ⋅ 1)(u²)`. In
+            this case, the state always has a single channel, no matter the
+            spatial dimension. Default: False.
+        - `order`: The order of the Exponential Time Differencing Runge
+            Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
+            solves the linear part of the equation. Use higher values for higher
+            accuracy and stability. The default choice of `2` is a good
+            compromise for single precision floats.
+        - `dealiasing_fraction`: The fraction of the wavenumbers to keep
+            before evaluating the nonlinearity. The default 2/3 corresponds to
+            Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2. Default:
+            2/3.
+        - `num_circle_points`: How many points to use in the complex contour
+            integral method to compute the coefficients of the exponential time
+            differencing Runge Kutta method. Default: 16.
+        - `circle_radius`: The radius of the contour used to compute the
+            coefficients of the exponential time differencing Runge Kutta
+            method. Default: 1.0.
 
         **Notes:**
+
             -
 
         **Good Values:**
-            - There is an anlytical solution to the (inviscid, `ν = 0`) KdV of
-                `u(t, x) = - 1/2 c^2 sech^2(c/2 (x - ct - a))` with the
-                hyperbolic secant `sech` and arbitrarily selected speed `c` and
-                shift `a`.
-            - For a nice simulation with an initial condition that breaks into
-                solitons choose `domain_extent=20.0` and an initial condition
-                with the first 5-10 modes. Set dt=0.01, num points in the range
-                of 50-200 are sufficient.
+
+        - There is an anlytical solution to the (inviscid, `ν = 0`) KdV of
+            `u(t, x) = - 1/2 c^2 sech^2(c/2 (x - ct - a))` with the hyperbolic
+            secant `sech` and arbitrarily selected speed `c` and shift `a`.
+        - For a nice simulation with an initial condition that breaks into
+            solitons choose `domain_extent=20.0` and an initial condition with
+            the first 5-10 modes. Set dt=0.01, num points in the range of 50-200
+            are sufficient.
         """
         self.convection_scale = convection_scale
         self.dispersivity = dispersivity

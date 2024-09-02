@@ -118,7 +118,7 @@ if use_difficulty:
     )
 else:
     stepper = ex.RepeatedStepper(
-        ex.normalized.NormlizedGeneralNonlinearStepper(
+        ex.normalized.NormalizedGeneralNonlinearStepper(
             1,
             num_points,
             normalized_coefficients_linear=tuple(

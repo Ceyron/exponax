@@ -57,40 +57,41 @@ class AllenCahn(BaseStepper):
         conditions, but here we use periodic boundary conditions.
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `domain_extent`: The size of the domain `L`; in higher dimensions
-                the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
-            - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and
-                **excludes** the right boundary point. In higher dimensions; the
-                number of points in each dimension is the same. Hence, the total
-                number of degrees of freedom is `Nᵈ`.
-            - `dt`: The timestep size `Δt` between two consecutive states.
-            - `diffusivity`: The diffusivity `ν`. The default value is `5e-3`.
-            - `first_order_coefficient`: The first order coefficient `c₁`. The
-                default value is `1.0`.
-            - `third_order_coefficient`: The third order coefficient `c₃`. The
-                default value is `-1.0`.
-            - `dealiasing_fraction`: The fraction of the highest wavenumbers to
-                dealias. Default is `1/2` because the default polynomial has a
-                highest degree of 3.
-            - `order`: The order of the Exponential Time Differencing Runge
-                Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0`
-                only solves the linear part of the equation. Use higher values
-                for higher accuracy and stability. The default choice of `2` is
-                a good compromise for single precision floats.
-            - `num_circle_points`: How many points to use in the complex contour
-                integral method to compute the coefficients of the exponential
-                time differencing Runge Kutta method. Default: 16.
-            - `circle_radius`: The radius of the contour used to compute the
-                coefficients of the exponential time differencing Runge Kutta
-                method. Default: 1.0.
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `domain_extent`: The size of the domain `L`; in higher dimensions
+            the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same. Hence, the total number of degrees of
+            freedom is `Nᵈ`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `diffusivity`: The diffusivity `ν`. The default value is `5e-3`.
+        - `first_order_coefficient`: The first order coefficient `c₁`. The
+            default value is `1.0`.
+        - `third_order_coefficient`: The third order coefficient `c₃`. The
+            default value is `-1.0`.
+        - `dealiasing_fraction`: The fraction of the highest wavenumbers to
+            dealias. Default is `1/2` because the default polynomial has a
+            highest degree of 3.
+        - `order`: The order of the Exponential Time Differencing Runge
+            Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
+            solves the linear part of the equation. Use higher values for higher
+            accuracy and stability. The default choice of `2` is a good
+            compromise for single precision floats.
+        - `num_circle_points`: How many points to use in the complex contour
+            integral method to compute the coefficients of the exponential time
+            differencing Runge Kutta method. Default: 16.
+        - `circle_radius`: The radius of the contour used to compute the
+            coefficients of the exponential time differencing Runge Kutta
+            method. Default: 1.0.
 
         **Notes:**
-            - See
-                https://github.com/chebfun/chebfun/blob/db207bc9f48278ca4def15bf90591bfa44d0801d/spin.m#L48
-                for an example IC of the Allen-Cahn in 1d.
 
+        - See
+            https://github.com/chebfun/chebfun/blob/db207bc9f48278ca4def15bf90591bfa44d0801d/spin.m#L48
+            for an example IC of the Allen-Cahn in 1d.
         """
         self.diffusivity = diffusivity
         self.first_order_coefficient = first_order_coefficient

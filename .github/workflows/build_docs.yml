@@ -1,51 +1,58 @@
-name: Build documentation
+name: Build Docs
 
 on:
-  # only run on PRs, not on pushes to main
-  # (this is handled by deploy_docs.yml)
-  pull_request:
-
-  workflow_call:
-    inputs:
-      artifact_name:
-        description: "Name of the artifact to upload"
-        required: false
-        type: string
+  push:
+    branches:
+      - main
 
 jobs:
-  test-docs:
-    runs-on: ubuntu-latest
-
+  build:
+    strategy:
+      matrix:
+        python-version: [ 3.11 ]
+        os: [ ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install system requirements
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y pandoc
-
-      - name: Setup Python environment
-        uses: actions/setup-python@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.python-version }}
 
-      - name: Install doc requirements
+      - name: Install dependencies
         run: |
-          pip install jax[cpu]
-          pip install .
-          pip install -r docs/requirements.txt
-
+          python -m pip install --upgrade pip
+          python -m pip install .
+          python -m pip install -r docs/requirements.txt
+      
       - name: Build docs
-        run: |
-          cd docs
-          export SPHINXOPTS="-W"  # treat warnings as errors
-          make html
+        run: mkdocs build 
 
-      - name: Upload HTML files
-        uses: actions/upload-artifact@v3
-        if: ${{ inputs.artifact_name }}
+      - name: Upload docs
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: ${{ inputs.artifact_name }}
-          path: docs/build/html
-          if-no-files-found: error
+          path: site
+
+  # Deploy job
+  deploy:
+    # Add a dependency to the build job
+    needs: build
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # Specify runner + deployment step
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 # or specific "vX.X.X" version tag for this action
