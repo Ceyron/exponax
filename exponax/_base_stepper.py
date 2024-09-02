@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 
 import equinox as eqx
-import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
 
 from ._spectral import (
     build_derivative_operator,
-    space_indices,
+    fft,
+    ifft,
     spatial_shape,
     wavenumber_shape,
 )
@@ -202,12 +202,12 @@ class BaseStepper(eqx.Module, ABC):
         **Returns:**
             - `u_next`: The state vector after one step, shape `(C, ..., N,)`.
         """
-        u_hat = jnp.fft.rfftn(u, axes=space_indices(self.num_spatial_dims))
+        u_hat = fft(u, num_spatial_dims=self.num_spatial_dims)
         u_next_hat = self.step_fourier(u_hat)
-        u_next = jnp.fft.irfftn(
+        u_next = ifft(
             u_next_hat,
-            s=spatial_shape(self.num_spatial_dims, self.num_points),
-            axes=space_indices(self.num_spatial_dims),
+            num_spatial_dims=self.num_spatial_dims,
+            num_points=self.num_points,
         )
         return u_next
 

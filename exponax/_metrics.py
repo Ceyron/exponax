@@ -4,7 +4,7 @@ import jax
 import jax.numpy as jnp
 from jaxtyping import Array, Float
 
-from ._spectral import low_pass_filter_mask, space_indices
+from ._spectral import fft, low_pass_filter_mask
 
 
 def _MSE(
@@ -505,8 +505,8 @@ def _fourier_nRMSE(
 
     mask = jnp.invert(low_mask) & high_mask
 
-    u_pred_fft = jnp.fft.rfftn(u_pred, axes=space_indices(num_spatial_dims))
-    u_ref_fft = jnp.fft.rfftn(u_ref, axes=space_indices(num_spatial_dims))
+    u_pred_fft = fft(u_pred, num_spatial_dims=num_spatial_dims)
+    u_ref_fft = fft(u_ref, num_spatial_dims=num_spatial_dims)
 
     # The FFT incurse rounding errors around the machine precision that can be
     # noticeable in the nRMSE. We will zero out the values that are smaller than

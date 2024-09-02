@@ -4,9 +4,8 @@ from jaxtyping import Array, Float, PRNGKeyArray
 
 from .._spectral import (
     build_scaling_array,
+    ifft,
     low_pass_filter_mask,
-    space_indices,
-    spatial_shape,
     wavenumber_shape,
 )
 from ._base_ic import BaseRandomICGenerator
@@ -131,10 +130,10 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
             self.num_spatial_dims, num_points
         )
 
-        u = jnp.fft.irfftn(
+        u = ifft(
             fourier_noise,
-            s=spatial_shape(self.num_spatial_dims, num_points),
-            axes=space_indices(self.num_spatial_dims),
+            num_spatial_dims=self.num_spatial_dims,
+            num_points=num_points,
         )
 
         if self.std_one:

@@ -1,4 +1,4 @@
-from typing import TypeVar, Union
+from typing import Optional, TypeVar, Union
 
 import jax.numpy as jnp
 from jaxtyping import Array, Bool, Complex, Float
@@ -69,113 +69,6 @@ def build_scaled_wavenumbers(
     scale = 2 * jnp.pi / domain_extent
     wavenumbers = build_wavenumbers(num_spatial_dims, num_points, indexing=indexing)
     return scale * wavenumbers
-
-
-def derivative(
-    field: Float[Array, "C ... N"],
-    domain_extent: float,
-    *,
-    order: int = 1,
-    indexing: str = "ij",
-) -> Union[Float[Array, "C D ... (N//2)+1"], Float[Array, "D ... (N//2)+1"]]:
-    """
-    Perform the spectral derivative of a field. In higher dimensions, this
-    defaults to the gradient (the collection of all partial derivatives). In 1d,
-    the resulting channel dimension holds the derivative. If the function is
-    called with an d-dimensional field which has 1 channel, the result will be a
-    d-dimensional field with d channels (one per partial derivative). If the
-    field originally had C channels, the result will be a matrix field with C
-    rows and d columns.
-
-    Note that applying this operator twice will produce issues at the Nyquist if
-    the number of degrees of freedom N is even. For this, consider also using
-    the order option.
-
-    **Arguments:**
-        - `field`: The field to differentiate, shape `(C, ..., N,)`. `C` can be
-            `1` for a scalar field or `D` for a vector field.
-        - `L`: The domain extent.
-        - `order`: The order of the derivative. Default is `1`.
-        - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
-          Either `"ij"` or `"xy"`. Default is `"ij"`.
-
-    **Returns:**
-        - `field_der`: The derivative of the field, shape `(C, D, ...,
-          (N//2)+1)` or `(D, ..., (N//2)+1)`.
-    """
-    channel_shape = field.shape[0]
-    spatial_shape = field.shape[1:]
-    D = len(spatial_shape)
-    N = spatial_shape[0]
-    derivative_operator = build_derivative_operator(
-        D, domain_extent, N, indexing=indexing
-    )
-    # # I decided to not use this fix
-
-    # # Required for even N, no effect for odd N
-    # derivative_operator_fixed = (
-    #     derivative_operator * nyquist_filter_mask(D, N)
-    # )
-    derivative_operator_fixed = derivative_operator**order
-
-    field_hat = jnp.fft.rfftn(field, axes=space_indices(D))
-    if channel_shape == 1:
-        # Do not introduce another channel axis
-        field_der_hat = derivative_operator_fixed * field_hat
-    else:
-        # Create a "derivative axis" right after the channel axis
-        field_der_hat = field_hat[:, None] * derivative_operator_fixed[None, ...]
-
-    field_der = jnp.fft.irfftn(field_der_hat, s=spatial_shape, axes=space_indices(D))
-
-    return field_der
-
-
-def make_incompressible(
-    field: Float[Array, "D ... N"],
-    *,
-    indexing: str = "ij",
-):
-    channel_shape = field.shape[0]
-    spatial_shape = field.shape[1:]
-    num_spatial_dims = len(spatial_shape)
-    if channel_shape != num_spatial_dims:
-        raise ValueError(
-            f"Expected the number of channels to be {num_spatial_dims}, got {channel_shape}."
-        )
-    num_points = spatial_shape[0]
-
-    derivative_operator = build_derivative_operator(
-        num_spatial_dims, 1.0, num_points, indexing=indexing
-    )  # domain_extent does not matter because it will cancel out
-
-    incompressible_field_hat = jnp.fft.rfftn(
-        field, axes=space_indices(num_spatial_dims)
-    )
-
-    divergence = jnp.sum(
-        derivative_operator * incompressible_field_hat, axis=0, keepdims=True
-    )
-
-    laplace_operator = build_laplace_operator(derivative_operator)
-
-    inv_laplace_operator = jnp.where(
-        laplace_operator == 0,
-        1.0,
-        1.0 / laplace_operator,
-    )
-
-    pseudo_pressure = -inv_laplace_operator * divergence
-
-    pseudo_pressure_garadient = derivative_operator * pseudo_pressure
-
-    incompressible_field_hat = incompressible_field_hat - pseudo_pressure_garadient
-
-    incompressible_field = jnp.fft.irfftn(
-        incompressible_field_hat, s=spatial_shape, axes=space_indices(num_spatial_dims)
-    )
-
-    return incompressible_field
 
 
 def build_derivative_operator(
@@ -470,3 +363,203 @@ def build_scaling_array(
     )
 
     return scaling
+
+
+def fft(
+    field: Float[Array, "C ... N"],
+    *,
+    num_spatial_dims: Optional[int] = None,
+) -> Complex[Array, "C ... (N//2)+1"]:
+    """
+    Perform a **real-valued** FFT of a field. This function is designed for
+    states in `Exponax` with a leading channel axis and then one, two, or three
+    following spatial axes, **each of the same length** N.
+
+    Only accepts real-valued input fields and performs a real-valued FFT. Hence,
+    the last axis of the returned field is of length N//2+1.
+
+    **Arguments:**
+        - `field`: The field to transform, shape `(C, ..., N,)`.
+        - `num_spatial_dims`: The number of spatial dimensions, i.e., how many
+            spatial axes follow the channel axis. Can be inferred from the array
+            if it follows the Exponax convention. For example, it is not allowed
+            to have a leading batch axis, in such a case use `jax.vmap` on this
+            function.
+
+    **Returns:**
+        - `field_hat`: The transformed field, shape `(C, ..., N//2+1)`.
+
+    !!! info
+        Internally uses `jax.numpy.fft.rfftn` with the default settings for the
+        `norm` argument with `norm="backward"`. This means that the forward FFT
+        (this function) does not apply any normalization to the result, only the
+        [`exponax.ifft`][] function applies normalization.
+    """
+    if num_spatial_dims is None:
+        num_spatial_dims = field.ndim - 1
+
+    return jnp.fft.rfftn(field, axes=space_indices(num_spatial_dims))
+
+
+def ifft(
+    field_hat: Complex[Array, "C ... (N//2)+1"],
+    *,
+    num_spatial_dims: Optional[int] = None,
+    num_points: Optional[int] = None,
+) -> Float[Array, "C ... N"]:
+    """
+    Perform the inverse **real-valued** FFT of a field. This is the inverse
+    operation of `fft`. This function is designed for states in `Exponax` with a
+    leading channel axis and then one, two, or three following spatial axes. In
+    state space all spatial axes have the same length N (here called
+    `num_points`).
+
+    Requires a complex-valued field in Fourier space with the last axis of
+    length N//2+1.
+
+    The number of points (N, or `num_points`) must be provided if the number of
+    spatial dimensions is 1. Otherwise, it can be inferred from the shape of the
+    field.
+
+    **Arguments:**
+        - `field_hat`: The transformed field, shape `(C, ..., N//2+1)`.
+        - `num_spatial_dims`: The number of spatial dimensions, i.e., how many
+            spatial axes follow the channel axis. Can be inferred from the array
+            if it follows the Exponax convention. For example, it is not allowed
+            to have a leading batch axis, in such a case use `jax.vmap` on this
+            function.
+        - `num_points`: The number of points in each spatial dimension. Can be
+          inferred if `num_spatial_dims` >= 2
+
+    **Returns:**
+        - `field`: The transformed field, shape `(C, ..., N,)`.
+
+    !!! info
+        Internally uses `jax.numpy.fft.irfftn` with the default settings for the
+        `norm` argument with `norm="backward"`. This means that the forward FFT
+        [`exponax.fft`][] function does not apply any normalization to the
+        input, only the inverse FFT (this function) applies normalization.
+        Hence, if you want to define a state in Fourier space and inversely
+        transform it, consider using [`exponax.spectral.build_scaling_array`][]
+        to correctly scale the complex values before transforming them back.
+    """
+    if num_spatial_dims is None:
+        num_spatial_dims = field_hat.ndim - 1
+
+    if num_points is None:
+        if num_spatial_dims >= 2:
+            num_points = field_hat.shape[-2]
+        else:
+            raise ValueError("num_points must be provided if num_spatial_dims == 1.")
+    return jnp.fft.irfftn(
+        field_hat,
+        s=spatial_shape(num_spatial_dims, num_points),
+        axes=space_indices(num_spatial_dims),
+    )
+
+
+def derivative(
+    field: Float[Array, "C ... N"],
+    domain_extent: float,
+    *,
+    order: int = 1,
+    indexing: str = "ij",
+) -> Union[Float[Array, "C D ... (N//2)+1"], Float[Array, "D ... (N//2)+1"]]:
+    """
+    Perform the spectral derivative of a field. In higher dimensions, this
+    defaults to the gradient (the collection of all partial derivatives). In 1d,
+    the resulting channel dimension holds the derivative. If the function is
+    called with an d-dimensional field which has 1 channel, the result will be a
+    d-dimensional field with d channels (one per partial derivative). If the
+    field originally had C channels, the result will be a matrix field with C
+    rows and d columns.
+
+    Note that applying this operator twice will produce issues at the Nyquist if
+    the number of degrees of freedom N is even. For this, consider also using
+    the order option.
+
+    **Arguments:**
+        - `field`: The field to differentiate, shape `(C, ..., N,)`. `C` can be
+            `1` for a scalar field or `D` for a vector field.
+        - `L`: The domain extent.
+        - `order`: The order of the derivative. Default is `1`.
+        - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
+          Either `"ij"` or `"xy"`. Default is `"ij"`.
+
+    **Returns:**
+        - `field_der`: The derivative of the field, shape `(C, D, ...,
+          (N//2)+1)` or `(D, ..., (N//2)+1)`.
+    """
+    channel_shape = field.shape[0]
+    spatial_shape = field.shape[1:]
+    D = len(spatial_shape)
+    N = spatial_shape[0]
+    derivative_operator = build_derivative_operator(
+        D, domain_extent, N, indexing=indexing
+    )
+    # # I decided to not use this fix
+
+    # # Required for even N, no effect for odd N
+    # derivative_operator_fixed = (
+    #     derivative_operator * nyquist_filter_mask(D, N)
+    # )
+    derivative_operator_fixed = derivative_operator**order
+
+    field_hat = fft(field, num_spatial_dims=D)
+    if channel_shape == 1:
+        # Do not introduce another channel axis
+        field_der_hat = derivative_operator_fixed * field_hat
+    else:
+        # Create a "derivative axis" right after the channel axis
+        field_der_hat = field_hat[:, None] * derivative_operator_fixed[None, ...]
+
+    field_der = ifft(field_der_hat, num_spatial_dims=D, num_points=N)
+
+    return field_der
+
+
+def make_incompressible(
+    field: Float[Array, "D ... N"],
+    *,
+    indexing: str = "ij",
+):
+    channel_shape = field.shape[0]
+    spatial_shape = field.shape[1:]
+    num_spatial_dims = len(spatial_shape)
+    if channel_shape != num_spatial_dims:
+        raise ValueError(
+            f"Expected the number of channels to be {num_spatial_dims}, got {channel_shape}."
+        )
+    num_points = spatial_shape[0]
+
+    derivative_operator = build_derivative_operator(
+        num_spatial_dims, 1.0, num_points, indexing=indexing
+    )  # domain_extent does not matter because it will cancel out
+
+    incompressible_field_hat = fft(field, num_spatial_dims=num_spatial_dims)
+
+    divergence = jnp.sum(
+        derivative_operator * incompressible_field_hat, axis=0, keepdims=True
+    )
+
+    laplace_operator = build_laplace_operator(derivative_operator)
+
+    inv_laplace_operator = jnp.where(
+        laplace_operator == 0,
+        1.0,
+        1.0 / laplace_operator,
+    )
+
+    pseudo_pressure = -inv_laplace_operator * divergence
+
+    pseudo_pressure_garadient = derivative_operator * pseudo_pressure
+
+    incompressible_field_hat = incompressible_field_hat - pseudo_pressure_garadient
+
+    incompressible_field = ifft(
+        incompressible_field_hat,
+        num_spatial_dims=num_spatial_dims,
+        num_points=num_points,
+    )
+
+    return incompressible_field
