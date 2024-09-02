@@ -61,7 +61,7 @@ class Advection(BaseStepper):
 
         **Notes:**
 
-        - The stepper is unconditionally stable, not matter the choice of
+        - The stepper is unconditionally stable, no matter the choice of
             any argument because the equation is solved analytically in Fourier
             space. **However**, note that initial conditions with modes higher
             than the Nyquist freuency (`(N//2)+1` with `N` being the

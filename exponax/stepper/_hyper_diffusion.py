@@ -72,7 +72,7 @@ class HyperDiffusion(BaseStepper):
 
         **Notes:**
 
-        - The stepper is unconditionally stable, not matter the choice of
+        - The stepper is unconditionally stable, no matter the choice of
             any argument because the equation is solved analytically in Fourier
             space.
         - Ultimately, only the factor `μ Δt / L⁴` affects the characteristic
