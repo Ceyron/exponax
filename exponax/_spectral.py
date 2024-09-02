@@ -388,6 +388,12 @@ def fft(
 
     **Returns:**
         - `field_hat`: The transformed field, shape `(C, ..., N//2+1)`.
+
+    !!! info
+        Internally uses `jax.numpy.fft.rfftn` with the default settings for the
+        `norm` argument with `norm="backward"`. This means that the forward FFT
+        (this function) does not apply any normalization to the result, only the
+        [`exponax.ifft`][] function applies normalization.
     """
     if num_spatial_dims is None:
         num_spatial_dims = field.ndim - 1
@@ -408,8 +414,8 @@ def ifft(
     state space all spatial axes have the same length N (here called
     `num_points`).
 
-    Requires a complex-valued field in Fourier space with the last axis of length
-    N//2+1.
+    Requires a complex-valued field in Fourier space with the last axis of
+    length N//2+1.
 
     The number of points (N, or `num_points`) must be provided if the number of
     spatial dimensions is 1. Otherwise, it can be inferred from the shape of the
@@ -427,6 +433,15 @@ def ifft(
 
     **Returns:**
         - `field`: The transformed field, shape `(C, ..., N,)`.
+
+    !!! info
+        Internally uses `jax.numpy.fft.irfftn` with the default settings for the
+        `norm` argument with `norm="backward"`. This means that the forward FFT
+        [`exponax.fft`][] function does not apply any normalization to the
+        input, only the inverse FFT (this function) applies normalization.
+        Hence, if you want to define a state in Fourier space and inversely
+        transform it, consider using [`exponax.spectral.build_scaling_array`][]
+        to correctly scale the complex values before transforming them back.
     """
     if num_spatial_dims is None:
         num_spatial_dims = field_hat.ndim - 1
