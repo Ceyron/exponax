@@ -43,19 +43,20 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         ```
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and
-                **excludes** the right boundary point. In higher dimensions; the
-                number of points in each dimension is the same.
-            - `derivative_operator`: A complex array of shape `(d, ..., N//2+1)`
-                that represents the derivative operator in Fourier space.
-            - `dealiasing_fraction`: The fraction of the highest resolved modes
-                that are not aliased. Defaults to `2/3` which corresponds to
-                Orszag's 2/3 rule.
-            - `scale`: The scale `b₁` of the convection term. Defaults to `1.0`.
-            - `single_channel`: Whether to use the single-channel hack. Defaults
-                to `False`.
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same.
+        - `derivative_operator`: A complex array of shape `(d, ..., N//2+1)`
+            that represents the derivative operator in Fourier space.
+        - `dealiasing_fraction`: The fraction of the highest resolved modes
+            that are not aliased. Defaults to `2/3` which corresponds to
+            Orszag's 2/3 rule.
+        - `scale`: The scale `b₁` of the convection term. Defaults to `1.0`.
+        - `single_channel`: Whether to use the single-channel hack. Defaults
+            to `False`.
         """
         self.derivative_operator = derivative_operator
         self.scale = scale
@@ -69,6 +70,24 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
     def _multi_channel_eval(
         self, u_hat: Complex[Array, "C ... (N//2)+1"]
     ) -> Complex[Array, "C ... (N//2)+1"]:
+        """
+        Evaluates the convection term for a multi-channel state `u_hat` in
+        Fourier space. The convection term is given by
+
+        ```
+            𝒩(u) = b₁ 1/2 ∇ ⋅ (u ⊗ u)
+        ```
+
+        with `∇ ⋅` the divergence operator and the outer product `u ⊗ u`.
+
+        **Arguments:**
+
+        - `u_hat`: The state in Fourier space.
+
+        **Returns:**
+
+        - `convection`: The evaluation of the convection term in Fourier space.
+        """
         num_channels = u_hat.shape[0]
         if num_channels != self.num_spatial_dims:
             raise ValueError(
@@ -88,6 +107,24 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
     def _single_channel_eval(
         self, u_hat: Complex[Array, "C ... (N//2)+1"]
     ) -> Complex[Array, "C ... (N//2)+1"]:
+        """
+        Evaluates the convection term for a single-channel state `u_hat` in
+        Fourier space. The convection term is given by
+
+        ```
+            𝒩(u) = b₁ 1/2 (1⃗ ⋅ ∇)(u²)
+        ```
+
+        with `∇ ⋅` the divergence operator and `1⃗` a vector of ones.
+
+        **Arguments:**
+
+        - `u_hat`: The state in Fourier space.
+
+        **Returns:**
+
+        - `convection`: The evaluation of the convection term in Fourier space.
+        """
         u_hat_dealiased = self.dealias(u_hat)
         u = self.ifft(u_hat_dealiased)
         u_square = u**2
