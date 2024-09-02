@@ -41,11 +41,12 @@ class Poisson(eqx.Module):
         It is included for completion.
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions.
-            - `domain_extent`: The extent of the domain.
-            - `num_points`: The number of points in each spatial dimension.
-            - `order`: The order of the Poisson equation. Defaults to 2. You can
-              also set `order=4` for the biharmonic equation.
+
+        - `num_spatial_dims`: The number of spatial dimensions.
+        - `domain_extent`: The extent of the domain.
+        - `num_points`: The number of points in each spatial dimension.
+        - `order`: The order of the Poisson equation. Defaults to 2. You can
+            also set `order=4` for the biharmonic equation.
         """
         self.num_spatial_dims = num_spatial_dims
         self.domain_extent = domain_extent
@@ -71,10 +72,12 @@ class Poisson(eqx.Module):
         Solve the Poisson equation in Fourier space.
 
         **Arguments:**
-            - `f_hat`: The Fourier transform of the right hand side.
+
+        - `f_hat`: The Fourier transform of the right hand side.
 
         **Returns:**
-            - `u_hat`: The Fourier transform of the solution.
+
+        - `u_hat`: The Fourier transform of the solution.
         """
         return -self._inv_operator * f_hat
 
@@ -83,13 +86,15 @@ class Poisson(eqx.Module):
         f: Float[Array, "C ... N"],
     ) -> Float[Array, "C ... N"]:
         """
-        Solve the Poisson equation in real space.
+        Solve the Poisson equation in state space.
 
         **Arguments:**
-            - `f`: The right hand side.
+
+        - `f`: The right hand side.
 
         **Returns:**
-            - `u`: The solution.
+
+        - `u`: The solution.
         """
         f_hat = fft(f, num_spatial_dims=self.num_spatial_dims)
         u_hat = self.step_fourier(f_hat)
@@ -104,6 +109,17 @@ class Poisson(eqx.Module):
         self,
         f: Float[Array, "C ... N"],
     ) -> Float[Array, "C ... N"]:
+        """
+        Solve the Poisson equation in state space.
+
+        **Arguments:**
+
+        - `f`: The right hand side.
+
+        **Returns:**
+
+        - `u`: The solution.
+        """
         if f.shape[1:] != spatial_shape(self.num_spatial_dims, self.num_points):
             raise ValueError(
                 f"Shape of f[1:] is {f.shape[1:]} but should be {spatial_shape(self.num_spatial_dims, self.num_points)}"
