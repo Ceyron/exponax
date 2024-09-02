@@ -100,7 +100,6 @@ class NormalizedNonlinearStepper(GeneralNonlinearStepper):
 
         self.normalized_coefficients_linear = normalized_coefficients_linear
         self.normalized_coefficients_nonlinear = normalized_coefficients_nonlinear
-        self.dealiasing_fraction = dealiasing_fraction
 
         super().__init__(
             num_spatial_dims=num_spatial_dims,

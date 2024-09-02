@@ -162,7 +162,6 @@ class NormalizedGradientNormStepper(GeneralGradientNormStepper):
         """
         self.normalized_coefficients = normalized_coefficients
         self.normalized_gradient_norm_scale = normalized_gradient_norm_scale
-        self.dealiasing_fraction = dealiasing_fraction
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             domain_extent=1.0,
