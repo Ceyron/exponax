@@ -5,7 +5,8 @@ from jaxtyping import Array, Complex, Float
 from ._spectral import (
     build_derivative_operator,
     build_laplace_operator,
-    space_indices,
+    fft,
+    ifft,
     spatial_shape,
 )
 
@@ -90,12 +91,12 @@ class Poisson(eqx.Module):
         **Returns:**
             - `u`: The solution.
         """
-        f_hat = jnp.fft.rfftn(f, axes=space_indices(self.num_spatial_dims))
+        f_hat = fft(f, num_spatial_dims=self.num_spatial_dims)
         u_hat = self.step_fourier(f_hat)
-        u = jnp.fft.irfftn(
+        u = ifft(
             u_hat,
-            axes=space_indices(self.num_spatial_dims),
-            s=spatial_shape(self.num_spatial_dims, self.num_points),
+            num_spatial_dims=self.num_spatial_dims,
+            num_points=self.num_points,
         )
         return u
 
