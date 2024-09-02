@@ -66,20 +66,18 @@ modes for the linear terms.
 """
 
 from . import reaction as reaction
+from ._advection import Advection
+from ._advection_diffusion import AdvectionDiffusion
 from ._burgers import Burgers
 from ._convection import GeneralConvectionStepper
+from ._diffusion import Diffusion
+from ._dispersion import Dispersion
 from ._general_nonlinear import GeneralNonlinearStepper
 from ._gradient_norm import GeneralGradientNormStepper
+from ._hyper_diffusion import HyperDiffusion
 from ._korteweg_de_vries import KortewegDeVries
 from ._kuramoto_sivashinsky import KuramotoSivashinsky, KuramotoSivashinskyConservative
-from ._linear import (
-    Advection,
-    AdvectionDiffusion,
-    Diffusion,
-    Dispersion,
-    GeneralLinearStepper,
-    HyperDiffusion,
-)
+from ._linear import GeneralLinearStepper
 from ._navier_stokes import KolmogorovFlowVorticity, NavierStokesVorticity
 from ._polynomial import GeneralPolynomialStepper
 from ._vorticity_convection import GeneralVorticityConvectionStepper
