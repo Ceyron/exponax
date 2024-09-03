@@ -2,7 +2,7 @@ import equinox as eqx
 from jaxtyping import Array, Complex, Float
 
 from ._base_stepper import BaseStepper
-from ._spectral import fft, ifft
+from ._spectral import fft, ifft, spatial_shape
 from ._utils import repeat
 
 
@@ -109,4 +109,11 @@ class RepeatedStepper(eqx.Module):
 
         - `u_next`: The state after `self.num_sub_steps` time steps.
         """
-        return repeat(self.stepper, self.num_sub_steps)(u)
+        expected_shape = (self.num_channels,) + spatial_shape(
+            self.num_spatial_dims, self.num_points
+        )
+        if u.shape != expected_shape:
+            raise ValueError(
+                f"Expected shape {expected_shape}, got {u.shape}. For batched operation use `jax.vmap` on this function."
+            )
+        return self.step(u)
