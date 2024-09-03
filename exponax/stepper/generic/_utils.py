@@ -448,7 +448,7 @@ def extract_normalized_gradient_norm_scale_from_difficulty(
 
 
 def reduce_normalized_nonlinear_scales_to_difficulty(
-    normalized_nonlinear_scales: tuple[float],
+    normalized_nonlinear_scales: tuple[float, float, float],
     *,
     num_spatial_dims: int,
     num_points: int,
@@ -501,7 +501,7 @@ def reduce_normalized_nonlinear_scales_to_difficulty(
 
 
 def extract_normalized_nonlinear_scales_from_difficulty(
-    nonlinear_difficulties: tuple[float],
+    nonlinear_difficulties: tuple[float, float, float],
     *,
     num_spatial_dims: int,
     num_points: int,

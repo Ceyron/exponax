@@ -11,7 +11,7 @@ from ._utils import (
 
 class GeneralNonlinearStepper(BaseStepper):
     coefficients_linear: tuple[float, ...]
-    coefficients_nonlinear: tuple[float, 3]
+    coefficients_nonlinear: tuple[float, float, float]
     dealiasing_fraction: float
 
     def __init__(
@@ -22,7 +22,7 @@ class GeneralNonlinearStepper(BaseStepper):
         dt: float,
         *,
         coefficients_linear: tuple[float, ...] = (0.0, 0.0, 0.01),
-        coefficients_nonlinear: tuple[float, 3] = (0.0, -1.0, 0.0),
+        coefficients_nonlinear: tuple[float, float, float] = (0.0, -1.0, 0.0),
         order=2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,
@@ -156,7 +156,7 @@ class GeneralNonlinearStepper(BaseStepper):
 
 class NormalizedNonlinearStepper(GeneralNonlinearStepper):
     normalized_coefficients_linear: tuple[float, ...]
-    normalized_coefficients_nonlinear: tuple[float, ...]
+    normalized_coefficients_nonlinear: tuple[float, float, float]
 
     def __init__(
         self,
@@ -164,7 +164,11 @@ class NormalizedNonlinearStepper(GeneralNonlinearStepper):
         num_points: int,
         *,
         normalized_coefficients_linear: tuple[float, ...] = (0.0, 0.0, 0.1 * 0.1),
-        normalized_coefficients_nonlinear: tuple[float, ...] = (0.0, -1.0 * 0.1, 0.0),
+        normalized_coefficients_nonlinear: tuple[float, float, float] = (
+            0.0,
+            -1.0 * 0.1,
+            0.0,
+        ),
         order=2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,
@@ -271,7 +275,7 @@ class NormalizedNonlinearStepper(GeneralNonlinearStepper):
 
 class DifficultyNonlinearStepper(NormalizedNonlinearStepper):
     linear_difficulties: tuple[float, ...]
-    nonlinear_difficulties: tuple[float, ...]
+    nonlinear_difficulties: tuple[float, float, float]
 
     def __init__(
         self,
@@ -283,7 +287,7 @@ class DifficultyNonlinearStepper(NormalizedNonlinearStepper):
             0.0,
             0.1 * 0.1 / 1.0 * 48**2 * 2,
         ),
-        nonlinear_difficulties: tuple[float, ...] = (
+        nonlinear_difficulties: tuple[float, float, float] = (
             0.0,
             -1.0 * 0.1 / 1.0 * 48,
             0.0,
