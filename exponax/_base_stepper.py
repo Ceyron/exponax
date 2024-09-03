@@ -253,8 +253,8 @@ class BaseStepper(eqx.Module, ABC):
         - `u_next`: The state vector after one step, shape `(C, ..., N,)`.
 
         !!! tip
-            Use this call method together with `exponax.rollout` to produce
-            temporal trajectories by efficiently autogressive rollout.
+            Use this call method together with `exponax.rollout` to efficiently
+            produce temporal trajectories.
 
         !!! info
             For batched operation, use `jax.vmap` on this function.
