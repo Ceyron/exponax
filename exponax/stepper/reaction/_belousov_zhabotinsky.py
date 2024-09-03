@@ -47,7 +47,7 @@ class BelousovZhabotinskyNonlinearFun(BaseNonlinearFun):
 
 
 class BelousovZhabotinsky(BaseStepper):
-    diffusivities: tuple[float, 3]
+    diffusivities: tuple[float, float, float]
     dealiasing_fraction: float
 
     def __init__(
@@ -57,7 +57,7 @@ class BelousovZhabotinsky(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        diffusivities: tuple[float, 3] = (1e-5, 2e-5, 1e-5),
+        diffusivities: tuple[float, float, float] = (1e-5, 2e-5, 1e-5),
         order: int = 2,
         dealiasing_fraction: float = 1
         / 2,  # Needs lower value due to cubic nonlinearity
