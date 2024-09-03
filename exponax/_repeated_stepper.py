@@ -2,6 +2,7 @@ import equinox as eqx
 from jaxtyping import Array, Complex, Float
 
 from ._base_stepper import BaseStepper
+from ._spectral import fft, ifft
 from ._utils import repeat
 
 
@@ -64,7 +65,14 @@ class RepeatedStepper(eqx.Module):
 
         - `u_next`: The state after `self.num_sub_steps` time steps.
         """
-        return repeat(self.stepper.step, self.num_sub_steps)(u)
+        u_hat = fft(u, num_spatial_dims=self.num_spatial_dims)
+        u_hat_after_steps = self.step_fourier(u_hat)
+        u_after_steps = ifft(
+            u_hat_after_steps,
+            num_spatial_dims=self.num_spatial_dims,
+            num_points=self.num_points,
+        )
+        return u_after_steps
 
     def step_fourier(
         self,
