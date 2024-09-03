@@ -26,11 +26,84 @@ class GeneralPolynomialStepper(BaseStepper):
         circle_radius: float = 1.0,
     ):
         """
-        By default: Fisher-KPP with a small diffusion and 10.0 reactivity
+        Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) semi-linear PDEs
+        consisting of an arbitrary combination of polynomial nonlinearities and
+        (isotropic) linear derivatives. This can be used to represent a wide
+        array of reaction-diffusion equations.
 
-        Note that the first two entries in the polynomial_scales list are often zero.
+        In 1d, the PDE is of the form
 
-        The effect of polynomial_scale[1] is similar to the effect of coefficients[0]
+        ```
+            uₜ = ∑ₖ pₖ uᵏ + ∑ⱼ aⱼ uₓʲ
+        ```
+
+        where `pₖ` are the polynomial coefficients and `aⱼ` are the linear
+        coefficients. `uᵏ` denotes `u` pointwise raised to the power of `k`
+        (hence the polynomial contribution) and `uₓʲ` denotes the `j`-th
+        derivative of `u`.
+
+        The higher-dimensional generalization reads
+
+        ```
+            uₜ = ∑ₖ pₖ uᵏ + ∑ⱼ a_j (1⋅∇ʲ)u
+
+        ```
+
+        where `∇ʲ` is the `j`-th derivative operator.
+
+        The default configuration corresponds to the Fisher-KPP equation with
+        the following settings
+
+        ```python
+
+        exponax.stepper.reaction.FisherKPP(
+            num_spatial_dims=num_spatial_dims, domain_extent=domain_extent,
+            num_points=num_points, dt=dt, diffusivity=0.01, reactivity=-10.0,
+            #TODO: Check this
+        )
+        ```
+
+        Note that the effect of polynomial_scale[1] is similar to the effect of
+        coefficients[0] with the difference that in ETDRK integration the latter
+        is treated anlytically and should be preferred.
+
+        **Arguments:**
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `domain_extent`: The size of the domain `L`; in higher dimensions
+            the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same. Hence, the total number of degrees of
+            freedom is `Nᵈ`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `coefficients`: The list of coefficients `a_j` corresponding to the
+            derivatives. The length of this tuple represents the highest
+            occuring derivative. The default value `(10.0, 0.0, 0.01)` in
+            combination with the default `polynomial_scales` corresponds to the
+            Fisher-KPP equation.
+        - `polynomial_scales`: The list of scales `pₖ` corresponding to the
+            polynomial contributions. The length of this tuple represents the
+            highest occuring polynomial. The default value `(0.0, 0.0, 10.0)` in
+            combination with the default `coefficients` corresponds to the
+            Fisher-KPP equation.
+        - `order`: The order of the Exponential Time Differencing Runge
+            Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
+            solves the linear part of the equation. Use higher values for higher
+            accuracy and stability. The default choice of `2` is a good
+            compromise for single precision floats.
+        - `dealiasing_fraction`: The fraction of the wavenumbers to keep
+            before evaluating the nonlinearity. The default 2/3 corresponds to
+            Orszag's 2/3 rule which is sufficient if the highest occuring
+            polynomial is quadratic (i.e., there are at maximum three entries in
+            the `polynomial_scales` tuple).
+        - `num_circle_points`: How many points to use in the complex contour
+            integral method to compute the coefficients of the exponential time
+            differencing Runge Kutta method.
+        - `circle_radius`: The radius of the contour used to compute the
+            coefficients of the exponential time differencing Runge Kutta
+            method.
         """
         self.coefficients = coefficients
         self.polynomial_scales = polynomial_scales
@@ -98,7 +171,48 @@ class NormalizedPolynomialStepper(GeneralPolynomialStepper):
         circle_radius: float = 1.0,
     ):
         """
-        By default: Fisher-KPP
+        Timestepper for the **normalized** d-dimensional (`d ∈ {1, 2, 3}`)
+        semi-linear PDEs consisting of an arbitrary combination of polynomial
+        nonlinearities and (isotropic) linear derivatives. Uses a normalized
+        interface, i.e., the domain is scaled to `Ω = (0, 1)ᵈ` and time step
+        size is `Δt = 1.0`.
+
+        See `exponax.stepper.generic.GeneralPolynomialStepper` for more details
+        on the functional form of the PDE.
+
+        The default settings correspond to the Fisher-KPP equation.
+
+        **Arguments:**
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `num_points`: The number of points `N` used to discretize the domain.
+            This **includes** the left boundary point and **excludes** the right
+            boundary point. In higher dimensions; the number of points in each
+            dimension is the same. Hence, the total number of degrees of freedom
+            is `Nᵈ`.
+        - `normalized_coefficients`: The list of coefficients `α_j` corresponding
+            to the derivatives. The length of this tuple represents the highest
+            occuring derivative. The default value corresponds to the Fisher-KPP
+            equation.
+        - `normalized_polynomial_scales`: The list of scales `βₖ` corresponding
+            to the polynomial contributions. The length of this tuple represents
+            the highest occuring polynomial. The default value corresponds to the
+            Fisher-KPP equation.
+        - `order`: The order of the Exponential Time Differencing Runge Kutta
+            method. Must be one of {0, 1, 2, 3, 4}. The option `0` only solves
+            the linear part of the equation. Use higher values for higher accuracy
+            and stability. The default choice of `2` is a good compromise for
+            single precision floats.
+        - `dealiasing_fraction`: The fraction of the wavenumbers to keep before
+            evaluating the nonlinearity. The default 2/3 corresponds to Orszag's
+            2/3 rule which is sufficient if the highest occuring polynomial is
+            quadratic (i.e., there are at maximum three entries in the
+            `normalized_polynomial_scales` tuple).
+        - `num_circle_points`: How many points to use in the complex contour
+            integral method to compute the coefficients of the exponential time
+            differencing Runge Kutta method.
+        - `circle_radius`: The radius of the contour used to compute the
+            coefficients of the exponential time differencing Runge Kutta method.
         """
         self.normalized_coefficients = normalized_coefficients
         self.normalized_polynomial_scales = normalized_polynomial_scales
@@ -142,7 +256,63 @@ class DifficultyPolynomialStepper(NormalizedPolynomialStepper):
         circle_radius: float = 1.0,
     ):
         """
-        By default: Fisher-KPP
+        Timestepper for **difficulty-based** d-dimensional (`d ∈ {1, 2, 3}`)
+        semi-linear PDEs consisting of an arbitrary combination of polynomial
+        nonlinearities and (isotropic) linear derivatives. Uses a
+        difficulty-based interface where the "intensity" of the dynamics reduces
+        with increasing resolution. This is intended such that emulator learning
+        problems on two resolutions are comparibly difficult.
+
+        Different to `exponax.stepper.generic.NormalizedPolynomialStepper`, the
+        dynamics are defined by difficulties. The difficulties are a different
+        combination of normalized dynamics, `num_spatial_dims`, and
+        `num_points`.
+
+            γᵢ = αᵢ Nⁱ 2ⁱ⁻¹ d
+
+        with `d` the number of spatial dimensions, `N` the number of points, and
+        `αᵢ` the normalized coefficient.
+
+        Since the polynomial nonlinearity does not contain any derivatives, we
+        have that
+
+        ```
+            normalized_polynomial_scales = polynomial_difficulties
+        ```
+
+        The default settings correspond to the Fisher-KPP equation.
+
+        **Arguments:**
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `num_points`: The number of points `N` used to discretize the domain.
+            This **includes** the left boundary point and **excludes** the right
+            boundary point. In higher dimensions; the number of points in each
+            dimension is the same. Hence, the total number of degrees of freedom
+            is `Nᵈ`.
+        - `linear_difficulties`: The list of difficulties `γ_j` corresponding to
+            the derivatives. The length of this tuple represents the highest
+            occuring derivative. The default value corresponds to the Fisher-KPP
+            equation.
+        - `polynomial_difficulties`: The list of difficulties `δₖ` corresponding
+            to the polynomial contributions. The length of this tuple represents
+            the highest occuring polynomial. The default value corresponds to the
+            Fisher-KPP equation.
+        - `order`: The order of the Exponential Time Differencing Runge Kutta
+            method. Must be one of {0, 1, 2, 3, 4}. The option `0` only solves
+            the linear part of the equation. Use higher values for higher accuracy
+            and stability. The default choice of `2` is a good compromise for
+            single precision floats.
+        - `dealiasing_fraction`: The fraction of the wavenumbers to keep before
+            evaluating the nonlinearity. The default 2/3 corresponds to Orszag's
+            2/3 rule which is sufficient if the highest occuring polynomial is
+            quadratic (i.e., there are at maximum three entries in the
+            `polynomial_difficulties` tuple).
+        - `num_circle_points`: How many points to use in the complex contour
+            integral method to compute the coefficients of the exponential time
+            differencing Runge Kutta method.
+        - `circle_radius`: The radius of the contour used to compute the
+            coefficients of the exponential time differencing Runge Kutta method.
         """
         self.linear_difficulties = linear_difficulties
         self.polynomial_difficulties = polynomial_difficulties
