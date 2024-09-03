@@ -181,7 +181,11 @@ class NormalizedConvectionStepper(GeneralConvectionStepper):
         activates a single-channel hack.
 
         Under the default settings, it behaves like the Burgers equation under
-        the following settings ```python exponax.stepper.Burgers(
+        the following settings
+
+        ```python
+
+        exponax.stepper.Burgers(
             D=D, L=1, N=N, dt=0.1, diffusivity=0.01,
         )
         ```
@@ -277,7 +281,7 @@ class DifficultyConvectionStepper(NormalizedConvectionStepper):
 
         The difficulty of the nonlinear convection scale is defined by
 
-            δ = β * M * N² * D
+            δ₁ = β₁ * M * N * D
 
         with `M` the maximum absolute value of the input state (typically `1.0`
         if one uses the `exponax.ic` random generators with the `max_one=True`
