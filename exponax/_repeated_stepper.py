@@ -57,6 +57,10 @@ class RepeatedStepper(eqx.Module):
         Step the PDE forward in time by `self.num_sub_steps` time steps given the
         current state `u`.
 
+        !!! info
+            Performs the substepping in Fourier space to avoid unnecessary
+            back-and-forth transformations.
+
         **Arguments:**
 
         - `u`: The current state.
@@ -100,6 +104,10 @@ class RepeatedStepper(eqx.Module):
         """
         Step the PDE forward in time by self.num_sub_steps time steps given the
         current state `u`.
+
+        !!! info
+            Performs the substepping in Fourier space to avoid unnecessary
+            back-and-forth transformations.
 
         **Arguments:**
 
