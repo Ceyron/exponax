@@ -275,17 +275,19 @@ class DifficultyConvectionStepper(NormalizedConvectionStepper):
         with `d` the number of spatial dimensions, `N` the number of points, and
         `αᵢ` the normalized coefficient.
 
-        For the nonlinear convection scale it is defined as
+        The difficulty of the nonlinear convection scale is defined by
 
             δ = β * M * N² * D
 
-        with `M` the maximum absolute value of the input state.
+        with `M` the maximum absolute value of the input state (typically `1.0`
+        if one uses the `exponax.ic` random generators with the `max_one=True`
+        argument).
 
-        This interface is more natural because the difficulties for all orders
-        (given by `i`) are around 1.0. Additionally, they relate to stability
-        condition of explicit Finite Difference schemes for the particular
-        equations. For example, for advection (`i=1`), the absolute of the
-        difficulty is the Courant-Friedrichs-Lewy (CFL) number.
+        This interface is more natural than the normalized interface because the
+        difficulties for all orders (given by `i`) are around 1.0. Additionally,
+        they relate to stability condition of explicit Finite Difference schemes
+        for the particular equations. For example, for advection (`i=1`), the
+        absolute of the difficulty is the Courant-Friedrichs-Lewy (CFL) number.
 
         Under the default settings, this timestepper represents the Burgers
         equation.
