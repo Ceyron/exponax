@@ -25,25 +25,35 @@ class VorticityConvection2d(BaseNonlinearFun):
         streamfunction-vorticity formulation. In state space, it reads
 
         ```
-            𝒩(ω) = b ([1, -1]ᵀ ⊙ ∇(Δ⁻¹u)) ⋅ ∇u
+            𝒩(u) = - b ([1, -1]ᵀ ⊙ ∇(Δ⁻¹u)) ⋅ ∇u
         ```
 
         with `b` the convection scale, `⊙` the Hadamard product, `∇` the
         derivative operator, `Δ⁻¹` the inverse Laplacian, and `u` the vorticity.
 
+        The minus arises because `Exponax` follows the convention that all
+        nonlinear and linear differential operators are on the right-hand side
+        of the equation. Typically, the vorticity convection term is on the
+        left-hand side. Hence, the minus is required to move the term to the
+        right-hand side.
+
+        Since the inverse Laplacian is required, it internally performs a
+        Poisson solve which is straightforward in Fourier space.
+
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and **excludes**
-                the right boundary point. In higher dimensions; the number of
-                points in each dimension is the same.
-            - `convection_scale`: The scale `b` of the convection term. Defaults to
-                `1.0`.
-            - `derivative_operator`: A complex array of shape `(d, ..., N//2+1)` that
-                represents the derivative operator in Fourier space.
-            - `dealiasing_fraction`: The fraction of the highest resolved modes that
-                are not aliased. Defaults to `2/3` which corresponds to Orszag's 2/3
-                rule.
+
+        - `num_spatial_dims`: The number of spatial dimensions `D`.
+        - `num_points`: The number of points `N` used to discretize the domain.
+            This **includes** the left boundary point and **excludes** the right
+            boundary point. In higher dimensions; the number of points in each
+            dimension is the same.
+        - `convection_scale`: The scale `b` of the convection term. Defaults
+            to `1.0`.
+        - `derivative_operator`: A complex array of shape `(d, ..., N//2+1)`
+            that represents the derivative operator in Fourier space.
+        - `dealiasing_fraction`: The fraction of the highest resolved modes
+            that are not aliased. Defaults to `2/3` which corresponds to
+            Orszag's 2/3 rule.
         """
         if num_spatial_dims != 2:
             raise ValueError(f"Expected num_spatial_dims = 2, got {num_spatial_dims}.")
@@ -60,7 +70,9 @@ class VorticityConvection2d(BaseNonlinearFun):
         laplacian = build_laplace_operator(derivative_operator, order=2)
 
         # Uses the UNCHANGED mean solution to the Poisson equation (hence, the
-        # mean of the "right-hand side" will be the mean of the solution)
+        # mean of the "right-hand side" will be the mean of the solution).
+        # However, this does not matter because we subsequently take the
+        # gradient which would annihilate any mean energy anyway.
         self.inv_laplacian = jnp.where(laplacian == 0, 1.0, 1 / laplacian)
 
     def __call__(
@@ -110,11 +122,12 @@ class VorticityConvection2dKolmogorov(VorticityConvection2d):
         In state space, it reads
 
         ```
-            𝒩(ω) = b ([1, -1]ᵀ ⊙ ∇(Δ⁻¹u)) ⋅ ∇u - f
+            𝒩(u) = - b ([1, -1]ᵀ ⊙ ∇(Δ⁻¹u)) ⋅ ∇u - f
         ```
 
         For details on the vorticity convective term, see
-        `VorticityConvection2d`. The forcing term has the form
+        `exponax.nonlin_fun.VorticityConvection2d`. The forcing term has the
+        form
 
         ```
             f = -k (2π/L) γ cos(k (2π/L) x₁)
@@ -126,22 +139,21 @@ class VorticityConvection2dKolmogorov(VorticityConvection2d):
         the vorticity is derived via the curl).
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `num_points`: The number of points `N` used to discretize the
-                domain. This **includes** the left boundary point and
-                **excludes** the right boundary point. In higher dimensions; the
-                number of points in each dimension is the same.
-            - `convection_scale`: The scale `b` of the convection term. Defaults
-                to `1.0`.
-            - `injection_mode`: The wavenumber `k` at which energy is injected.
-                Defaults to `4`.
-            - `injection_scale`: The intensity `γ` of the injection term.
-                Defaults to `1.0`.
-            - `derivative_operator`: A complex array of shape `(d, ..., N//2+1)`
-                that represents the derivative operator in Fourier space.
-            - `dealiasing_fraction`: The fraction of the highest resolved modes
-                that are not aliased. Defaults to `2/3` which corresponds to
-                Orszag's 2/3 rule.
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same.
+        - `convection_scale`: The scale `b` of the convection term. Defaults
+            to `1.0`.
+        - `injection_mode`: The wavenumber `k` at which energy is injected.
+        - `injection_scale`: The intensity `γ` of the injection term.
+        - `derivative_operator`: A complex array of shape `(d, ..., N//2+1)`
+            that represents the derivative operator in Fourier space.
+        - `dealiasing_fraction`: The fraction of the highest resolved modes
+            that are not aliased. Defaults to `2/3` which corresponds to
+            Orszag's 2/3 rule.
         """
         super().__init__(
             num_spatial_dims,

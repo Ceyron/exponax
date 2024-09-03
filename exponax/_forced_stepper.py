@@ -33,7 +33,8 @@ class ForcedStepper(eqx.Module):
         transient integrators to forced problems.
 
         **Arguments**:
-            - `stepper`: The stepper to be transformed.
+
+        - `stepper`: The stepper to be transformed.
         """
         self.stepper = stepper
 
@@ -49,11 +50,13 @@ class ForcedStepper(eqx.Module):
         The forcing term `f` is assumed to be evaluated on the same grid as `u`.
 
         **Arguments**:
-            - `u`: The current state.
-            - `f`: The forcing term.
+
+        - `u`: The current state.
+        - `f`: The forcing term.
 
         **Returns**:
-            - `u_next`: The state after one time step.
+
+        - `u_next`: The state after one time step.
         """
         u_with_force = u + self.stepper.dt * f
         return self.stepper.step(u_with_force)
@@ -71,11 +74,13 @@ class ForcedStepper(eqx.Module):
         `u_hat`.
 
         **Arguments**:
-            - `u_hat`: The current state in Fourier space.
-            - `f_hat`: The forcing term in Fourier space.
+
+        - `u_hat`: The current state in Fourier space.
+        - `f_hat`: The forcing term in Fourier space.
 
         **Returns**:
-            - `u_next_hat`: The state after one time step in Fourier space.
+
+        - `u_next_hat`: The state after one time step in Fourier space.
         """
         u_hat_with_force = u_hat + self.stepper.dt * f_hat
         return self.stepper.step_fourier(u_hat_with_force)
@@ -91,12 +96,13 @@ class ForcedStepper(eqx.Module):
 
         The forcing term `f` is assumed to be evaluated on the same grid as `u`.
 
-        **Arguments**:
-            - `u`: The current state.
-            - `f`: The forcing term.
+        **Arguments:**
 
-        **Returns**:
-            - `u_next`: The state after one time step.
+        - `u`: The current state.
+        - `f`: The forcing term.
+
+        **Returns:**
+
+        - `u_next`: The state after one time step.
         """
-
         return self.step(u, f)

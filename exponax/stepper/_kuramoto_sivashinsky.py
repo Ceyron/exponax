@@ -31,7 +31,7 @@ class KuramotoSivashinsky(BaseStepper):
         equation on periodic boundary conditions. Uses the **combustion format**
         (or non-conservative format). Most deep learning papers in 1d considered
         the conservative format available as
-        [`KuramotoSivashinskyConservative`](exponax/stepper/KuramotoSivashinskyConservative).
+        [`exponax.stepper.KuramotoSivashinskyConservative`][].
 
         In 1d, the KS equation is given by
 

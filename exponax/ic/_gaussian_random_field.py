@@ -31,19 +31,20 @@ class GaussianRandomField(BaseRandomICGenerator):
     ):
         """
         Random generator for initial states following a power-law spectrum in
-        Fourier space.
+        Fourier space, i.e., it decays polynomially with the wavenumber.
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions.
-            - `domain_extent`: The extent of the domain in each spatial direction.
-            - `powerlaw_exponent`: The exponent of the power-law spectrum.
-            - `zero_mean`: Whether the field should have zero mean.
-            - `std_one`: Whether to normalize the state to have a standard
-                deviation of one. Defaults to `False`. Only works if the offset
-                is zero.
-            - `max_one`: Whether to normalize the state to have the maximum
-                absolute value of one. Defaults to `False`. Only one of
-                `std_one` and `max_one` can be `True`.
+
+        - `num_spatial_dims`: The number of spatial dimensions.
+        - `domain_extent`: The extent of the domain in each spatial direction.
+        - `powerlaw_exponent`: The exponent of the power-law spectrum.
+        - `zero_mean`: Whether the field should have zero mean.
+        - `std_one`: Whether to normalize the state to have a standard
+            deviation of one. Defaults to `False`. Only works if the offset is
+            zero.
+        - `max_one`: Whether to normalize the state to have the maximum
+            absolute value of one. Defaults to `False`. Only one of `std_one`
+            and `max_one` can be `True`.
         """
         if not zero_mean and std_one:
             raise ValueError("Cannot have `zero_mean=False` and `std_one=True`.")
