@@ -108,6 +108,13 @@ class RepeatedStepper(eqx.Module):
         **Returns:**
 
         - `u_next`: The state after `self.num_sub_steps` time steps.
+
+        !!! tip
+            Use this call method together with `exponax.rollout` to efficiently
+            produce temporal trajectories.
+
+        !!! info
+            For batched operation, use `jax.vmap` on this function.
         """
         expected_shape = (self.num_channels,) + spatial_shape(
             self.num_spatial_dims, self.num_points
