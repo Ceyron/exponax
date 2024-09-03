@@ -26,6 +26,10 @@ class RepeatedStepper(eqx.Module):
         Sugarcoat the utility function `repeat` in a callable PyTree for easy
         composition with other equinox modules.
 
+        !!! info
+            Performs the substepping in Fourier space to avoid unnecessary
+            back-and-forth transformations.
+
         One intended usage is to get "more accurate" or "more stable" time steppers
         that perform substeps.
 
