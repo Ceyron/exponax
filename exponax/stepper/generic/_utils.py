@@ -127,7 +127,7 @@ def normalize_gradient_norm_scale(
     *,
     domain_extent: float,
     dt: float,
-):
+) -> float:
     """
     Normalize the scale in front of the gradient norm term to be used with the
     normalized generic steppers.
@@ -157,7 +157,7 @@ def denormalize_gradient_norm_scale(
     *,
     domain_extent: float,
     dt: float,
-):
+) -> float:
     """
     Denormalize the scale in front of the gradient norm term as it was used in
     the normalized generic steppers to then be used again in a generic stepper
@@ -184,11 +184,11 @@ def denormalize_gradient_norm_scale(
 
 
 def normalize_polynomial_scales(
-    polynomial_scales: tuple[float],
+    polynomial_scales: tuple[float, ...],
     *,
     domain_extent: float = None,
     dt: float,
-) -> tuple[float]:
+) -> tuple[float, ...]:
     """
     Normalize the polynomial scales to be used with the normalized polynomial
     stepper.
@@ -243,7 +243,7 @@ def reduce_normalized_coefficients_to_difficulty(
     *,
     num_spatial_dims: int,
     num_points: int,
-):
+) -> tuple[float, ...]:
     """
     Reduce the normalized coefficients for a linear operator to a difficulty
     based interface. This interface is designed to "reduce the intensity of the
@@ -284,7 +284,7 @@ def extract_normalized_coefficients_from_difficulty(
     *,
     num_spatial_dims: int,
     num_points: int,
-):
+) -> tuple[float, ...]:
     """
     Extract the normalized coefficients for a linear operator from a difficulty
     based interface.
@@ -322,7 +322,7 @@ def reduce_normalized_convection_scale_to_difficulty(
     num_spatial_dims: int,
     num_points: int,
     maximum_absolute: float,
-):
+) -> float:
     """
     Reduce the normalized convection scale to a difficulty based interface.
 
@@ -354,7 +354,7 @@ def extract_normalized_convection_scale_from_difficulty(
     num_spatial_dims: int,
     num_points: int,
     maximum_absolute: float,
-):
+) -> float:
     """
     Extract the normalized convection scale from a difficulty based interface.
 
@@ -386,7 +386,7 @@ def reduce_normalized_gradient_norm_scale_to_difficulty(
     num_spatial_dims: int,
     num_points: int,
     maximum_absolute: float,
-):
+) -> float:
     """
     Reduce the normalized gradient norm scale to a difficulty based interface.
 
@@ -421,7 +421,7 @@ def extract_normalized_gradient_norm_scale_from_difficulty(
     num_spatial_dims: int,
     num_points: int,
     maximum_absolute: float,
-):
+) -> float:
     """
     Extract the normalized gradient norm scale from a difficulty based interface.
 
@@ -448,12 +448,12 @@ def extract_normalized_gradient_norm_scale_from_difficulty(
 
 
 def reduce_normalized_nonlinear_scales_to_difficulty(
-    normalized_nonlinear_scales: tuple[float],
+    normalized_nonlinear_scales: tuple[float, float, float],
     *,
     num_spatial_dims: int,
     num_points: int,
     maximum_absolute: float,
-):
+) -> tuple[float, float, float]:
     """
     Reduce the normalized nonlinear scales associated with a quadratic, a
     (single-channel) convection term, and a gradient norm term to a difficulty
@@ -501,12 +501,12 @@ def reduce_normalized_nonlinear_scales_to_difficulty(
 
 
 def extract_normalized_nonlinear_scales_from_difficulty(
-    nonlinear_difficulties: tuple[float],
+    nonlinear_difficulties: tuple[float, float, float],
     *,
     num_spatial_dims: int,
     num_points: int,
     maximum_absolute: float,
-):
+) -> tuple[float, float, float]:
     """
     Extract the normalized nonlinear scales associated with a quadratic, a
     (single-channel) convection term, and a gradient norm term from a difficulty
