@@ -1,10 +1,13 @@
 from itertools import product
 from typing import Optional, TypeVar, Union
 
+import jax
 import jax.numpy as jnp
 from jaxtyping import Array, Bool, Complex, Float
 
+C = TypeVar("C")
 D = TypeVar("D")
+N = TypeVar("N")
 
 
 def build_wavenumbers(
@@ -652,3 +655,45 @@ def make_incompressible(
     )
 
     return incompressible_field
+
+
+def get_power_spectrum(
+    field: Float[Array, "C ... N"],
+) -> Float[Array, "C (N//2)+1"]:
+    """
+    Preliminary function -> might not be working correctly ... :/
+
+    Inspired by:
+    https://github.com/scaomath/torch-cfd/blob/8c64319272f7660a57c491d823384130823900fe/sfno/visualizations.py#L114
+
+    """
+    num_spatial_dims = field.ndim - 1
+    num_points = field.shape[-1]
+
+    field_hat = fft(field, num_spatial_dims=num_spatial_dims)
+
+    wavenumbers_mesh = build_wavenumbers(num_spatial_dims, num_points)
+    wavenumbers_1d = build_wavenumbers(1, num_points)
+    wavenumbers_norm = jnp.linalg.norm(wavenumbers_mesh, axis=0, keepdims=True)
+
+    dk = wavenumbers_1d[0, 1] - wavenumbers_1d[0, 0]
+
+    power = jnp.abs(field_hat) ** 2 * 1 / 2
+
+    spectrum = []
+
+    def power_in_bucket(p, k):
+        lower_limit = k - dk / 2
+        upper_limit = k + dk / 2
+        mask = (wavenumbers_norm[0] >= lower_limit) & (
+            wavenumbers_norm[0] < upper_limit
+        )
+        return jnp.sum(p[mask])
+
+    for k in wavenumbers_1d[0, :]:
+        spectrum.append(jax.vmap(power_in_bucket, in_axes=(0, None))(power, k))
+
+    spectrum = jnp.stack(spectrum, axis=-1)
+    spectrum /= jnp.sum(spectrum, axis=-1, keepdims=True)
+
+    return spectrum
