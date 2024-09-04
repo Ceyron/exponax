@@ -1,3 +1,4 @@
+from itertools import product
 from typing import Optional, TypeVar, Union
 
 import jax.numpy as jnp
@@ -363,6 +364,94 @@ def build_scaling_array(
     )
 
     return scaling
+
+
+def build_reconstructional_scaling_array(
+    num_spatial_dims: int,
+    num_points: int,
+    *,
+    indexing: str = "ij",
+) -> Float[Array, "1 ... (N//2)+1"]:
+    """
+    Similar to `build_scaling_array`, but corresponds to the scaling observed
+    when reconstructing a signal from its Fourier transform.
+    """
+    right_most_wavenumbers = jnp.fft.rfftfreq(num_points, 1 / num_points)
+    other_wavenumbers = jnp.fft.fftfreq(num_points, 1 / num_points)
+
+    right_most_scaling = jnp.where(
+        right_most_wavenumbers == 0,
+        num_points,
+        num_points / 2,
+    )
+    other_scaling = jnp.where(
+        other_wavenumbers == 0,
+        num_points,
+        num_points,  # This is the only difference to `build_scaling_array`
+    )
+
+    # If N is even, special treatment for the Nyquist mode
+    if num_points % 2 == 0:
+        # rfft has the Nyquist mode as positive wavenumber
+        right_most_scaling = jnp.where(
+            right_most_wavenumbers == num_points // 2,
+            num_points,
+            right_most_scaling,
+        )
+        # standard fft has the Nyquist mode as negative wavenumber
+        other_scaling = jnp.where(
+            other_wavenumbers == -num_points // 2,
+            num_points,
+            other_scaling,
+        )
+
+    scaling_list = [
+        other_scaling,
+    ] * (num_spatial_dims - 1) + [
+        right_most_scaling,
+    ]
+
+    scaling = jnp.prod(
+        jnp.stack(
+            jnp.meshgrid(*scaling_list, indexing=indexing),
+        ),
+        axis=0,
+        keepdims=True,
+    )
+
+    return scaling
+
+
+def get_modes_slices(
+    num_spatial_dims: int, num_points: int
+) -> tuple[tuple[slice, ...], ...]:
+    """
+    Produces a list of list of slices corresponding to all positive and negative
+    wavenumber blocks found in the representation of a state in Fourier space.
+    """
+    is_even = num_points % 2 == 0
+    nyquist_mode = num_points // 2
+    if is_even:
+        left_slice = slice(None, nyquist_mode)
+        right_slice = slice(-nyquist_mode, None)
+    else:
+        left_slice = slice(None, nyquist_mode + 1)
+        right_slice = slice(-nyquist_mode, None)
+
+    # Starts with the right-most slice which is associated with the axis over
+    # which we apply the rfft
+    slices_ = [[slice(None, nyquist_mode + 1)]]
+    # All other axes have both positive and negative wavenumbers
+    slices_ += [[left_slice, right_slice] for _ in range(num_spatial_dims - 1)]
+    all_modes_slices = [
+        [
+            slice(None),
+        ]
+        + list(reversed(p))
+        for p in product(*slices_)
+    ]
+    all_modes_slices = tuple([tuple(block_slices) for block_slices in all_modes_slices])
+    return all_modes_slices
 
 
 def fft(

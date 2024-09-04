@@ -162,6 +162,7 @@ nav:
         - Grid Generation: 'api/utilities/grid_generation.md'
         - Derivatives: 'api/utilities/derivatives.md'
         - Spectral: 'api/utilities/spectral.md'
+        - Interpolation: 'api/utilities/interpolation.md'
         - Normalized & Difficulty: 'api/utilities/normalized_and_difficulty.md'
         - Metrics:
             - MSE-based: 'api/utilities/metrics/mse_based.md'
