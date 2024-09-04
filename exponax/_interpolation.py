@@ -8,12 +8,18 @@ import jax
 import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
 
-from ._spectral import build_scaled_wavenumbers, build_scaling_array, fft, space_indices
+from ._spectral import (
+    build_reconstructional_scaling_array,
+    build_scaled_wavenumbers,
+    fft,
+    space_indices,
+)
 
 C = TypeVar("C")  # Channel axis
 D = TypeVar(
     "D"
 )  # Dimension axis - must have as many dimensions as the array has subsequent spatial axes
+N = TypeVar("N")  # Spatial axis
 
 
 class FourierInterpolator(eqx.Module):
@@ -36,9 +42,9 @@ class FourierInterpolator(eqx.Module):
         self.domain_extent = domain_extent
         self.num_points = state.shape[-1]
 
-        self.state_hat_scaled = fft(
-            state, num_spatial_dims=self.num_spatial_dims
-        ) / build_scaling_array(self.num_spatial_dims, self.num_points)
+        self.state_hat_scaled = fft(state, num_spatial_dims=self.num_spatial_dims) / (
+            build_reconstructional_scaling_array(self.num_spatial_dims, self.num_points)
+        )
         self.wavenumbers = build_scaled_wavenumbers(
             self.num_spatial_dims, self.domain_extent, self.num_points
         )
@@ -54,21 +60,18 @@ class FourierInterpolator(eqx.Module):
         x_bloated: Float[Array, "D ... 1"] = jnp.expand_dims(
             x, axis=space_indices(self.num_spatial_dims)
         )
-        # Adds singleton axis for channels
-        x_bloated: Float[Array, "1 D ... 1"] = x_bloated[None]
 
-        # Add singleton axis at position where `x_bloated` has its spatial axis
-        # D
-        state_hat_scaled_bloated: Complex[
-            Array, "C 1 ... (N//2)+1"
-        ] = self.state_hat_scaled[:, None]
+        # The exponential term sums over the wavenumber dimension axis (`"D"`)
+        exp_term: Complex[Array, "... (N//2)+1"] = jnp.exp(
+            jnp.sum(1j * self.wavenumbers * x_bloated, axis=0)
+        )
 
-        # Add singleton axis for channels
-        wavenumbers_bloated: Float[Array, "1 D ... (N//2)+1"] = self.wavenumbers[None]
+        # Re-add a singleton channel axis to have broadcasting work correctly
+        exp_term: Complex[Array, "1 ... (N//2)+1"] = exp_term[None, :]
 
-        interpolation_operation: Complex[
-            Array, "C D ... (N//2)+1"
-        ] = state_hat_scaled_bloated * jnp.exp(1j * wavenumbers_bloated * x_bloated)
+        interpolation_operation: Complex[Array, "C ... (N//2)+1"] = (
+            self.state_hat_scaled * exp_term
+        )
 
         interpolated_value: Float[Array, "C"] = jnp.real(
             jax.vmap(jnp.sum)(interpolation_operation)
