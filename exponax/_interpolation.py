@@ -195,7 +195,41 @@ def map_between_resolutions(
     *,
     oddball_zero: bool = True,
 ):
-    """ """
+    """
+    Upsamples or downsamples a state in `Exponax` convention to a new resolution
+    via manipulation of its Fourier representation.
+
+    This approach is way more efficient that `exponax.FourierInterpolator` but
+    can only move the state between uniform Cartesian grids of different
+    resolutions.
+
+    !!! info
+        If the new resolution is higher than the old resolution, the state is
+        upsampled. If the new resolution is lower than the old resolution, the
+        state is downsampled. If the given state is bandlimited, i.e., the
+        highest wavenumber containing non-zero energy is at max `(N//2)`, then
+        upsampling will be exact (no interpolation error). Also, in case of
+        downsampling: if the given state was bandlimited, and the it would be
+        still be bandlimited in the new resolution, this downsampling will also
+        be exact, i.e., no coarsening artifacts. If this is not the case, one
+        loses high-frequency (fine scale) information.
+
+    **Arguments:**
+
+    - `state`: The state to interpolate. Must conform to the `Exponax`
+        standard with a leading channel axis (can be a singleton axis if there
+        is only one channel), and one, two, or three subsequent spatial axes
+        (depending on the number of spatial dimensions). These latter spatial
+        axes must have the same number of dimensions.
+    - `new_num_points`: The new number of points in each spatial dimension.
+    - `oddball_zero`: Whether to zero out the Nyquist frequency in case of
+        even-sized grids. This is usually preferred.
+
+    **Returns:**
+
+    - `new_state`: The state interpolated to the new resolution. This will have
+        the same number of channels as the input state.
+    """
     num_spatial_dims = state.ndim - 1
     old_num_points = state.shape[-1]
     num_channels = state.shape[0]
