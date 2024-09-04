@@ -73,7 +73,7 @@ class FourierInterpolator(eqx.Module):
         )
 
         # Re-add a singleton channel axis to have broadcasting work correctly
-        exp_term: Complex[Array, "1 ... (N//2)+1"] = exp_term[None, :]
+        exp_term: Complex[Array, "1 ... (N//2)+1"] = exp_term[None, ...]
 
         interpolation_operation: Complex[Array, "C ... (N//2)+1"] = (
             self.state_hat_scaled * exp_term
