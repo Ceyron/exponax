@@ -88,4 +88,5 @@ def test_fourier_interpolator_2d(
     interpolated_u = interpolator(query_location)
     correct_val = fn(query_location)
 
-    assert interpolated_u == pytest.approx(correct_val)
+    # Looser rel and abs tol because JAX runs in single precision by default
+    assert interpolated_u == pytest.approx(correct_val, rel=1e-5, abs=1e-5)
