@@ -194,7 +194,7 @@ def map_between_resolutions(
     new_num_points: int,
     *,
     oddball_zero: bool = True,
-):
+) -> Float[Array, "C ... N_new"]:
     """
     Upsamples or downsamples a state in `Exponax` convention to a new resolution
     via manipulation of its Fourier representation.
