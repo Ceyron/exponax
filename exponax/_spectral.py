@@ -1,3 +1,4 @@
+from itertools import product
 from typing import Optional, TypeVar, Union
 
 import jax.numpy as jnp
@@ -419,6 +420,35 @@ def build_reconstructional_scaling_array(
     )
 
     return scaling
+
+
+def get_modes_slices(num_spatial_dims: int, num_points: int) -> list[list[slice]]:
+    """
+    Produces a list of list of slices corresponding to all positive and negative
+    wavenumber blocks found in the representation of a state in Fourier space.
+    """
+    is_even = num_points % 2 == 0
+    nyquist_mode = num_points // 2
+    if is_even:
+        left_slice = slice(None, nyquist_mode)
+        right_slice = slice(-nyquist_mode, None)
+    else:
+        left_slice = slice(None, nyquist_mode + 1)
+        right_slice = slice(-nyquist_mode, None)
+
+    # Starts with the right-most slice which is associated with the axis over
+    # which we apply the rfft
+    slices_ = [[slice(None, nyquist_mode + 1)]]
+    # All other axes have both positive and negative wavenumbers
+    slices_ += [[left_slice, right_slice] for _ in range(num_spatial_dims - 1)]
+    all_modes_slices = [
+        [
+            slice(None),
+        ]
+        + list(reversed(p))
+        for p in product(*slices_)
+    ]
+    return all_modes_slices
 
 
 def fft(
