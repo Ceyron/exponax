@@ -372,7 +372,8 @@ def build_reconstructional_scaling_array(
     indexing: str = "ij",
 ) -> Float[Array, "1 ... (N//2)+1"]:
     """
-    Similar to `build_scaling_array`, but TODO
+    Similar to `build_scaling_array`, but corresponds to the scaling observed
+    when reconstructing a signal from its Fourier transform.
     """
     right_most_wavenumbers = jnp.fft.rfftfreq(num_points, 1 / num_points)
     other_wavenumbers = jnp.fft.fftfreq(num_points, 1 / num_points)
