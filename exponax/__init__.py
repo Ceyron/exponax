@@ -4,7 +4,7 @@ from . import _spectral as spectral
 from . import etdrk, ic, nonlin_fun, stepper, viz
 from ._base_stepper import BaseStepper
 from ._forced_stepper import ForcedStepper
-from ._interpolation import FourierInterpolator
+from ._interpolation import FourierInterpolator, map_between_resolutions
 from ._repeated_stepper import RepeatedStepper
 from ._spectral import derivative, fft, ifft, make_incompressible
 from ._utils import (
@@ -41,4 +41,5 @@ __all__ = [
     "viz",
     "spectral",
     "FourierInterpolator",
+    "map_between_resolutions",
 ]

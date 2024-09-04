@@ -11,8 +11,13 @@ from jaxtyping import Array, Complex, Float
 from ._spectral import (
     build_reconstructional_scaling_array,
     build_scaled_wavenumbers,
+    build_scaling_array,
     fft,
+    get_modes_slices,
+    ifft,
+    nyquist_filter_mask,
     space_indices,
+    wavenumber_shape,
 )
 
 C = TypeVar("C")  # Channel axis
@@ -182,3 +187,60 @@ class FourierInterpolator(eqx.Module):
         )
 
         return interpolated_value
+
+
+def map_between_resolutions(
+    state: Float[Array, "C ... N"],
+    new_num_points: int,
+    *,
+    oddball_zero: bool = True,
+):
+    """ """
+    num_spatial_dims = state.ndim - 1
+    old_num_points = state.shape[-1]
+    num_channels = state.shape[0]
+
+    if old_num_points == new_num_points:
+        return state
+    if new_num_points > old_num_points:
+        # Upscaling
+        if old_num_points % 2 == 0 and oddball_zero:
+            state *= nyquist_filter_mask(num_spatial_dims, old_num_points)
+
+    old_state_hat_scaled = fft(
+        state, num_spatial_dims=num_spatial_dims
+    ) / build_scaling_array(
+        num_spatial_dims,
+        old_num_points,
+    )
+    new_state_hat_scaled = jnp.zeros(
+        (num_channels,) + wavenumber_shape(num_spatial_dims, new_num_points),
+        dtype=old_state_hat_scaled.dtype,
+    )
+
+    modes_slices: list[list[slice]] = get_modes_slices(
+        num_spatial_dims,
+        min(old_num_points, new_num_points),
+    )
+
+    for block_slice in modes_slices:
+        new_state_hat_scaled = new_state_hat_scaled.at[block_slice].set(
+            old_state_hat_scaled[block_slice]
+        )
+
+    new_state_hat = new_state_hat_scaled * build_scaling_array(
+        num_spatial_dims,
+        new_num_points,
+    )
+    if old_num_points > new_num_points:
+        # Downscaling
+        if new_num_points % 2 == 0 and oddball_zero:
+            new_state_hat *= nyquist_filter_mask(num_spatial_dims, new_num_points)
+
+    new_state = ifft(
+        new_state_hat,
+        num_spatial_dims=num_spatial_dims,
+        num_points=new_num_points,
+    )
+
+    return new_state
