@@ -34,6 +34,7 @@ class FourierInterpolator(eqx.Module):
         state: Float[Array, "C ... N"],
         *,
         domain_extent: float = 1.0,
+        indexing: str = "ij",
     ):
         """
         Assumes that the indexing convention is "ij"
@@ -43,10 +44,15 @@ class FourierInterpolator(eqx.Module):
         self.num_points = state.shape[-1]
 
         self.state_hat_scaled = fft(state, num_spatial_dims=self.num_spatial_dims) / (
-            build_reconstructional_scaling_array(self.num_spatial_dims, self.num_points)
+            build_reconstructional_scaling_array(
+                self.num_spatial_dims, self.num_points, indexing=indexing
+            )
         )
         self.wavenumbers = build_scaled_wavenumbers(
-            self.num_spatial_dims, self.domain_extent, self.num_points
+            self.num_spatial_dims,
+            self.domain_extent,
+            self.num_points,
+            indexing=indexing,
         )
 
     def __call__(
