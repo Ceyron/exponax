@@ -688,12 +688,12 @@ def get_power_spectrum(
         mask = (wavenumbers_norm[0] >= lower_limit) & (
             wavenumbers_norm[0] < upper_limit
         )
-        return jnp.sum(p[mask])
+        return jnp.mean(p[mask])
 
     for k in wavenumbers_1d[0, :]:
         spectrum.append(jax.vmap(power_in_bucket, in_axes=(0, None))(power, k))
 
     spectrum = jnp.stack(spectrum, axis=-1)
-    spectrum /= jnp.sum(spectrum, axis=-1, keepdims=True)
+    # spectrum /= jnp.sum(spectrum, axis=-1, keepdims=True)
 
     return spectrum
