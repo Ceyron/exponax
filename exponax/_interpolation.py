@@ -1,7 +1,7 @@
 """
 Utilities to map Exponax states to different grids.
 """
-from typing import TypeVar
+from typing import Literal, TypeVar
 
 import equinox as eqx
 import jax
@@ -34,10 +34,45 @@ class FourierInterpolator(eqx.Module):
         state: Float[Array, "C ... N"],
         *,
         domain_extent: float = 1.0,
-        indexing: str = "ij",
+        indexing: Literal["ij", "xy"] = "ij",
     ):
         """
-        Assumes that the indexing convention is "ij"
+        Builds an interpolation function for an `Exponax` state using its
+        Fourier representation.
+
+        After instantiation, the interpolant can be called with a query
+        coordinate `x ∈ ℝᴰ` (e.g., `x = jnp.array([0.3, 0.5])` in 2D) to obtain
+        the corresponding value. If the query coordinate is not within the
+        domain, i.e., `x ∉ Ω = [0, L]ᴰ`, the returned result is found in its
+        periodic extension.
+
+        !!! info
+            If the state is band-limited, i.e., the highest wavenumber
+            containing non-zero energy is at max `(N//2)`, then the
+            interpolation will be exact (no interpolation error).
+
+        !!! warning
+            This interpolation uses global basis functions. Hence its memory and
+            computation for evaluating one query location scales with `O(N^D)`.
+            Consequently, if multiple query locations are to be evaluated in
+            parallel (via `jax.vmap`), the memory and computation scales with
+            `O(N^D * M)` where `M` is the number of query locations. This can
+            easily exceed available resources. In such cases, either consider
+            evaluating the query locations in smaller batches or resort to local
+            basis interpolants like linear or cubic splines (see
+            `scipy.interpolate` or its JAX anologons).
+
+        **Arguments:**
+
+        - `state`: The state to interpolate. Must conform to the `Exponax`
+            standard with a leading channel axis (can be a singleton axis if
+            there is only one channel), and one, two, or three subsequent
+            spatial axes (depending on the number of spatial dimensions). These
+            latter spatial axes must have the same number of dimensions.
+        - `domain_extent`: The size of the domain `L`; in higher dimensions the
+            domain is assumed to be a scaled hypercube `Ω = (0, L)ᴰ`.
+        - `indexing`: The indexing convention of the spatial axes. The default
+            `"ij"` follows the `Exponax` convention.
         """
         self.num_spatial_dims = state.ndim - 1
         self.domain_extent = domain_extent
@@ -60,7 +95,70 @@ class FourierInterpolator(eqx.Module):
         x: Float[Array, "D"],
     ) -> Float[Array, "C"]:
         """
-        use `jax.vmap(..., axis=(-1))` on this for batched operation
+        Evaluate the interpolant at the query location `x`.
+
+        **Arguments:**
+
+        - `x`: The query location. Must be a vector of length `D` where `D` is
+            the number of spatial dimensions. This must match the number of
+            spatial dimensions of the state used to build the interpolant.
+
+        **Returns:**
+
+        - `interpolated_value`: The interpolated value at the query location
+            `x`. This will have as many channels as the state used to build the
+            interpolant.
+
+
+        !!! tip
+            To evaluate the interpolant at multiple query locations in parallel,
+            use `jax.vmap`. For example, in 1d:
+
+            ```python
+
+            print(state.shape)  # (C, N)
+
+            interpolator = FourierInterpolator(state, domain_extent=1.0)
+
+            print(query_locations.shape)  # (1, M)
+
+            interpolated_values = jax.vmap(
+                interpolator, in_axes=-1, out_axes=-1,
+            )(query_locations)
+
+            print(interpolated_values.shape)  # (C, M)
+
+            ```
+
+            If the query locations have multiple batch axes (e.g., to represent
+            another grid), consider using nested `jax.vmap` calls. For example,
+            in 2D
+
+            ```python
+
+            print(state.shape)  # (C, N, N)
+
+            interpolator = FourierInterpolator(state, domain_extent=1.0)
+
+            print(query_locations.shape)  # (2, M, P)
+
+            interpolated_values = jax.vmap(
+                jax.vmap(interpolator, in_axes=-1, out_axes=-1), in_axes=-2,
+                out_axes=-2,
+            )(query_locations)
+
+            print(interpolated_values.shape)  # (C, M, P)
+
+            ```
+
+        !!! warning
+            This interpolation uses global basis functions. Hence its memory and
+            computation for evaluating one query location scales with `O(N^D)`.
+            Consequently, if multiple query locations are to be evaluated in
+            parallel (via `jax.vmap`), the memory and computation scales with
+            `O(N^D * M)` where `M` is the number of query locations. This can
+            easily exceed available resources. In such cases, consider
+            evaluating the query locations in smaller batches.
         """
         # Adds singleton axes for each spatial dimension
         x_bloated: Float[Array, "D ... 1"] = jnp.expand_dims(
