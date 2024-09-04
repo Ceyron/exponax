@@ -663,6 +663,10 @@ def get_power_spectrum(
     """
     Preliminary function -> might not be working correctly ... :/
 
+    If passed a vorticity field like produced by
+    `exponax.stepper.NavierStokesVorticity`, this will produce the enstrophy
+    spectrum.
+
     Inspired by:
     https://github.com/scaomath/torch-cfd/blob/8c64319272f7660a57c491d823384130823900fe/sfno/visualizations.py#L114
 
