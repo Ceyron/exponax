@@ -202,10 +202,6 @@ def map_between_resolutions(
 
     if old_num_points == new_num_points:
         return state
-    if new_num_points > old_num_points:
-        # Upscaling
-        if old_num_points % 2 == 0 and oddball_zero:
-            state *= nyquist_filter_mask(num_spatial_dims, old_num_points)
 
     old_state_hat_scaled = fft(
         state, num_spatial_dims=num_spatial_dims
@@ -213,6 +209,14 @@ def map_between_resolutions(
         num_spatial_dims,
         old_num_points,
     )
+
+    if new_num_points > old_num_points:
+        # Upscaling
+        if old_num_points % 2 == 0 and oddball_zero:
+            old_state_hat_scaled *= nyquist_filter_mask(
+                num_spatial_dims, old_num_points
+            )
+
     new_state_hat_scaled = jnp.zeros(
         (num_channels,) + wavenumber_shape(num_spatial_dims, new_num_points),
         dtype=old_state_hat_scaled.dtype,
