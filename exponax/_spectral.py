@@ -422,7 +422,9 @@ def build_reconstructional_scaling_array(
     return scaling
 
 
-def get_modes_slices(num_spatial_dims: int, num_points: int) -> list[list[slice]]:
+def get_modes_slices(
+    num_spatial_dims: int, num_points: int
+) -> tuple[tuple[slice, ...], ...]:
     """
     Produces a list of list of slices corresponding to all positive and negative
     wavenumber blocks found in the representation of a state in Fourier space.
@@ -448,6 +450,7 @@ def get_modes_slices(num_spatial_dims: int, num_points: int) -> list[list[slice]
         + list(reversed(p))
         for p in product(*slices_)
     ]
+    all_modes_slices = tuple([tuple(block_slices) for block_slices in all_modes_slices])
     return all_modes_slices
 
 
