@@ -868,10 +868,6 @@ def get_spectrum(
         The returned array will always have two axes, no matter how many spatial
         axes the input has.
 
-    !!! info
-        If it is applied to a vorticity field with `power=True` (default), it
-        produces the enstrophy spectrum.
-
     **Arguments:**
 
     - `state`: The state to compute the spectrum of. The state must follow the
@@ -883,6 +879,17 @@ def get_spectrum(
     **Returns:**
 
     - `spectrum`: The spectrum of the state, shape `(C, (N//2)+1)`.
+
+    !!! tip
+        The spectrum is usually best presented with a logarithmic y-axis, either
+        as `plt.semiology` or `plt.loglog`. Sometimes it can be helpful to set
+        the spectrum below a threshold to zero to better visualize the relevant
+        parts of the spectrum. This can be done with `jnp.maximum(spectrum,
+        1e-10)` for example.
+
+    !!! info
+        If it is applied to a vorticity field with `power=True` (default), it
+        produces the enstrophy spectrum.
 
     !!! note
         The binning in higher dimensions can sometimes be counterintuitive. For
