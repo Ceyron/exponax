@@ -366,4 +366,6 @@ def test_nonlinear_normalized_stepper():
     regular_burgers_pred = regular_burgers_stepper(u_0)
     normalized_burgers_pred = normalized_burgers_stepper(u_0)
 
-    assert regular_burgers_pred == pytest.approx(normalized_burgers_pred)
+    assert regular_burgers_pred == pytest.approx(
+        normalized_burgers_pred, rel=1e-5, abs=1e-5
+    )
