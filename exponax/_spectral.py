@@ -402,11 +402,7 @@ def _build_scaling_array(
     indexing: str = "ij",
 ):
     """
-    Shared routine between `build_scaling_array` and
-    `build_reconstructional_scaling_array`.
-
-    The `others_fraction` argument is used to determine the scaling of the
-    wavenumbers in the spatial dimensions that are **not** the right-most one.
+    Low-Level routine to build scaling arrays, prefer using `build_scaling_array`.
     """
     right_most_wavenumbers = jnp.fft.rfftfreq(num_points, 1 / num_points)
     other_wavenumbers = jnp.fft.fftfreq(num_points, 1 / num_points)
