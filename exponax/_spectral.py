@@ -397,7 +397,8 @@ def _build_scaling_array(
     num_spatial_dims: int,
     num_points: int,
     *,
-    others_fraction: Literal[2, 1],
+    right_most_scaling_denominator: Literal[2, 1],
+    others_scaling_denominator: Literal[2, 1],
     indexing: str = "ij",
 ):
     """
@@ -413,12 +414,12 @@ def _build_scaling_array(
     right_most_scaling = jnp.where(
         right_most_wavenumbers == 0,
         num_points,
-        num_points / 2,
+        num_points / right_most_scaling_denominator,
     )
     other_scaling = jnp.where(
         other_wavenumbers == 0,
         num_points,
-        num_points / others_fraction,  # Only difference
+        num_points / others_scaling_denominator,  # Only difference
     )
 
     # If N is even, special treatment for the Nyquist mode
@@ -457,21 +458,37 @@ def build_scaling_array(
     num_spatial_dims: int,
     num_points: int,
     *,
+    mode: Literal["norm_compensation", "reconstruction", "coef_extraction"],
     indexing: str = "ij",
 ) -> Float[Array, "1 ... (N//2)+1"]:
     """
-    Creates an array of the values that would be seen in the result of a
-    (real-valued) Fourier transform of signal which has amplitude 1 in all
-    resolvable wavenumbers.
+    When `exponax.fft` is used, the resulting array in Fourier space represents
+    a scaled version of the Fourier coefficients. Use this function to produce
+    arrays to counteract this scaling based on the task.
 
-    This can be used to counteract the scaling that is applied by the FFT
-    assuming one uses the default `norm="backward"`, which is also the default
-    done by the `Exponax` wrapped routines `exponax.fft` and `exponax.ifft`.
+    1. `"norm_compensation"`: The scaling is exactly the scaling the
+       `exponax.ifft` applies.
+    2. `"reconstruction"`: Technically `"norm_compensation"` should provide an
+        array of coefficients that can be used to build a Fourier interpolant
+        (i.e., what `exponax.FourierInterpolator` does). However, since
+        `exponax.fft` uses the real-valued FFT, there is only half of the
+        contribution for the coefficients along the right-most axis. This mode
+        provides the scaling to counteract this.
+    3. `"coef_extraction"`: Any of the former modes (in higher dimensions) does
+        not produce the same coefficients as the amplitude in the physical space
+        (because there is a coefficient contribution both in the positive and
+        negative wavenumber). For example, if the signal `3 * cos(2x)` was
+        discretized on the domain `[0, 2pi]` with 10 points, the amplitude of
+        the Fourier coefficient at the 2nd wavenumber would be `3/2` if rescaled
+        with mode `"norm_compensation"`. This mode provides the scaling to
+        extract the correct coefficients.
 
     **Arguments:**
 
     - `num_spatial_dims`: The number of spatial dimensions.
     - `num_points`: The number of points in each spatial dimension.
+    - `mode`: The mode of the scaling array. Either `"norm_compensation"`,
+        `"reconstruction"`, or `"coef_extraction"`.
     - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
         Either `"ij"` or `"xy"`. Default is `"ij"`.
 
@@ -479,40 +496,32 @@ def build_scaling_array(
 
     - `scaling`: The scaling array.
     """
-    return _build_scaling_array(
-        num_spatial_dims, num_points, others_fraction=2, indexing=indexing
-    )
-
-
-def build_reconstructional_scaling_array(
-    num_spatial_dims: int,
-    num_points: int,
-    *,
-    indexing: str = "ij",
-) -> Float[Array, "1 ... (N//2)+1"]:
-    """
-    Similar to `build_scaling_array`, but corresponds to the scaling observed
-    when reconstructing a signal from its Fourier transform.
-
-    This is different because it accounts for the fact `Exponax` uses the `rfft`
-    which only contributes half the coefficient magnitude for the axis which is
-    (approximately) halved in the Fourier space. A difference to `build_scaling_array`
-    can only be observed if `num_spatial_dims >= 2`.
-
-    **Arguments:**
-
-    - `num_spatial_dims`: The number of spatial dimensions.
-    - `num_points`: The number of points in each spatial dimension.
-    - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
-        Either `"ij"` or `"xy"`. Default is `"ij"`.
-
-    **Returns:**
-
-    - `scaling`: The reconstructional scaling array.
-    """
-    return _build_scaling_array(
-        num_spatial_dims, num_points, others_fraction=1, indexing=indexing
-    )
+    if mode == "norm_compensation":
+        return _build_scaling_array(
+            num_spatial_dims,
+            num_points,
+            right_most_scaling_denominator=1,
+            others_scaling_denominator=1,
+            indexing=indexing,
+        )
+    elif mode == "reconstruction":
+        return _build_scaling_array(
+            num_spatial_dims,
+            num_points,
+            right_most_scaling_denominator=2,
+            others_scaling_denominator=1,
+            indexing=indexing,
+        )
+    elif mode == "coef_extraction":
+        return _build_scaling_array(
+            num_spatial_dims,
+            num_points,
+            right_most_scaling_denominator=2,
+            others_scaling_denominator=2,
+            indexing=indexing,
+        )
+    else:
+        raise ValueError("Invalid mode.")
 
 
 def get_modes_slices(
@@ -867,7 +876,9 @@ def get_fourier_coefficients(
     - `coefficients`: The Fourier coefficients, shape `(C, ..., N//2+1)`.
     """
     state_hat = fft(state)
-    return state_hat / build_scaling_array(state.ndim - 1, state.shape[-1])
+    return state_hat / build_scaling_array(
+        state.ndim - 1, state.shape[-1], mode="coef_extraction"
+    )
 
 
 def get_power_spectrum(

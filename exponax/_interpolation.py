@@ -9,7 +9,6 @@ import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
 
 from ._spectral import (
-    build_reconstructional_scaling_array,
     build_scaled_wavenumbers,
     build_scaling_array,
     fft,
@@ -84,8 +83,11 @@ class FourierInterpolator(eqx.Module):
         self.num_points = state.shape[-1]
 
         self.state_hat_scaled = fft(state, num_spatial_dims=self.num_spatial_dims) / (
-            build_reconstructional_scaling_array(
-                self.num_spatial_dims, self.num_points, indexing=indexing
+            build_scaling_array(
+                self.num_spatial_dims,
+                self.num_points,
+                mode="reconstruction",
+                indexing=indexing,
             )
         )
         self.wavenumbers = build_scaled_wavenumbers(
@@ -242,6 +244,7 @@ def map_between_resolutions(
     ) / build_scaling_array(
         num_spatial_dims,
         old_num_points,
+        mode="norm_compensation",
     )
 
     if new_num_points > old_num_points:
@@ -269,6 +272,7 @@ def map_between_resolutions(
     new_state_hat = new_state_hat_scaled * build_scaling_array(
         num_spatial_dims,
         new_num_points,
+        mode="norm_compensation",
     )
     if old_num_points > new_num_points:
         # Downscaling
