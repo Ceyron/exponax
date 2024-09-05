@@ -466,8 +466,8 @@ def build_scaling_array(
        `exponax.ifft` applies.
     2. `"reconstruction"`: Technically `"norm_compensation"` should provide an
         array of coefficients that can be used to build a Fourier interpolant
-        (i.e., what `exponax.FourierInterpolator` does). However, since
-        `exponax.fft` uses the real-valued FFT, there is only half of the
+        (i.e., what [`exponax.FourierInterpolator`][] does). However, since
+        [`exponax.fft`][] uses the real-valued FFT, there is only half of the
         contribution for the coefficients along the right-most axis. This mode
         provides the scaling to counteract this.
     3. `"coef_extraction"`: Any of the former modes (in higher dimensions) does
