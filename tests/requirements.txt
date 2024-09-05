@@ -1,3 +1,2 @@
 jaxlib
 pytest
-vape4d
