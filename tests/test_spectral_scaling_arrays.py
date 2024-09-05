@@ -37,3 +37,54 @@ def test_building_scaling_array_for_norm_compensation(
 
 
 # Mode "reconstruction" is already tested as part of the `test_interpolation.py``
+
+
+def test_building_scaling_array_for_coef_extraction():
+    # 1D
+    grid_1d = ex.make_grid(1, 2 * jnp.pi, 10)
+
+    u = 3 * jnp.cos(2 * grid_1d)
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        1,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 2] == pytest.approx(3.0 + 0.0j)
+
+    u = 3.0 * jnp.ones_like(grid_1d)
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        1,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 0] == pytest.approx(3.0 + 0.0j)
+
+    u = 3.0 * jnp.sin(2 * grid_1d)
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        1,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 2] == pytest.approx(0.0 - 3.0j)
+
+    u = 3.0 * jnp.cos(5 * grid_1d)
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        1,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 5] == pytest.approx(3.0 + 0.0j)
+
+    u = 3.0 * jnp.sin(5 * grid_1d)
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        1,
+        10,
+        mode="coef_extraction",
+    )
+    # Nyquist mode sine cannot be captured
+    assert u_hat_scaled.round(5)[0, 5] == pytest.approx(0.0 + 0.0j)
