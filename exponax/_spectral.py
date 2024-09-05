@@ -263,20 +263,25 @@ def low_pass_filter_mask(
     return mask
 
 
-def nyquist_filter_mask(
+def oddball_filter_mask(
     num_spatial_dims: int,
     num_points: int,
 ) -> Bool[Array, "1 ... N"]:
     """
-    Creates mask that if multiplied with a field in Fourier space will remove
-    the Nyquist mode.
+    Creates mask that if multiplied with a field in Fourier space remove the
+    Nyquist mode if the number of degrees of freedom is even.
 
     **Arguments:**
         - `num_spatial_dims`: The number of spatial dimensions.
         - `num_points`: The number of points in each spatial dimension.
 
     **Returns:**
-        - `mask`: The Nyquist filter mask, shape `(1, ..., N//2+1)`.
+        - `mask`: The oddball filter mask, shape `(1, ..., N//2+1)`.
+
+    !!! info
+        For more background on why this is needed, see
+        https://www.mech.kth.se/~mattias/simson-user-guide-v4.0.pdf section
+        6.2.4 and https://math.mit.edu/~stevenj/fft-deriv.pdf
     """
     if num_points % 2 == 1:
         # Odd number of degrees of freedom (no issue with the Nyquist mode)

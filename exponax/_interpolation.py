@@ -15,7 +15,7 @@ from ._spectral import (
     fft,
     get_modes_slices,
     ifft,
-    nyquist_filter_mask,
+    oddball_filter_mask,
     space_indices,
     wavenumber_shape,
 )
@@ -247,7 +247,7 @@ def map_between_resolutions(
     if new_num_points > old_num_points:
         # Upscaling
         if old_num_points % 2 == 0 and oddball_zero:
-            old_state_hat_scaled *= nyquist_filter_mask(
+            old_state_hat_scaled *= oddball_filter_mask(
                 num_spatial_dims, old_num_points
             )
 
@@ -273,7 +273,7 @@ def map_between_resolutions(
     if old_num_points > new_num_points:
         # Downscaling
         if new_num_points % 2 == 0 and oddball_zero:
-            new_state_hat *= nyquist_filter_mask(num_spatial_dims, new_num_points)
+            new_state_hat *= oddball_filter_mask(num_spatial_dims, new_num_points)
 
     new_state = ifft(
         new_state_hat,
