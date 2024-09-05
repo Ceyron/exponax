@@ -14,8 +14,10 @@ class KortewegDeVries(BaseStepper):
     convection_scale: float
     dispersivity: float
     diffusivity: float
+    hyper_diffusivity: float
     dealiasing_fraction: float
     advect_over_diffuse: bool
+    diffuse_over_diffuse: bool
     single_channel: bool
 
     def __init__(
@@ -26,23 +28,25 @@ class KortewegDeVries(BaseStepper):
         dt: float,
         *,
         convection_scale: float = -6.0,
-        dispersivity: float = 1.0,
-        advect_over_diffuse: bool = False,
-        single_channel: bool = False,
         diffusivity: float = 0.0,
+        dispersivity: float = 1.0,
+        hyper_diffusivity: float = 0.01,
+        advect_over_diffuse: bool = False,
+        diffuse_over_diffuse: bool = False,
+        single_channel: bool = False,
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
         """
-        Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) Korteweg-de Vries
-        equation on periodic boundary conditions.
+        Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) (hyper-viscous)
+        Korteweg-de Vries equation on periodic boundary conditions.
 
         In 1d, the Korteweg-de Vries equation is given by
 
         ```
-            uₜ + b₁ 1/2 (u²)ₓ + a₃ uₓₓₓ = ν uₓₓ
+            uₜ + b₁ 1/2 (u²)ₓ + a₃ uₓₓₓ = ν uₓₓ - μ uₓₓₓₓ
         ```
 
         with `b₁` the convection coefficient, `a₃` the dispersion coefficient
@@ -52,23 +56,24 @@ class KortewegDeVries(BaseStepper):
         dimensions, the equation reads (using vector format for the channels)
 
         ```
-            uₜ + b₁ 1/2 ∇ ⋅ (u ⊗ u) + a₃ 1 ⋅ (∇⊙∇⊙(∇u)) = ν Δu
+            uₜ + b₁ 1/2 ∇ ⋅ (u ⊗ u) + a₃ 1 ⋅ (∇⊙∇⊙(∇u)) = ν Δu - μ ((∇⊙∇) ⋅ (∇⊙∇)) u
         ```
 
         or
 
         ```
-            uₜ + b₁ 1/2 ∇ ⋅ (u ⊗ u) + a₃ ∇ ⋅ ∇(Δu) = ν Δu
+            uₜ + b₁ 1/2 ∇ ⋅ (u ⊗ u) + a₃ ∇ ⋅ ∇(Δu) = ν Δu - μ Δ(Δu)
         ```
 
-        if `advect_over_diffuse` is `True`.
+        if `advect_over_diffuse` is `True` and `diffuse_on_diffuse` is `True`,
 
         In 1d, the expected temporal behavior is that the initial condition
         breaks into soliton waves that propagate at a speed depending on their
         height. They interact with other soliton waves by being spatially
-        displaced but having an unchanged shape and propagation speed. If the
-        diffusivity is non-zero, the solution decays to a constant state.
-        Otherwise, the soliton interaction continues indefinitely.
+        displaced but having an unchanged shape and propagation speed. If either
+        the `diffusivity` or the `hyper_diffusivity` is non-zero (by default,
+        the latter is active), the solution will decay over time with the
+        produced small-scall features decaying the fastest.
 
         **Arguments:**
 
@@ -86,13 +91,19 @@ class KortewegDeVries(BaseStepper):
             evaluation. The value of `b₁` scales it further. Oftentimes `b₁ =
             -6` to match the analytical soliton solutions. See also
             https://en.wikipedia.org/wiki/Korteweg%E2%80%93De_Vries_equation#One-soliton_solution
+        - `diffusivity`: The rate at which the solution decays.
         - `dispersivity`: The dispersion coefficient `a₃`. Dispersion refers
             to wavenumber-dependent advection, i.e., higher wavenumbers are
             advected faster. Default `1.0`,
+        - `hyper_diffusivity`: The hyper-diffusivity (associated with a
+            fourth-order term). This stepper only supports scalar (=isotropic)
+            hyper-diffusivity. Default: 0.01.
         - `advect_over_diffuse`: If `True`, the dispersion is computed as
             advection over diffusion. This adds spatial mixing. Default is
             `False`.
-        - `diffusivity`: The rate at which the solution decays.
+        - `diffuse_on_diffuse`: If `True`, the hyper-diffusion is computed as
+            the diffusion of the diffusion. This adds spatial mixing. Default is
+            `False`.
         - `single_channel`: Whether to use the single channel mode in higher
             dimensions. In this case the the convection is `b₁ (∇ ⋅ 1)(u²)`. In
             this case, the state always has a single channel, no matter the
@@ -128,9 +139,11 @@ class KortewegDeVries(BaseStepper):
             are sufficient.
         """
         self.convection_scale = convection_scale
-        self.dispersivity = dispersivity
-        self.advect_over_diffuse = advect_over_diffuse
         self.diffusivity = diffusivity
+        self.dispersivity = dispersivity
+        self.hyper_diffusivity = hyper_diffusivity
+        self.advect_over_diffuse = advect_over_diffuse
+        self.diffuse_over_diffuse = diffuse_over_diffuse
         self.single_channel = single_channel
         self.dealiasing_fraction = dealiasing_fraction
 
@@ -157,6 +170,9 @@ class KortewegDeVries(BaseStepper):
     ) -> Complex[Array, "1 ... (N//2)+1"]:
         dispersion_velocity = self.dispersivity * jnp.ones(self.num_spatial_dims)
         laplace_operator = build_laplace_operator(derivative_operator, order=2)
+
+        diffusion_operator = self.diffusivity * laplace_operator
+
         if self.advect_over_diffuse:
             dispersion_operator = (
                 -build_gradient_inner_product_operator(
@@ -169,7 +185,18 @@ class KortewegDeVries(BaseStepper):
                 derivative_operator, dispersion_velocity, order=3
             )
 
-        linear_operator = dispersion_operator + self.diffusivity * laplace_operator
+        if self.diffuse_over_diffuse:
+            hyper_diffusion_operator = (
+                -self.hyper_diffusivity * laplace_operator * laplace_operator
+            )
+        else:
+            hyper_diffusion_operator = -self.hyper_diffusivity * build_laplace_operator(
+                derivative_operator, order=4
+            )
+
+        linear_operator = (
+            diffusion_operator + dispersion_operator + hyper_diffusion_operator
+        )
         return linear_operator
 
     def _build_nonlinear_fun(
