@@ -855,8 +855,10 @@ def make_incompressible(
     return incompressible_field
 
 
-def get_power_spectrum(
-    field: Float[Array, "C ... N"],
+def get_spectrum(
+    state: Float[Array, "C ... N"],
+    *,
+    power: bool = True,
 ) -> Float[Array, "C (N//2)+1"]:
     """
     Preliminary function -> might not be working correctly ... :/
@@ -869,10 +871,15 @@ def get_power_spectrum(
     https://github.com/scaomath/torch-cfd/blob/8c64319272f7660a57c491d823384130823900fe/sfno/visualizations.py#L114
 
     """
-    num_spatial_dims = field.ndim - 1
-    num_points = field.shape[-1]
+    num_spatial_dims = state.ndim - 1
+    num_points = state.shape[-1]
 
-    field_hat = fft(field, num_spatial_dims=num_spatial_dims)
+    state_hat = fft(state, num_spatial_dims=num_spatial_dims)
+    state_hat_scaled = state_hat / build_scaling_array(
+        num_spatial_dims,
+        num_points,
+        mode="reconstruction",  # because of rfft
+    )
 
     wavenumbers_mesh = build_wavenumbers(num_spatial_dims, num_points)
     wavenumbers_1d = build_wavenumbers(1, num_points)
@@ -880,7 +887,10 @@ def get_power_spectrum(
 
     dk = wavenumbers_1d[0, 1] - wavenumbers_1d[0, 0]
 
-    power = jnp.abs(field_hat) ** 2 * 1 / 2
+    if power:
+        magnitude = 0.5 * jnp.abs(state_hat_scaled) ** 2
+    else:
+        magnitude = jnp.abs(state_hat_scaled)
 
     spectrum = []
 
@@ -893,7 +903,7 @@ def get_power_spectrum(
         return jnp.mean(p[mask])
 
     for k in wavenumbers_1d[0, :]:
-        spectrum.append(jax.vmap(power_in_bucket, in_axes=(0, None))(power, k))
+        spectrum.append(jax.vmap(power_in_bucket, in_axes=(0, None))(magnitude, k))
 
     spectrum = jnp.stack(spectrum, axis=-1)
     # spectrum /= jnp.sum(spectrum, axis=-1, keepdims=True)
