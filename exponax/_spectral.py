@@ -1,5 +1,5 @@
 from itertools import product
-from typing import Optional, TypeVar, Union
+from typing import Literal, Optional, TypeVar, Union
 
 import jax
 import jax.numpy as jnp
@@ -393,31 +393,19 @@ def oddball_filter_mask(
         )
 
 
-def build_scaling_array(
+def _build_scaling_array(
     num_spatial_dims: int,
     num_points: int,
     *,
+    others_fraction: Literal[2, 1],
     indexing: str = "ij",
-) -> Float[Array, "1 ... (N//2)+1"]:
+):
     """
-    Creates an array of the values that would be seen in the result of a
-    (real-valued) Fourier transform of signal which has amplitude 1 in all
-    resolvable wavenumbers.
+    Shared routine between `build_scaling_array` and
+    `build_reconstructional_scaling_array`.
 
-    This can be used to counteract the scaling that is applied by the FFT
-    assuming one uses the default `norm="backward"`, which is also the default
-    done by the `Exponax` wrapped routines `exponax.fft` and `exponax.ifft`.
-
-    **Arguments:**
-
-    - `num_spatial_dims`: The number of spatial dimensions.
-    - `num_points`: The number of points in each spatial dimension.
-    - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
-        Either `"ij"` or `"xy"`. Default is `"ij"`.
-
-    **Returns:**
-
-    - `scaling`: The scaling array.
+    The `others_fraction` argument is used to determine the scaling of the
+    wavenumbers in the spatial dimensions that are **not** the right-most one.
     """
     right_most_wavenumbers = jnp.fft.rfftfreq(num_points, 1 / num_points)
     other_wavenumbers = jnp.fft.fftfreq(num_points, 1 / num_points)
@@ -430,7 +418,7 @@ def build_scaling_array(
     other_scaling = jnp.where(
         other_wavenumbers == 0,
         num_points,
-        num_points / 2,
+        num_points / others_fraction,  # Only difference
     )
 
     # If N is even, special treatment for the Nyquist mode
@@ -463,6 +451,37 @@ def build_scaling_array(
     )
 
     return scaling
+
+
+def build_scaling_array(
+    num_spatial_dims: int,
+    num_points: int,
+    *,
+    indexing: str = "ij",
+) -> Float[Array, "1 ... (N//2)+1"]:
+    """
+    Creates an array of the values that would be seen in the result of a
+    (real-valued) Fourier transform of signal which has amplitude 1 in all
+    resolvable wavenumbers.
+
+    This can be used to counteract the scaling that is applied by the FFT
+    assuming one uses the default `norm="backward"`, which is also the default
+    done by the `Exponax` wrapped routines `exponax.fft` and `exponax.ifft`.
+
+    **Arguments:**
+
+    - `num_spatial_dims`: The number of spatial dimensions.
+    - `num_points`: The number of points in each spatial dimension.
+    - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
+        Either `"ij"` or `"xy"`. Default is `"ij"`.
+
+    **Returns:**
+
+    - `scaling`: The scaling array.
+    """
+    return _build_scaling_array(
+        num_spatial_dims, num_points, others_fraction=2, indexing=indexing
+    )
 
 
 def build_reconstructional_scaling_array(
@@ -491,50 +510,9 @@ def build_reconstructional_scaling_array(
 
     - `scaling`: The reconstructional scaling array.
     """
-    right_most_wavenumbers = jnp.fft.rfftfreq(num_points, 1 / num_points)
-    other_wavenumbers = jnp.fft.fftfreq(num_points, 1 / num_points)
-
-    right_most_scaling = jnp.where(
-        right_most_wavenumbers == 0,
-        num_points,
-        num_points / 2,
+    return _build_scaling_array(
+        num_spatial_dims, num_points, others_fraction=1, indexing=indexing
     )
-    other_scaling = jnp.where(
-        other_wavenumbers == 0,
-        num_points,
-        num_points,  # This is the only difference to `build_scaling_array`
-    )
-
-    # If N is even, special treatment for the Nyquist mode
-    if num_points % 2 == 0:
-        # rfft has the Nyquist mode as positive wavenumber
-        right_most_scaling = jnp.where(
-            right_most_wavenumbers == num_points // 2,
-            num_points,
-            right_most_scaling,
-        )
-        # standard fft has the Nyquist mode as negative wavenumber
-        other_scaling = jnp.where(
-            other_wavenumbers == -num_points // 2,
-            num_points,
-            other_scaling,
-        )
-
-    scaling_list = [
-        other_scaling,
-    ] * (num_spatial_dims - 1) + [
-        right_most_scaling,
-    ]
-
-    scaling = jnp.prod(
-        jnp.stack(
-            jnp.meshgrid(*scaling_list, indexing=indexing),
-        ),
-        axis=0,
-        keepdims=True,
-    )
-
-    return scaling
 
 
 def get_modes_slices(
