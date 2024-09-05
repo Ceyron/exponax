@@ -869,19 +869,28 @@ def get_spectrum(
         axes the input has.
 
     !!! info
-        If it is applied to a vorticity field, it produces the enstrophy spectrum.
+        If it is applied to a vorticity field with `power=True` (default), it
+        produces the enstrophy spectrum.
 
     **Arguments:**
 
-    - `state`: The state to compute the spectrum of. The state must follow the `Exponax`
-        convention with a leading channel axis and then one, two, or three subsequent
-        spatial axes, **each of the same length** N.
-    - `power`: Whether to compute the power spectrum or the amplitude spectrum. Default
-        is `True` meaning the amplitude spectrum.
+    - `state`: The state to compute the spectrum of. The state must follow the
+        `Exponax` convention with a leading channel axis and then one, two, or
+        three subsequent spatial axes, **each of the same length** N.
+    - `power`: Whether to compute the power spectrum or the amplitude spectrum.
+        Default is `True` meaning the amplitude spectrum.
 
     **Returns:**
 
     - `spectrum`: The spectrum of the state, shape `(C, (N//2)+1)`.
+
+    !!! note
+        The binning in higher dimensions can sometimes be counterintuitive. For
+        example, on a 2D grid if mode `[2, 2]` is populated, this is not
+        represented in the 2-bin (i.e., when indexing the returning array of
+        this function at `[2]`), but in the 3-bin because its distance from the
+        center is `sqrt(2**2 + 2**2) = 2.8284...` which is not in the range of
+        the 2-bin `[1.5, 2.5)`.
     """
     num_spatial_dims = state.ndim - 1
     num_points = state.shape[-1]
@@ -912,7 +921,7 @@ def get_spectrum(
         mask = (wavenumbers_norm[0] >= lower_limit) & (
             wavenumbers_norm[0] < upper_limit
         )
-        return jnp.mean(p[mask])
+        return jnp.sum(p[mask])
 
     for k in wavenumbers_1d[0, :]:
         spectrum.append(jax.vmap(power_in_bucket, in_axes=(0, None))(magnitude, k))
