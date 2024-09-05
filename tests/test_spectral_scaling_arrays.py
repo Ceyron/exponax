@@ -88,3 +88,128 @@ def test_building_scaling_array_for_coef_extraction():
     )
     # Nyquist mode sine cannot be captured
     assert u_hat_scaled.round(5)[0, 5] == pytest.approx(0.0 + 0.0j)
+
+    # 2D - single terms
+    grid_2d = ex.make_grid(2, 2 * jnp.pi, 10)
+
+    u = 3.0 * jnp.cos(2 * grid_2d[0:1])
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        2,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 2, 0] == pytest.approx(3.0 + 0.0j)
+
+    u = 3.0 * jnp.cos(2 * grid_2d[1:2])
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        2,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 0, 2] == pytest.approx(3.0 + 0.0j)
+
+    u = 3.0 * jnp.ones_like(grid_2d[0:1])
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        2,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 0, 0] == pytest.approx(3.0 + 0.0j)
+
+    u = 3.0 * jnp.sin(2 * grid_2d[0:1])
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        2,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 2, 0] == pytest.approx(0.0 - 3.0j)
+
+    u = 3.0 * jnp.sin(2 * grid_2d[1:2])
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        2,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 0, 2] == pytest.approx(0.0 - 3.0j)
+
+    u = 3.0 * jnp.cos(5 * grid_2d[0:1])
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        2,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 5, 0] == pytest.approx(3.0 + 0.0j)
+
+    u = 3.0 * jnp.cos(5 * grid_2d[1:2])
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        2,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 0, 5] == pytest.approx(3.0 + 0.0j)
+
+    u = 3.0 * jnp.sin(5 * grid_2d[0:1])
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        2,
+        10,
+        mode="coef_extraction",
+    )
+    # Nyquist mode sine cannot be captured
+    assert u_hat_scaled.round(5)[0, 5, 0] == pytest.approx(0.0 + 0.0j)
+
+    u = 3.0 * jnp.sin(5 * grid_2d[1:2])
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        2,
+        10,
+        mode="coef_extraction",
+    )
+    # Nyquist mode sine cannot be captured
+    assert u_hat_scaled.round(5)[0, 0, 5] == pytest.approx(0.0 + 0.0j)
+
+    # 2D - mixed terms
+    u = 3.0 * jnp.cos(2 * grid_2d[0:1]) * jnp.cos(2 * grid_2d[1:2])
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        2,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 2, 2] == pytest.approx(3.0 + 0.0j)
+
+    u = 3.0 * jnp.sin(2 * grid_2d[0:1]) * jnp.sin(2 * grid_2d[1:2])
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        2,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 2, 2] == pytest.approx(-3.0 + 0.0j)
+
+    u = 3.0 * jnp.cos(2 * grid_2d[0:1]) * jnp.sin(2 * grid_2d[1:2])
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        2,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 2, 2] == pytest.approx(0.0 - 3.0j)
+
+    u = 3.0 * jnp.sin(2 * grid_2d[0:1]) * jnp.cos(2 * grid_2d[1:2])
+    u_hat = ex.fft(u)
+    u_hat_scaled = u_hat / ex.spectral.build_scaling_array(
+        2,
+        10,
+        mode="coef_extraction",
+    )
+    assert u_hat_scaled.round(5)[0, 2, 2] == pytest.approx(0.0 - 3.0j)
+
+    # TODO: 3D
