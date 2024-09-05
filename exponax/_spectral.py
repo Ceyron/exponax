@@ -22,14 +22,16 @@ def build_wavenumbers(
     `jax.numpy.fft.rfftn`.
 
     **Arguments:**
-        - `num_spatial_dims`: The number of spatial dimensions.
-        - `num_points`: The number of points in each spatial dimension.
-        - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
-          Either `"ij"` or `"xy"`. Default is `"ij"`.
+
+    - `num_spatial_dims`: The number of spatial dimensions.
+    - `num_points`: The number of points in each spatial dimension.
+    - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
+        Either `"ij"` or `"xy"`. Default is `"ij"`.
 
     **Returns:**
-        - `wavenumbers`: An array of wavenumber integer coordinates, shape
-            `(D, ..., (N//2)+1)`.
+
+    - `wavenumbers`: An array of wavenumber integer coordinates, shape
+        `(D, ..., (N//2)+1)`.
     """
     right_most_wavenumbers = jnp.fft.rfftfreq(num_points, 1 / num_points)
     other_wavenumbers = jnp.fft.fftfreq(num_points, 1 / num_points)
@@ -55,20 +57,26 @@ def build_scaled_wavenumbers(
     indexing: str = "ij",
 ) -> Float[Array, "D ... (N//2)+1"]:
     """
-    Setup an array containing scaled wavenumbers associated with a
-    "num_spatial_dims"-dimensional rfft (real-valued FFT)
-    `jax.numpy.fft.rfftn`. Scaling is done by `2 * pi / L`.
+    Setup an array containing **scaled** wavenumbers associated with a
+    "num_spatial_dims"-dimensional rfft (real-valued FFT) `jax.numpy.fft.rfftn`.
+    Scaling is done by `2 * pi / L`.
 
     **Arguments:**
-        - `num_spatial_dims`: The number of spatial dimensions.
-        - `domain_extent`: The domain extent.
-        - `num_points`: The number of points in each spatial dimension.
-        - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
-          Either `"ij"` or `"xy"`. Default is `"ij"`.
+
+    - `num_spatial_dims`: The number of spatial dimensions.
+    - `domain_extent`: The domain extent.
+    - `num_points`: The number of points in each spatial dimension.
+    - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
+        Either `"ij"` or `"xy"`. Default is `"ij"`.
 
     **Returns:**
-        - `wavenumbers`: An array of wavenumber integer coordinates, shape
-            `(D, ..., (N//2)+1)`.
+
+    - `wavenumbers`: An array of wavenumber integer coordinates, shape
+        `(D, ..., (N//2)+1)`.
+
+    !!! info
+        These correctly scaled wavenumbers are used to set up derivative
+        operators via `1j * wavenumbers`.
     """
     scale = 2 * jnp.pi / domain_extent
     wavenumbers = build_wavenumbers(num_spatial_dims, num_points, indexing=indexing)
@@ -86,15 +94,21 @@ def build_derivative_operator(
     Setup the derivative operator in Fourier space.
 
     **Arguments:**
-        - `D`: The number of spatial dimensions.
-        - `L`: The domain extent.
-        - `N`: The number of points in each spatial dimension.
-        - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
-          Either `"ij"` or `"xy"`. Default is `"ij"`.
+
+    - `num_spatial_dims`: The number of spatial dimensions `d`.
+    - `domain_extent`: The size of the domain `L`; in higher dimensions
+        the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+    - `num_points`: The number of points `N` used to discretize the
+        domain. This **includes** the left boundary point and **excludes** the
+        right boundary point. In higher dimensions; the number of points in each
+        dimension is the same. Hence, the total number of degrees of freedom is
+        `Nᵈ`.
+    - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
 
     **Returns:**
-        - `derivative_operator`: The derivative operator, shape `(D, ...,
-          N//2+1)`.
+
+    - `derivative_operator`: The derivative operator in Fourier space
+        (complex-valued array)
     """
     return 1j * build_scaled_wavenumbers(
         num_spatial_dims, domain_extent, num_points, indexing=indexing
@@ -107,16 +121,27 @@ def build_laplace_operator(
     order: int = 2,
 ) -> Complex[Array, "1 ... (N//2)+1"]:
     """
-    Given the derivative operator of [`build_derivative_operator`], return the
-    Laplace operator.
+    Given the derivative operator of
+    [`exponax.spectral.build_derivative_operator`], return the Laplace operator.
+
+    In state space:
+
+        Δ = ∇ ⋅ ∇
+
+    And in Fourier space:
+
+        i² k⃗ᵀ k⃗ = - k⃗ᵀ k⃗
 
     **Arguments:**
-        - `derivative_operator`: The derivative operator, shape `(D, ...,
-          N//2+1)`.
-        - `order`: The order of the Laplace operator. Default is `2`.
+
+    - `derivative_operator`: The derivative operator in Fourier space.
+    - `order`: The order of the Laplace operator. Default is `2`. Use a higher
+        even number for "higher-order Laplacians". For example, `order=4` will
+        return the biharmonic operator (without spatial mixing).
 
     **Returns:**
-        - `laplace_operator`: The Laplace operator, shape `(1, ..., N//2+1)`.
+
+    - `laplace_operator`: The Laplace operator in Fourier space.
     """
     if order % 2 != 0:
         raise ValueError("Order must be even.")
@@ -131,18 +156,31 @@ def build_gradient_inner_product_operator(
     order: int = 1,
 ) -> Complex[Array, "1 ... (N//2)+1"]:
     """
-    Given the derivative operator of [`build_derivative_operator`] and a velocity
-    field, return the operator that computes the inner product of the gradient
-    with the velocity.
+    Given the derivative operator of [`build_derivative_operator`] and a
+    velocity vector, return the operator that computes the inner product of the
+    gradient with the velocity.
+
+    In state space this is:
+
+        c⃗ ⋅ ∇
+
+    And in Fourier space:
+
+        c⃗ ⋅ i k⃗
 
     **Arguments:**
-        - `derivative_operator`: The derivative operator, shape `(D, ...,
-            N//2+1)`.
-        - `velocity`: The velocity field, shape `(D,)`.
-        - `order`: The order of the gradient. Default is `1`.
+
+    - `derivative_operator`: The derivative operator in Fourier space.
+    - `velocity`: The velocity vector, must be an array with one axis with as
+        many dimensions as the derivative operator has in its leading axis.
+    - `order`: The order of the gradient. Default is `1` which is the "regular
+        gradient". Use higher orders for higher-order gradients given in terms
+        elementwise products. For example, `order=3` will return `c⃗ ⋅ (∇ ⊙ ∇ ⊙
+        ∇)`
 
     **Returns:**
-        - `operator`: The operator, shape `(1, ..., N//2+1)`.
+
+    - `operator`: The operator in Fourier space.
     """
     if order % 2 != 1:
         raise ValueError("Order must be odd.")
@@ -161,52 +199,47 @@ def build_gradient_inner_product_operator(
     # Need to add singleton channel axis
     operator = operator[None, ...]
 
-    # Old form below
-    # # Need to move the channel/dimension axis last to enable autobroadcast over
-    # # the arbitrary number of spatial axes, Then we can move this singleton axis
-    # # back to the front
-    # operator = jnp.swapaxes(
-    #     jnp.sum(
-    #         velocity
-    #         * jnp.swapaxes(
-    #             derivative_operator**order,
-    #             0,
-    #             -1,
-    #         ),
-    #         axis=-1,
-    #         keepdims=True,
-    #     ),
-    #     0,
-    #     -1,
-    # )
-
     return operator
 
 
 def space_indices(num_spatial_dims: int) -> tuple[int, ...]:
     """
-    Returns the indices within a field array that correspond to the spatial
-    dimensions.
+    Returns the axes indices within a state array that correspond to the spatial
+    axes.
+
+    !!! example
+        For a 2D field array, the spatial indices are `(-2, -1)`.
 
     **Arguments:**
-        - `num_spatial_dims`: The number of spatial dimensions.
+
+    - `num_spatial_dims`: The number of spatial dimensions.
 
     **Returns:**
-        - `indices`: The indices of the spatial dimensions.
+
+    - `indices`: The indices of the spatial axes.
     """
     return tuple(range(-num_spatial_dims, 0))
 
 
 def spatial_shape(num_spatial_dims: int, num_points: int) -> tuple[int, ...]:
     """
-    Returns the shape of a spatial field array.
+    Returns the shape of a spatial field array (without its leading channel
+    axis). This follows the `Exponax` convention that the resolution is
+    indentical in each dimension.
+
+    !!! example
+        For a 2D field array with 64 points in each dimension, the spatial shape
+        is `(64, 64)`. For a 3D field array with 32 points in each dimension,
+        the spatial shape is `(32, 32, 32)`.
 
     **Arguments:**
-        - `num_spatial_dims`: The number of spatial dimensions.
-        - `num_points`: The number of points in each spatial dimension.
+
+    - `num_spatial_dims`: The number of spatial dimensions.
+    - `num_points`: The number of points in each spatial dimension.
 
     **Returns:**
-        - `shape`: The shape of the spatial field array.
+
+    - `shape`: The shape of the spatial field array.
     """
     return (num_points,) * num_spatial_dims
 
@@ -214,14 +247,23 @@ def spatial_shape(num_spatial_dims: int, num_points: int) -> tuple[int, ...]:
 def wavenumber_shape(num_spatial_dims: int, num_points: int) -> tuple[int, ...]:
     """
     Returns the spatial shape of a field in Fourier space (assuming the usage of
-    rfft, `jax.numpy.fft.rfftn`).
+    `exponax.fft` which internall performs a real-valued fft
+    `jax.numpy.fft.rfftn`).
+
+    !!! example
+        For a 2D field array with 64 points in each dimension, the wavenumber shape
+        is `(64, 33)`. For a 3D field array with 32 points in each dimension,
+        the spatial shape is `(32, 32, 17)`. For a 1D field array with 51 points,
+        the wavenumber shape is `(26,)`.
 
     **Arguments:**
-        - `num_spatial_dims`: The number of spatial dimensions.
-        - `num_points`: The number of points in each spatial dimension.
+
+    - `num_spatial_dims`: The number of spatial dimensions.
+    - `num_points`: The number of points in each spatial dimension.
 
     **Returns:**
-        - `shape`: The shape of the spatial field array.
+
+    - `shape`: The shape of the spatial axes of a state array in Fourier space.
     """
     return (num_points,) * (num_spatial_dims - 1) + (num_points // 2 + 1,)
 
@@ -238,16 +280,46 @@ def low_pass_filter_mask(
     Create a low-pass filter mask in Fourier space.
 
     **Arguments:**
-        - `num_spatial_dims`: The number of spatial dimensions.
-        - `num_points`: The number of points in each spatial dimension.
-        - `cutoff`: The cutoff wavenumber. This is inclusive.
-        - `axis_separate`: Whether to apply the cutoff to each axis separately.
-          Default is `True`.
-        - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
-          Either `"ij"` or `"xy"`. Default is `"ij"`.
+
+    - `num_spatial_dims`: The number of spatial dimensions.
+    - `num_points`: The number of points in each spatial dimension.
+    - `cutoff`: The cutoff wavenumber. This is inclusive.
+    - `axis_separate`: Whether to apply the cutoff to each axis separately.
+        If `True` (default) the low-pass chunk is a hypercube in Fourier space.
+        If `False`, the low-pass chunk is a sphere in Fourier space. Only
+        relevant for `num_spatial_dims` >= 2.
+    - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
+        Either `"ij"` or `"xy"`. Default is `"ij"`.
 
     **Returns:**
-        - `mask`: The low-pass filter mask, shape `(1, ..., N//2+1)`.
+
+    - `mask`: The low-pass filter mask.
+
+
+    !!! example
+        In 1D with 10 points, a cutoff of 3 will produce the mask
+
+        ```python
+
+        array([[ True,  True,  True,  True, False, False]])
+
+        ```
+
+        To better understand this, let's produce the corresponding wavenumbers:
+
+        ```python
+
+        wn = exponax.spectral.build_wavenumbers(1, 10)
+
+        print(wn)
+
+        # array([[0,  1,  2,  3,  4,  5]])
+
+        ```
+
+        There are 6 wavenumbers in total (because this equals `(N//2)+1`), the
+        zeroth wavenumber is the mean mode, and then the mask includes the next
+        three wavenumbers because its **`cutoff` is inclusive**.
     """
     wavenumbers = build_wavenumbers(num_spatial_dims, num_points, indexing=indexing)
 
@@ -272,11 +344,29 @@ def oddball_filter_mask(
     Nyquist mode if the number of degrees of freedom is even.
 
     **Arguments:**
-        - `num_spatial_dims`: The number of spatial dimensions.
-        - `num_points`: The number of points in each spatial dimension.
+
+    - `num_spatial_dims`: The number of spatial dimensions.
+    - `num_points`: The number of points in each spatial dimension.
 
     **Returns:**
-        - `mask`: The oddball filter mask, shape `(1, ..., N//2+1)`.
+
+    - `mask`: The oddball filter mask which is `True` for all wavenumbers except
+        the Nyquist mode if the number of degrees of freedom is even.
+
+    !!! example
+        ```python
+
+        mask_even = exponax.spectral.oddball_filter_mask(1, 6)
+
+        # array([[ True,  True,  True, False]])
+
+        mask_odd = exponax.spectral.oddball_filter_mask(1, 7)
+
+        # array([[ True,  True,  True,  True]])
+
+        ```
+
+        For higher-dimensional examples, see `tests/test_filter_masks.py`.
 
     !!! info
         For more background on why this is needed, see
@@ -297,16 +387,10 @@ def oddball_filter_mask(
         return low_pass_filter_mask(
             num_spatial_dims,
             num_points,
+            # The cutoff is **inclusive**
             cutoff=mode_below_nyquist - 1,
             axis_separate=True,
         )
-
-        # # Todo: Do we need the below?
-        # wavenumbers = build_wavenumbers(D, N, scaled=False)
-        # mask = True
-        # for wn_grid in wavenumbers:
-        #     mask = mask & (wn_grid != -mode_below_nyquist)
-        # return mask
 
 
 def build_scaling_array(
@@ -317,16 +401,23 @@ def build_scaling_array(
 ) -> Float[Array, "1 ... (N//2)+1"]:
     """
     Creates an array of the values that would be seen in the result of a
-    (real-valued) Fourier transform of a signal of amplitude 1.
+    (real-valued) Fourier transform of signal which has amplitude 1 in all
+    resolvable wavenumbers.
+
+    This can be used to counteract the scaling that is applied by the FFT
+    assuming one uses the default `norm="backward"`, which is also the default
+    done by the `Exponax` wrapped routines `exponax.fft` and `exponax.ifft`.
 
     **Arguments:**
-        - `num_spatial_dims`: The number of spatial dimensions.
-        - `num_points`: The number of points in each spatial dimension.
-        - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
-          Either `"ij"` or `"xy"`. Default is `"ij"`.
+
+    - `num_spatial_dims`: The number of spatial dimensions.
+    - `num_points`: The number of points in each spatial dimension.
+    - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
+        Either `"ij"` or `"xy"`. Default is `"ij"`.
 
     **Returns:**
-        - `scaling`: The scaling array, shape `(1, ..., N//2+1)`.
+
+    - `scaling`: The scaling array.
     """
     right_most_wavenumbers = jnp.fft.rfftfreq(num_points, 1 / num_points)
     other_wavenumbers = jnp.fft.fftfreq(num_points, 1 / num_points)
@@ -383,6 +474,22 @@ def build_reconstructional_scaling_array(
     """
     Similar to `build_scaling_array`, but corresponds to the scaling observed
     when reconstructing a signal from its Fourier transform.
+
+    This is different because it accounts for the fact `Exponax` uses the `rfft`
+    which only contributes half the coefficient magnitude for the axis which is
+    (approximately) halved in the Fourier space. A difference to `build_scaling_array`
+    can only be observed if `num_spatial_dims >= 2`.
+
+    **Arguments:**
+
+    - `num_spatial_dims`: The number of spatial dimensions.
+    - `num_points`: The number of points in each spatial dimension.
+    - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
+        Either `"ij"` or `"xy"`. Default is `"ij"`.
+
+    **Returns:**
+
+    - `scaling`: The reconstructional scaling array.
     """
     right_most_wavenumbers = jnp.fft.rfftfreq(num_points, 1 / num_points)
     other_wavenumbers = jnp.fft.fftfreq(num_points, 1 / num_points)
