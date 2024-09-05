@@ -855,28 +855,6 @@ def make_incompressible(
     return incompressible_field
 
 
-def get_fourier_coefficients(
-    state: Float[Array, "C ... N"],
-) -> Complex[Array, "C ... (N//2)+1"]:
-    """
-    EXPERIMENTAL
-
-    Get the Fourier coefficients of a state in Fourier space.
-
-    **Arguments:**
-
-    - `state`: The state, shape `(C, ..., N,)`.
-
-    **Returns:**
-
-    - `coefficients`: The Fourier coefficients, shape `(C, ..., N//2+1)`.
-    """
-    state_hat = fft(state)
-    return state_hat / build_scaling_array(
-        state.ndim - 1, state.shape[-1], mode="coef_extraction"
-    )
-
-
 def get_power_spectrum(
     field: Float[Array, "C ... N"],
 ) -> Float[Array, "C (N//2)+1"]:
