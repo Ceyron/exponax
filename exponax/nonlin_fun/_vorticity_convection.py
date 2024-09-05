@@ -171,7 +171,7 @@ class VorticityConvection2dKolmogorov(VorticityConvection2d):
             # `injection_mode`, because we apply the forcing on the vorticity.
             -injection_mode
             * injection_scale
-            * build_scaling_array(num_spatial_dims, num_points),
+            * build_scaling_array(num_spatial_dims, num_points, mode="coef_extraction"),
             0.0,
         )
 

@@ -132,7 +132,9 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
         )
 
         fourier_noise = fourier_noise * build_scaling_array(
-            self.num_spatial_dims, num_points
+            self.num_spatial_dims,
+            num_points,
+            mode="coef_extraction",
         )
 
         u = ifft(

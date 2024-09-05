@@ -5,3 +5,11 @@
 ---
 
 ::: exponax.ifft
+
+---
+
+::: exponax.get_spectrum
+
+---
+
+::: exponax.spectral.build_scaling_array

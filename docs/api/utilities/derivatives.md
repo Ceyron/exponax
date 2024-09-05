@@ -4,4 +4,4 @@
 
 ---
 
-::: exponax.make_incompressible
+::: exponax.spectral.make_incompressible

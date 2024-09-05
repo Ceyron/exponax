@@ -6,7 +6,7 @@ from ._base_stepper import BaseStepper
 from ._forced_stepper import ForcedStepper
 from ._interpolation import FourierInterpolator, map_between_resolutions
 from ._repeated_stepper import RepeatedStepper
-from ._spectral import derivative, fft, ifft, make_incompressible
+from ._spectral import derivative, fft, get_spectrum, ifft
 from ._utils import (
     build_ic_set,
     make_grid,
@@ -26,7 +26,7 @@ __all__ = [
     "derivative",
     "fft",
     "ifft",
-    "make_incompressible",
+    "get_spectrum",
     "make_grid",
     "rollout",
     "repeat",
