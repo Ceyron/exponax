@@ -158,21 +158,18 @@ class KortewegDeVries(BaseStepper):
         dispersion_velocity = self.dispersivity * jnp.ones(self.num_spatial_dims)
         laplace_operator = build_laplace_operator(derivative_operator, order=2)
         if self.advect_over_diffuse:
-            linear_operator = (
+            dispersion_operator = (
                 -build_gradient_inner_product_operator(
                     derivative_operator, self.advect_over_diffuse_dispersivity, order=1
                 )
                 * laplace_operator
-                + self.diffusivity * laplace_operator
             )
         else:
-            linear_operator = (
-                -build_gradient_inner_product_operator(
-                    derivative_operator, dispersion_velocity, order=3
-                )
-                + self.diffusivity * laplace_operator
+            dispersion_operator = -build_gradient_inner_product_operator(
+                derivative_operator, dispersion_velocity, order=3
             )
 
+        linear_operator = dispersion_operator + self.diffusivity * laplace_operator
         return linear_operator
 
     def _build_nonlinear_fun(
