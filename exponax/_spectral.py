@@ -861,15 +861,27 @@ def get_spectrum(
     power: bool = True,
 ) -> Float[Array, "C (N//2)+1"]:
     """
-    Preliminary function -> might not be working correctly ... :/
+    Compute the Fourier spectrum of a state, either the power spectrum or the
+    amplitude spectrum.
 
-    If passed a vorticity field like produced by
-    `exponax.stepper.NavierStokesVorticity`, this will produce the enstrophy
-    spectrum.
+    !!! info
+        The returned array will always have two axes, no matter how many spatial
+        axes the input has.
 
-    Inspired by:
-    https://github.com/scaomath/torch-cfd/blob/8c64319272f7660a57c491d823384130823900fe/sfno/visualizations.py#L114
+    !!! info
+        If it is applied to a vorticity field, it produces the enstrophy spectrum.
 
+    **Arguments:**
+
+    - `state`: The state to compute the spectrum of. The state must follow the `Exponax`
+        convention with a leading channel axis and then one, two, or three subsequent
+        spatial axes, **each of the same length** N.
+    - `power`: Whether to compute the power spectrum or the amplitude spectrum. Default
+        is `True` meaning the amplitude spectrum.
+
+    **Returns:**
+
+    - `spectrum`: The spectrum of the state, shape `(C, (N//2)+1)`.
     """
     num_spatial_dims = state.ndim - 1
     num_points = state.shape[-1]
