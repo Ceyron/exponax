@@ -519,8 +519,60 @@ def get_modes_slices(
     num_spatial_dims: int, num_points: int
 ) -> tuple[tuple[slice, ...], ...]:
     """
-    Produces a list of list of slices corresponding to all positive and negative
-    wavenumber blocks found in the representation of a state in Fourier space.
+    Produces a tuple of tuple of slices corresponding to all positive and
+    negative wavenumber blocks found in the representation of a state in Fourier
+    space.
+
+    **Arguments:**
+
+    - `num_spatial_dims`: The number of spatial dimensions.
+    - `num_points`: The number of points in each spatial dimension.
+
+    **Returns:**
+
+    - `all_modes_slices`: The tuple of tuple of slices. The outer tuple has
+        `2^(D-1)` entries if `D` is the number of spatial dimensions. Each inner
+        tuple has `D+1` entries.
+
+    !!! example
+        In 1D, there is only one block of coefficients in Fourier space; those
+        associated with the positive wavenumbers. The additional `slice(None)`
+        in the beginning is for the channel axis.
+
+        ```python
+
+        slices = exponax.spectral.get_modes_slices(1, 10)
+
+        print(slices)
+
+        # (
+
+        #     (slice(None), slice(None, 6)),
+
+        # )
+
+        ```
+
+        In 2D, there are two blocks of coefficients; one for the positive
+        wavenumbers and one for the negative wavenumbers along the first axis
+        (which cannot be halved because the `rfft` already acts on the last, the
+        second spatial axis).
+
+        ```python
+
+        slices = exponax.spectral.get_modes_slices(2, 10)
+
+        print(slices)
+
+        # (
+
+        #     (slice(None), slice(None, 5), slice(None, 6)),
+
+        #     (slice(None), slice(-5, None), slice(None, 6)),
+
+        # )
+
+        ```
     """
     is_even = num_points % 2 == 0
     nyquist_mode = num_points // 2
@@ -555,27 +607,36 @@ def fft(
     """
     Perform a **real-valued** FFT of a field. This function is designed for
     states in `Exponax` with a leading channel axis and then one, two, or three
-    following spatial axes, **each of the same length** N.
+    subsequent spatial axes, **each of the same length** N.
 
     Only accepts real-valued input fields and performs a real-valued FFT. Hence,
     the last axis of the returned field is of length N//2+1.
 
+    !!! warning
+        The argument `num_spatial_dims` can only be correctly inferred if the
+        array follows the Exponax convention, e.g., no leading batch axis. For a
+        batched operation, use `jax.vmap` on this function.
+
     **Arguments:**
-        - `field`: The field to transform, shape `(C, ..., N,)`.
-        - `num_spatial_dims`: The number of spatial dimensions, i.e., how many
-            spatial axes follow the channel axis. Can be inferred from the array
-            if it follows the Exponax convention. For example, it is not allowed
-            to have a leading batch axis, in such a case use `jax.vmap` on this
-            function.
+
+    - `field`: The state to transform.
+    - `num_spatial_dims`: The number of spatial dimensions, i.e., how many
+        spatial axes follow the channel axis. Can be inferred from the array if
+        it follows the Exponax convention. For example, it is not allowed to
+        have a leading batch axis, in such a case use `jax.vmap` on this
+        function.
 
     **Returns:**
-        - `field_hat`: The transformed field, shape `(C, ..., N//2+1)`.
+
+    - `field_hat`: The transformed field, shape `(C, ..., N//2+1)`.
 
     !!! info
         Internally uses `jax.numpy.fft.rfftn` with the default settings for the
         `norm` argument with `norm="backward"`. This means that the forward FFT
         (this function) does not apply any normalization to the result, only the
-        [`exponax.ifft`][] function applies normalization.
+        [`exponax.ifft`][] function applies normalization. To extract the
+        amplitude of the coefficients divide by
+        `expoanx.spectral.build_scaling_array`.
     """
     if num_spatial_dims is None:
         num_spatial_dims = field.ndim - 1
@@ -591,30 +652,38 @@ def ifft(
 ) -> Float[Array, "C ... N"]:
     """
     Perform the inverse **real-valued** FFT of a field. This is the inverse
-    operation of `fft`. This function is designed for states in `Exponax` with a
-    leading channel axis and then one, two, or three following spatial axes. In
-    state space all spatial axes have the same length N (here called
-    `num_points`).
+    operation of `exponax.fft`. This function is designed for states in
+    `Exponax` with a leading channel axis and then one, two, or three following
+    spatial axes. In state space all spatial axes have the same length N (here
+    called `num_points`).
 
     Requires a complex-valued field in Fourier space with the last axis of
     length N//2+1.
 
-    The number of points (N, or `num_points`) must be provided if the number of
-    spatial dimensions is 1. Otherwise, it can be inferred from the shape of the
-    field.
+    !!! info
+        The number of points (N, or `num_points`) must be provided if the number
+        of spatial dimensions is 1. Otherwise, it can be inferred from the shape
+        of the field.
+
+    !!! warning
+        The argument `num_spatial_dims` can only be correctly inferred if the
+        array follows the Exponax convention, e.g., no leading batch axis. For a
+        batched operation, use `jax.vmap` on this function.
 
     **Arguments:**
-        - `field_hat`: The transformed field, shape `(C, ..., N//2+1)`.
-        - `num_spatial_dims`: The number of spatial dimensions, i.e., how many
-            spatial axes follow the channel axis. Can be inferred from the array
-            if it follows the Exponax convention. For example, it is not allowed
-            to have a leading batch axis, in such a case use `jax.vmap` on this
-            function.
-        - `num_points`: The number of points in each spatial dimension. Can be
-          inferred if `num_spatial_dims` >= 2
+
+    - `field_hat`: The transformed field, shape `(C, ..., N//2+1)`.
+    - `num_spatial_dims`: The number of spatial dimensions, i.e., how many
+        spatial axes follow the channel axis. Can be inferred from the array if
+        it follows the Exponax convention. For example, it is not allowed to
+        have a leading batch axis, in such a case use `jax.vmap` on this
+        function.
+    - `num_points`: The number of points in each spatial dimension. Can be
+        inferred if `num_spatial_dims` >= 2
 
     **Returns:**
-        - `field`: The transformed field, shape `(C, ..., N,)`.
+
+    - `field`: The state in physical space, shape `(C, ..., N,)`.
 
     !!! info
         Internally uses `jax.numpy.fft.irfftn` with the default settings for the
@@ -660,24 +729,32 @@ def derivative(
     the number of degrees of freedom N is even. For this, consider also using
     the order option.
 
+    !!! warning
+        The argument `num_spatial_dims` can only be correctly inferred if the
+        array follows the Exponax convention, e.g., no leading batch axis. For a
+        batched operation, use `jax.vmap` on this function.
+
     **Arguments:**
-        - `field`: The field to differentiate, shape `(C, ..., N,)`. `C` can be
-            `1` for a scalar field or `D` for a vector field.
-        - `L`: The domain extent.
-        - `order`: The order of the derivative. Default is `1`.
-        - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
-          Either `"ij"` or `"xy"`. Default is `"ij"`.
+
+    - `field`: The field to differentiate, shape `(C, ..., N,)`. `C` can be
+        `1` for a scalar field or `D` for a vector field.
+    - `domain_extent`: The size of the domain `L`; in higher dimensions
+        the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+    - `order`: The order of the derivative. Default is `1`.
+    - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
+        Either `"ij"` or `"xy"`. Default is `"ij"`.
 
     **Returns:**
-        - `field_der`: The derivative of the field, shape `(C, D, ...,
-          (N//2)+1)` or `(D, ..., (N//2)+1)`.
+
+    - `field_der`: The derivative of the field, shape `(C, D, ...,
+        (N//2)+1)` or `(D, ..., (N//2)+1)`.
     """
     channel_shape = field.shape[0]
     spatial_shape = field.shape[1:]
-    D = len(spatial_shape)
-    N = spatial_shape[0]
+    num_spatial_dims = len(spatial_shape)
+    num_points = spatial_shape[0]
     derivative_operator = build_derivative_operator(
-        D, domain_extent, N, indexing=indexing
+        num_spatial_dims, domain_extent, num_points, indexing=indexing
     )
     # # I decided to not use this fix
 
@@ -687,7 +764,7 @@ def derivative(
     # )
     derivative_operator_fixed = derivative_operator**order
 
-    field_hat = fft(field, num_spatial_dims=D)
+    field_hat = fft(field, num_spatial_dims=num_spatial_dims)
     if channel_shape == 1:
         # Do not introduce another channel axis
         field_der_hat = derivative_operator_fixed * field_hat
@@ -695,7 +772,9 @@ def derivative(
         # Create a "derivative axis" right after the channel axis
         field_der_hat = field_hat[:, None] * derivative_operator_fixed[None, ...]
 
-    field_der = ifft(field_der_hat, num_spatial_dims=D, num_points=N)
+    field_der = ifft(
+        field_der_hat, num_spatial_dims=num_spatial_dims, num_points=num_points
+    )
 
     return field_der
 
@@ -705,6 +784,30 @@ def make_incompressible(
     *,
     indexing: str = "ij",
 ):
+    """
+    Makes a velocity field incompressible by solving the associated pressure
+    Poisson equation and subtract the pressure gradient.
+
+    With the divergence of the velocity field as the right-hand side, solve the
+    Poisson equation for pressure `p`
+
+        Δp = - ∇ ⋅ v⃗
+
+    and then correct the velocity field to be incompressible
+
+        v⃗ ← v⃗ - ∇p
+
+    **Arguments:**
+
+    - `field`: The velocity field to make incompressible, shape `(D, ..., N,)`.
+        Must have as many channel dimensions as spatial axes.
+    - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
+
+    **Returns:**
+
+    - `incompressible_field`: The incompressible velocity field, shape `(D, ...,
+        N,)`.
+    """
     channel_shape = field.shape[0]
     spatial_shape = field.shape[1:]
     num_spatial_dims = len(spatial_shape)
