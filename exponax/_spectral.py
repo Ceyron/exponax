@@ -256,7 +256,7 @@ def low_pass_filter_mask(
         for wn_grid in wavenumbers:
             mask = mask & (jnp.abs(wn_grid) <= cutoff)
     else:
-        mask = jnp.linalg.norm(mask, axis=0) <= cutoff
+        mask = jnp.linalg.norm(wavenumbers, axis=0) <= cutoff
 
     mask = mask[jnp.newaxis, ...]
 
