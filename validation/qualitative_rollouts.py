@@ -1,7 +1,3 @@
-"""
-Work in Progress.
-"""
-
 import os
 import sys
 from pathlib import Path
@@ -15,6 +11,8 @@ sys.path.append(".")
 import exponax as ex  # noqa: E402
 
 ic_key = jax.random.PRNGKey(0)
+
+HAS_VAPE = True  # Set to False if you are on a non-GPU machine to not produce the 3D animations
 
 CONFIGURATIONS_1D = [
     # Linear
@@ -345,6 +343,182 @@ CONFIGURATIONS_2D = [
     ),
 ]
 
+CONFIGURATIONS_3D = [
+    # Linear
+    (
+        ex.stepper.Advection(3, 3.0, 32, 0.1, velocity=jnp.array([0.3, -0.5, 0.1])),
+        "advection",
+        ex.ic.RandomTruncatedFourierSeries(3, cutoff=5),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.Diffusion(3, 3.0, 32, 0.1, diffusivity=0.01),
+        "diffusion",
+        ex.ic.RandomTruncatedFourierSeries(3, cutoff=5),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.Diffusion(
+            3, 3.0, 32, 0.1, diffusivity=jnp.array([0.01, 0.05, 0.005])
+        ),
+        "diffusion_diagonal",
+        ex.ic.RandomTruncatedFourierSeries(3, cutoff=5),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.Diffusion(
+            3,
+            3.0,
+            32,
+            0.1,
+            diffusivity=jnp.array(
+                [[0.02, 0.01, 0.005], [0.01, 0.05, 0.01], [0.005, 0.01, 0.03]]
+            ),
+        ),
+        "diffusion_anisotropic",
+        ex.ic.RandomTruncatedFourierSeries(3, cutoff=5),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.AdvectionDiffusion(
+            3, 3.0, 32, 0.1, diffusivity=0.01, velocity=jnp.array([0.3, -0.5, 0.1])
+        ),
+        "advection_diffusion",
+        ex.ic.RandomTruncatedFourierSeries(3, cutoff=5),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.Dispersion(3, 3.0, 32, 0.1, dispersivity=0.01),
+        "dispersion",
+        ex.ic.RandomTruncatedFourierSeries(3, cutoff=3),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.Dispersion(
+            3, 3.0, 32, 0.1, dispersivity=0.01, advect_on_diffusion=True
+        ),
+        "dispersion_advect_on_diffuse",
+        ex.ic.RandomTruncatedFourierSeries(3, cutoff=3),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.HyperDiffusion(3, 3.0, 32, 0.1, hyper_diffusivity=0.0001),
+        "hyper_diffusion",
+        ex.ic.RandomTruncatedFourierSeries(3, cutoff=5),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.HyperDiffusion(
+            3, 3.0, 32, 0.1, hyper_diffusivity=0.0001, diffuse_on_diffuse=True
+        ),
+        "hyper_diffusion_diffuse_on_diffuse",
+        ex.ic.RandomTruncatedFourierSeries(3, cutoff=5),
+        0,
+        30,
+        (-1.0, 1.0),
+    ),
+    # Nonlinear
+    (
+        ex.stepper.Burgers(3, 3.0, 48, 0.05, diffusivity=0.02),
+        "burgers",
+        ex.ic.RandomMultiChannelICGenerator(
+            3
+            * [
+                ex.ic.ClampingICGenerator(
+                    ex.ic.RandomTruncatedFourierSeries(3, cutoff=5),
+                    (-1.0, 1.0),
+                ),
+            ]
+        ),
+        0,
+        100,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.Burgers(3, 3.0, 48, 0.05, diffusivity=0.01, single_channel=True),
+        "burgers_single_channel",
+        ex.ic.ClampingICGenerator(
+            ex.ic.RandomTruncatedFourierSeries(3, cutoff=5),
+            (-1.0, 1.0),
+        ),
+        0,
+        100,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.KortewegDeVries(3, 20.0, 48, dt=0.01),
+        "kdv",
+        ex.ic.RandomMultiChannelICGenerator(
+            3
+            * [
+                ex.ic.ClampingICGenerator(
+                    ex.ic.RandomTruncatedFourierSeries(3, cutoff=5),
+                    (-1.0, 1.0),
+                ),
+            ]
+        ),
+        0,
+        100,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.KortewegDeVries(3, 20.0, 48, dt=0.01, single_channel=True),
+        "kdv_single_channel",
+        ex.ic.ClampingICGenerator(
+            ex.ic.RandomTruncatedFourierSeries(3, cutoff=5),
+            (-1.0, 1.0),
+        ),
+        0,
+        100,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.KuramotoSivashinsky(3, 30.0, 48, 0.1),
+        "ks",
+        ex.ic.RandomTruncatedFourierSeries(3, cutoff=3),
+        500,
+        100,
+        (-6.5, 6.5),
+    ),
+    (
+        ex.stepper.reaction.GrayScott(3, 2.0, 48, 1.0),
+        "gray_scott",
+        ex.ic.RandomMultiChannelICGenerator(
+            [
+                ex.ic.RandomGaussianBlobs(3, one_complement=True),
+                ex.ic.RandomGaussianBlobs(3),
+            ]
+        ),
+        0,
+        100,
+        (-1.0, 1.0),
+    ),
+    (
+        ex.stepper.reaction.SwiftHohenberg(3, 20.0 * jnp.pi, 48, 0.1),
+        "swift_hohenberg",
+        ex.ic.RandomTruncatedFourierSeries(3, cutoff=5, max_one=True),
+        0,
+        100,
+        (-1.0, 1.0),
+    ),
+]
+
 dir_path = Path(os.path.dirname(os.path.realpath(__file__)))
 img_folder = dir_path / Path("qualitative_rollouts")
 img_folder.mkdir(exist_ok=True)
@@ -401,3 +575,31 @@ for stepper_2d, name, ic_distribution, warmup_steps, steps, vlim in CONFIGURATIO
     p_meter_2d.update(1)
 
 p_meter_2d.close()
+
+
+p_meter_3d = tqdm(CONFIGURATIONS_3D, desc="", total=len(CONFIGURATIONS_3D))
+# 3d problems (produce animations)
+for stepper_3d, name, ic_distribution, warmup_steps, steps, vlim in CONFIGURATIONS_3D:
+    p_meter_3d.set_description(f"3d {name}")
+
+    ic = ic_distribution(stepper_3d.num_points, key=ic_key)
+    ic = ex.repeat(stepper_3d, warmup_steps)(ic)
+    trj = ex.rollout(stepper_3d, steps, include_init=True)(ic)
+    jnp.save(img_folder / f"{name}_3d.npy", trj)
+
+    if HAS_VAPE:
+        num_channels = stepper_3d.num_channels
+        ani = ex.viz.animate_state_3d_facet(
+            trj,
+            vlim=vlim,
+            titles=[f"{name} channel {i}" for i in range(num_channels)],
+            grid=(1, num_channels),
+            figsize=(5 * num_channels, 5),
+        )
+
+        ani.save(img_folder / f"{name}_3d.mp4")
+        del ani
+
+    p_meter_3d.update(1)
+
+p_meter_3d.close()
