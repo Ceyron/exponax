@@ -362,23 +362,13 @@ for stepper_1d, name, ic_distribution, warmup_steps, steps, vlim in CONFIGURATIO
     jnp.save(img_folder / f"{name}_1d.npy", trj)
 
     num_channels = stepper_1d.num_channels
-    fig, ax_s = plt.subplots(num_channels, 1, figsize=(8, 4 * num_channels))
-    if num_channels == 1:
-        ax_s = [
-            ax_s,
-        ]
-    for i, ax in enumerate(ax_s):
-        ax.imshow(
-            trj[:, i, :].T,
-            aspect="auto",
-            origin="lower",
-            vmin=vlim[0],
-            vmax=vlim[1],
-            cmap="RdBu_r",
-        )
-        ax.set_title(f"{name} channel {i}")
-        ax.set_xlabel("time")
-        ax.set_ylabel("space")
+    fig = ex.viz.plot_spatio_temporal_facet(
+        trj,
+        vlim=vlim,
+        titles=[f"{name} channel {i}" for i in range(num_channels)],
+        grid=(num_channels, 1),
+        figsize=(8, 4 * num_channels),
+    )
 
     fig.savefig(img_folder / f"{name}_1d.png")
     plt.close(fig)
