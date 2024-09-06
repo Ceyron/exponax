@@ -937,3 +937,30 @@ def get_spectrum(
     # spectrum /= jnp.sum(spectrum, axis=-1, keepdims=True)
 
     return spectrum
+
+
+def get_fourier_coefficients(
+    state: Float[Array, "C ... N"],
+    *,
+    scaling_compensation_mode: Optional[
+        Literal["norm_compensation", "reconstruction", "coef_extraction"]
+    ] = "coef_extraction",
+    round: Optional[int] = 3,
+    indexing: str = "ij",
+) -> Complex[Array, "C ... (N//2)+1"]:
+    state_hat = fft(state)
+    if scaling_compensation_mode is not None:
+        scaling = build_scaling_array(
+            state.ndim - 1,
+            state.shape[-1],
+            mode=scaling_compensation_mode,
+            indexing=indexing,
+        )
+        coefficients = state_hat / scaling
+    else:
+        coefficients = state_hat
+
+    if round is not None:
+        coefficients = jnp.round(coefficients, round)
+
+    return coefficients
