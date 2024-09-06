@@ -147,11 +147,5 @@ def test_validation_poisson_3d():
     assert u == pytest.approx(analytical_solution, abs=1e-6)
 
 
-# Nonlinear steppers
-
-# Burgers can be test by comparing it with the solution obtained by Cole-Hopf
-# transformation.
-
-
-# The Korteveg-de Vries equation has an analytical solution, given the initial
-# condition is a soliton.
+# Find more validations that do not fit the format of a unit test in the
+# `validation/` directory. For example, the following validations:
