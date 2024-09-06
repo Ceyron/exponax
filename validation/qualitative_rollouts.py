@@ -9,7 +9,6 @@ from pathlib import Path
 import jax
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 from tqdm import tqdm
 
 sys.path.append(".")
@@ -388,36 +387,13 @@ for stepper_2d, name, ic_distribution, warmup_steps, steps, vlim in CONFIGURATIO
     jnp.save(img_folder / f"{name}_2d.npy", trj)
 
     num_channels = stepper_2d.num_channels
-    fig, ax_s = plt.subplots(1, num_channels, figsize=(5 * num_channels, 5))
-    if num_channels == 1:
-        ax_s = [
-            ax_s,
-        ]
-    im_s = []
-    for i, ax in enumerate(ax_s):
-        im = ax.imshow(
-            trj[0, i, :, :].T,
-            aspect="auto",
-            origin="lower",
-            vmin=vlim[0],
-            vmax=vlim[1],
-            cmap="RdBu_r",
-        )
-        im_s.append(im)
-        ax.set_title(f"{name} channel {i}")
-        ax.set_xlabel("time")
-        ax.set_ylabel("space")
-    fig.suptitle(f"{name} 2d, t_i = 0")
-
-    def animate(i):
-        for j, im in enumerate(im_s):
-            im.set_data(trj[i, j, :, :].T)
-        fig.suptitle(f"{name} 2d, t_i = {i:04d}")
-        return im_s
-
-    plt.close(fig)
-
-    ani = FuncAnimation(fig, animate, frames=trj.shape[0], interval=100, blit=False)
+    ani = ex.viz.animate_state_2d_facet(
+        trj,
+        vlim=vlim,
+        titles=[f"{name} channel {i}" for i in range(num_channels)],
+        grid=(1, num_channels),
+        figsize=(5 * num_channels, 5),
+    )
 
     ani.save(img_folder / f"{name}_2d.mp4")
     del ani
