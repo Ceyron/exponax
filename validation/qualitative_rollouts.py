@@ -62,7 +62,7 @@ CONFIGURATIONS_1D = [
         (-1.0, 1.0),
     ),
     (
-        ex.stepper.GeneralLinearStepper(
+        ex.stepper.generic.GeneralLinearStepper(
             1,
             3.0,
             110,
@@ -76,7 +76,7 @@ CONFIGURATIONS_1D = [
         (-1.0, 1.0),
     ),
     (
-        ex.stepper.GeneralLinearStepper(
+        ex.stepper.generic.GeneralLinearStepper(
             1,
             3.0,
             110,
@@ -124,7 +124,7 @@ CONFIGURATIONS_1D = [
     ),
     # Reaction
     (
-        ex.reaction.FisherKPP(1, 10.0, 256, 0.001, reactivity=10.0),
+        ex.stepper.reaction.FisherKPP(1, 10.0, 256, 0.001, reactivity=10.0),
         "fisher_kpp",
         ex.ic.ClampingICGenerator(
             ex.ic.RandomTruncatedFourierSeries(1, cutoff=5), (0.0, 1.0)
@@ -316,7 +316,7 @@ CONFIGURATIONS_2D = [
     ),
     # Reaction
     (
-        ex.reaction.CahnHilliard(2, 128, 300, 0.001, gamma=1e-3),
+        ex.stepper.reaction.CahnHilliard(2, 128, 300, 0.001, gamma=1e-3),
         "cahn_hilliard",
         ex.ic.RandomTruncatedFourierSeries(2, cutoff=10),
         0,
@@ -324,7 +324,7 @@ CONFIGURATIONS_2D = [
         (-10.0, 10.0),
     ),
     (
-        ex.reaction.GrayScott(2, 2.0, 60, 1.0),
+        ex.stepper.reaction.GrayScott(2, 2.0, 60, 1.0),
         "gray_scott",
         ex.ic.RandomMultiChannelICGenerator(
             [
@@ -337,7 +337,7 @@ CONFIGURATIONS_2D = [
         (-1.0, 1.0),
     ),
     (
-        ex.reaction.SwiftHohenberg(2, 20.0 * jnp.pi, 100, 0.1),
+        ex.stepper.reaction.SwiftHohenberg(2, 20.0 * jnp.pi, 100, 0.1),
         "swift_hohenberg",
         ex.ic.RandomTruncatedFourierSeries(2, cutoff=5, max_one=True),
         0,
