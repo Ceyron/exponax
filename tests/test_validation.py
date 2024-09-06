@@ -38,6 +38,68 @@ def test_advection_1d():
     assert u_1_pred == pytest.approx(u_1, rel=1e-4)
 
 
+def test_advection_2d():
+    num_spatial_dims = 2
+    domain_extent = 10.0
+    num_points = 100
+    dt = 0.1
+    velocity = jnp.array([0.1, 0.2])
+
+    analytical_solution = lambda t, x: jnp.sin(
+        4 * 2 * jnp.pi * (x[0:1] - velocity[0] * t) / domain_extent
+    ) * jnp.sin(6 * 2 * jnp.pi * (x[1:2] - velocity[1] * t) / domain_extent)
+
+    grid = ex.make_grid(num_spatial_dims, domain_extent, num_points)
+    u_0 = analytical_solution(0.0, grid)
+    u_1 = analytical_solution(dt, grid)
+
+    stepper = ex.stepper.Advection(
+        num_spatial_dims,
+        domain_extent,
+        num_points,
+        dt,
+        velocity=velocity,
+    )
+
+    u_1_pred = stepper(u_0)
+
+    # Primarily only check the absolute difference
+    assert u_1_pred == pytest.approx(u_1, rel=1e-3)
+
+
+def test_advection_3d():
+    num_spatial_dims = 3
+    domain_extent = 10.0
+    num_points = 40
+    dt = 0.1
+    velocity = jnp.array([0.1, 0.2, 0.3])
+
+    analytical_solution = (
+        lambda t, x: jnp.sin(
+            4 * 2 * jnp.pi * (x[0:1] - velocity[0] * t) / domain_extent
+        )
+        * jnp.sin(6 * 2 * jnp.pi * (x[1:2] - velocity[1] * t) / domain_extent)
+        * jnp.sin(8 * 2 * jnp.pi * (x[2:3] - velocity[2] * t) / domain_extent)
+    )
+
+    grid = ex.make_grid(num_spatial_dims, domain_extent, num_points)
+    u_0 = analytical_solution(0.0, grid)
+    u_1 = analytical_solution(dt, grid)
+
+    stepper = ex.stepper.Advection(
+        num_spatial_dims,
+        domain_extent,
+        num_points,
+        dt,
+        velocity=velocity,
+    )
+
+    u_1_pred = stepper(u_0)
+
+    # Primarily only check the absolute difference
+    assert u_1_pred == pytest.approx(u_1, rel=1e-3)
+
+
 def test_diffusion_1d():
     num_spatial_dims = 1
     domain_extent = 10.0
