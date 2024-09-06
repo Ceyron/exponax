@@ -304,7 +304,7 @@ CONFIGURATIONS_2D = [
                 2 * jnp.pi,
                 72,
                 1.0 / 50,
-                diffusivity=0.001,
+                diffusivity=0.01,
             ),
             50,
         ),
