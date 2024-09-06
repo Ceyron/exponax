@@ -158,7 +158,7 @@ def test_specific_stepper_to_general_linear_stepper(
                 1, 3.0, 50, 0.1, dispersivity=1.0, convection_scale=-6.0
             ),
             -6.0,
-            [0.0, 0.0, 0.0, -1.0],
+            [0.0, 0.0, 0.0, -1.0, -0.01],
         ),
         (
             ex.stepper.KuramotoSivashinskyConservative(
