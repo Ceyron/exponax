@@ -945,7 +945,7 @@ def get_fourier_coefficients(
     scaling_compensation_mode: Optional[
         Literal["norm_compensation", "reconstruction", "coef_extraction"]
     ] = "coef_extraction",
-    round: Optional[int] = 3,
+    round: Optional[int] = 5,
     indexing: str = "ij",
 ) -> Complex[Array, "C ... (N//2)+1"]:
     """
@@ -973,7 +973,7 @@ def get_fourier_coefficients(
         compensation. See also [`exponax.spectral.build_scaling_array`][] for
         more information.
     - `round`: The number of decimals to round the coefficients to. Default is
-        `3` which compensates for the rounding errors created by the FFT in
+        `5` which compensates for the rounding errors created by the FFT in
         single precision such that all coefficients that should not carry any
         energy also have zero value. Set to `None` to not round.
     - `indexing`: The indexing scheme to use for `jax.numpy.meshgrid`.
