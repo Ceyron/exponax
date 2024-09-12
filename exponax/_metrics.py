@@ -2,7 +2,7 @@ from typing import Optional
 
 import jax
 import jax.numpy as jnp
-from jaxtyping import Array, Float
+from jaxtyping import Array, Complex, Float
 
 from ._spectral import fft, low_pass_filter_mask
 
@@ -451,18 +451,22 @@ def mean_correlation(
 #     return correlation
 
 
-def _fourier_nRMSE(
-    u_pred: Float[Array, "... N"],
-    u_ref: Float[Array, "... N"],
+def _fourier_nRMSE_hat(
+    u_pred_hat: Complex[Array, "... N"],
+    u_ref_hat: Complex[Array, "... N"],
     *,
     low: Optional[int] = None,
     high: Optional[int] = None,
     num_spatial_dims: Optional[int] = None,
+    num_points: Optional[int] = None,
     eps: float = 1e-5,
 ) -> float:
     """
     Low-level function to compute the normalized root mean squared error (nRMSE)
     between two fields in Fourier space.
+
+    Not that the fields must already be in Fourier space (i.e.
+    `exponax.fft(...)`).
 
     If `num_spatial_dims` is not provided, it will be inferred from the shape of
     the input fields. Please adjust this argument if you call this function with
@@ -471,21 +475,33 @@ def _fourier_nRMSE(
 
     **Arguments**:
 
-    - `u_pred` (array): The first field to be used in the error computation.
-    - `u_ref` (array): The second field to be used in the error computation.
+    - `u_pred_hat` (array): The first field to be used in the error computation.
+    - `u_ref_hat` (array): The second field to be used in the error computation.
     - `low` (int, optional): The low-pass filter cutoff. Default is 0.
     - `high` (int, optional): The high-pass filter cutoff. Default is the
         Nyquist frequency.
     - `num_spatial_dims` (int, optional): The number of spatial dimensions in
         the field. If `None`, it will be inferred from the shape of the input
         fields and then is the number of axes present. Default is `None`.
+    - `num_points` (int, optional): The number of points in the spatial domain.
+        If the `num_spacial_dims` is greater equal 2, this can be inferred from
+        the shape of the input fields. Otherwise, it must be provided.
     - `eps` (float, optional): Small value to avoid division by zero and to
         remove numerical rounding artiacts from the FFT. Default is 1e-5.
     """
     if num_spatial_dims is None:
-        num_spatial_dims = len(u_pred.shape)
+        num_spatial_dims = len(u_pred_hat.shape)
     # Assumes we have the same N for all dimensions
-    num_points = u_pred.shape[-1]
+    if num_points is None:
+        if num_spatial_dims >= 2:
+            # Need to index at -2, because the axis at -1 is the one being
+            # approx. halved by the FFT
+            num_points = u_pred_hat.shape[-2]
+        else:
+            raise ValueError(
+                "The number of points in the spatial domain must be provided if the "
+                "number of spatial dimensions is less than 2."
+            )
 
     if low is None:
         low = 0
@@ -505,25 +521,25 @@ def _fourier_nRMSE(
 
     mask = jnp.invert(low_mask) & high_mask
 
-    u_pred_fft = fft(u_pred, num_spatial_dims=num_spatial_dims)
-    u_ref_fft = fft(u_ref, num_spatial_dims=num_spatial_dims)
+    # u_pred_fft = fft(u_pred, num_spatial_dims=num_spatial_dims)
+    # u_ref_fft = fft(u_ref, num_spatial_dims=num_spatial_dims)
 
     # The FFT incurse rounding errors around the machine precision that can be
     # noticeable in the nRMSE. We will zero out the values that are smaller than
     # the epsilon to avoid this.
-    u_pred_fft = jnp.where(
-        jnp.abs(u_pred_fft) < eps,
-        jnp.zeros_like(u_pred_fft),
-        u_pred_fft,
+    u_pred_hat = jnp.where(
+        jnp.abs(u_pred_hat) < eps,
+        jnp.zeros_like(u_pred_hat),
+        u_pred_hat,
     )
-    u_ref_fft = jnp.where(
-        jnp.abs(u_ref_fft) < eps,
-        jnp.zeros_like(u_ref_fft),
-        u_ref_fft,
+    u_ref_hat = jnp.where(
+        jnp.abs(u_ref_hat) < eps,
+        jnp.zeros_like(u_ref_hat),
+        u_ref_hat,
     )
 
-    u_pred_fft_masked = u_pred_fft * mask
-    u_ref_fft_masked = u_ref_fft * mask
+    u_pred_fft_masked = u_pred_hat * mask
+    u_ref_fft_masked = u_ref_hat * mask
 
     diff_fft_masked = u_pred_fft_masked - u_ref_fft_masked
 
@@ -536,6 +552,36 @@ def _fourier_nRMSE(
     ).real
 
     nrmse = diff_norm_unscaled / (ref_norm_unscaled + eps)
+
+    return nrmse
+
+
+def _fourier_nRMSE(
+    u_pred: Float[Array, "... N"],
+    u_ref: Float[Array, "... N"],
+    *,
+    low: Optional[int] = None,
+    high: Optional[int] = None,
+    num_spatial_dims: Optional[int] = None,
+    eps: float = 1e-5,
+) -> float:
+    """ """
+    if num_spatial_dims is None:
+        num_spatial_dims = len(u_pred.shape)
+    num_points = u_pred.shape[-1]
+
+    u_pred_hat = fft(u_pred, num_spatial_dims=num_spatial_dims)
+    u_ref_hat = fft(u_ref, num_spatial_dims=num_spatial_dims)
+
+    nrmse = _fourier_nRMSE_hat(
+        u_pred_hat,
+        u_ref_hat,
+        low=low,
+        high=high,
+        num_spatial_dims=num_spatial_dims,
+        num_points=num_points,
+        eps=eps,
+    )
 
     return nrmse
 
