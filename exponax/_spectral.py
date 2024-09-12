@@ -932,13 +932,24 @@ def get_spectrum(
         mask = (wavenumbers_norm[0] >= lower_limit) & (
             wavenumbers_norm[0] < upper_limit
         )
-        return jnp.sum(p[mask])
+        # return jnp.sum(p[mask])
+        return jnp.where(
+            mask,
+            p,
+            0.0,
+        ).sum()
 
-    for k in wavenumbers_1d[0, :]:
-        spectrum.append(jax.vmap(power_in_bucket, in_axes=(0, None))(magnitude, k))
+    def scan_fn(_, k):
+        return None, jax.vmap(power_in_bucket, in_axes=(0, None))(magnitude, k)
 
-    spectrum = jnp.stack(spectrum, axis=-1)
-    # spectrum /= jnp.sum(spectrum, axis=-1, keepdims=True)
+    _, spectrum = jax.lax.scan(scan_fn, None, wavenumbers_1d[0, :])
+
+    spectrum = jnp.moveaxis(spectrum, 0, -1)
+
+    # for k in wavenumbers_1d[0, :]:
+    #     spectrum.append(jax.vmap(power_in_bucket, in_axes=(0, None))(magnitude, k))
+
+    # spectrum = jnp.stack(spectrum, axis=-1)
 
     return spectrum
 
