@@ -909,16 +909,20 @@ def get_spectrum(
         mode="reconstruction",  # because of rfft
     )
 
+    if power:
+        magnitude = 0.5 * jnp.abs(state_hat_scaled) ** 2
+    else:
+        magnitude = jnp.abs(state_hat_scaled)
+
+    if num_spatial_dims == 1:
+        # 1D does not need any binning and can be returned directly
+        return magnitude
+
     wavenumbers_mesh = build_wavenumbers(num_spatial_dims, num_points)
     wavenumbers_1d = build_wavenumbers(1, num_points)
     wavenumbers_norm = jnp.linalg.norm(wavenumbers_mesh, axis=0, keepdims=True)
 
     dk = wavenumbers_1d[0, 1] - wavenumbers_1d[0, 0]
-
-    if power:
-        magnitude = 0.5 * jnp.abs(state_hat_scaled) ** 2
-    else:
-        magnitude = jnp.abs(state_hat_scaled)
 
     spectrum = []
 
