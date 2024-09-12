@@ -2,6 +2,7 @@ from typing import Literal, TypeVar, Union
 
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
+import numpy as np
 from jaxtyping import Array, Float
 
 from ._plot import (
@@ -68,6 +69,8 @@ def plot_state_1d_facet(
 
     num_batches = states.shape[0]
 
+    if grid[0] * grid[1] == 1:
+        ax_s = np.array([[ax_s]])
     for i, ax in enumerate(ax_s.flatten()):
         if i < num_batches:
             plot_state_1d(
@@ -161,6 +164,8 @@ def plot_spatio_temporal_facet(
 
     num_subplots = trjs.shape[0]
 
+    if grid[0] * grid[1] == 1:
+        ax_s = np.array([[ax_s]])
     for i, ax in enumerate(ax_s.flatten()):
         single_trj = trjs[i]
         plot_spatio_temporal(
@@ -247,6 +252,8 @@ def plot_state_2d_facet(
 
     num_subplots = states.shape[0]
 
+    if grid[0] * grid[1] == 1:
+        ax_s = np.array([[ax_s]])
     for i, ax in enumerate(ax_s.flatten()):
         plot_state_2d(
             states[i],
@@ -343,6 +350,8 @@ def plot_state_3d_facet(
 
     num_subplots = states.shape[0]
 
+    if grid[0] * grid[1] == 1:
+        ax_s = np.array([[ax_s]])
     for i, ax in enumerate(ax_s.flatten()):
         plot_state_3d(
             states[i],
@@ -454,6 +463,8 @@ def plot_spatio_temporal_2d_facet(
 
     num_subplots = trjs.shape[0]
 
+    if grid[0] * grid[1] == 1:
+        ax_s = np.array([[ax_s]])
     for i, ax in enumerate(ax_s.flatten()):
         single_trj = trjs[i]
         plot_spatio_temporal_2d(
