@@ -76,7 +76,7 @@ def test_constant_offset(num_spatial_dims: int):
 #     return result
 
 
-@pytest.mark.parametrize("k,l", [(1, 2), (2, 1), (3, 4)])
+@pytest.mark.parametrize("wavenumber_k,wavenumber_l", [(1, 2), (2, 1), (3, 4)])
 def test_analytical_solution_1d(wavenumber_k: int, wavenumber_l: int):
     NUM_POINTS = 100
     DOMAIN_EXTENT = 2 * jnp.pi
