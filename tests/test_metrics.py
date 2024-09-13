@@ -10,8 +10,8 @@ def test_constant_offset(num_spatial_dims: int):
     NUM_POINTS = 40
     grid = ex.make_grid(num_spatial_dims, DOMAIN_EXTENT, NUM_POINTS)
 
-    u_0 = 2.0 * jnp.ones_like(grid)
-    u_1 = 4.0 * jnp.ones_like(grid)
+    u_0 = 2.0 * jnp.ones_like(grid[0:1])
+    u_1 = 4.0 * jnp.ones_like(grid[0:1])
 
     assert ex.metrics.MSE(u_1, u_0, domain_extent=1.0) == pytest.approx(4.0)
     assert ex.metrics.MSE(u_1, u_0, domain_extent=DOMAIN_EXTENT) == pytest.approx(
