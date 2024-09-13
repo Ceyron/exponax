@@ -5,7 +5,3 @@
 ---
 
 ::: exponax.metrics.mean_correlation
-
----
-
-::: exponax.metrics._correlation

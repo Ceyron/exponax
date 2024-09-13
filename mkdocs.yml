@@ -166,9 +166,9 @@ nav:
         - Interpolation: 'api/utilities/interpolation.md'
         - Normalized & Difficulty: 'api/utilities/normalized_and_difficulty.md'
         - Metrics:
-            - Correlation: 'api/utilities/metrics/correlation.md'
             - Spatial: 'api/utilities/metrics/spatial.md'
             - Fourier-based: 'api/utilities/metrics/fourier.md'
+            - Correlation: 'api/utilities/metrics/correlation.md'
         - Visualization:
             - Plot States: 'api/utilities/visualization/plot_states.md'
             - Plot Spatio-Temporal: 'api/utilities/visualization/plot_spatio_temporal.md'
