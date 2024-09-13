@@ -168,7 +168,7 @@ nav:
             - MSE-based: 'api/utilities/metrics/mse_based.md'
             - RMSE-based: 'api/utilities/metrics/rmse_based.md'
             - Correlation: 'api/utilities/metrics/correlation.md'
-            - Fourier nRMSE: 'api/utilities/metrics/fourier_nrmse.md'
+            - Fourier-based: 'api/utilities/metrics/fourier.md'
         - Visualization:
             - Plot States: 'api/utilities/visualization/plot_states.md'
             - Plot Spatio-Temporal: 'api/utilities/visualization/plot_spatio_temporal.md'
