@@ -1,3 +1,4 @@
+from ._correlation import correlation, mean_correlation
 from ._fourier import (
     fourier_aggregator,
     fourier_aggregator_diff,
@@ -46,4 +47,6 @@ __all__ = [
     "fourier_MAE",
     "fourier_MSE",
     "fourier_RMSE",
+    "correlation",
+    "mean_correlation",
 ]
