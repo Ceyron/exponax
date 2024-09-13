@@ -15,7 +15,7 @@ def test_constant_offset(num_spatial_dims: int):
 
     assert ex.metrics.MSE(u_1, u_0, domain_extent=1.0) == pytest.approx(4.0)
     assert ex.metrics.MSE(u_1, u_0, domain_extent=DOMAIN_EXTENT) == pytest.approx(
-        4.0 / DOMAIN_EXTENT**num_spatial_dims
+        DOMAIN_EXTENT**num_spatial_dims * 4.0
     )
 
     # MSE metric is symmetric
@@ -36,7 +36,7 @@ def test_constant_offset(num_spatial_dims: int):
 
     assert ex.metrics.RMSE(u_1, u_0, domain_extent=1.0) == pytest.approx(2.0)
     assert ex.metrics.RMSE(u_1, u_0, domain_extent=DOMAIN_EXTENT) == pytest.approx(
-        jnp.sqrt(4.0 / DOMAIN_EXTENT**num_spatial_dims)
+        jnp.sqrt(DOMAIN_EXTENT**num_spatial_dims * 4.0)
     )
 
     # RMSE is symmetric
