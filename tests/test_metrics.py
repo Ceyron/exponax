@@ -63,6 +63,17 @@ def test_constant_offset(num_spatial_dims: int):
     # assert ex.metrics.fourier_nRMSE(u_1, u_0) == ex.metrics.nRMSE(u_1, u_0)
     # assert ex.metrics.fourier_nRMSE(u_0, u_1) == ex.metrics.nRMSE(u_0, u_1)
 
+    # The Fourier based losses must be similar to their spatial counterparts due
+    # to Parseval's identity
+    assert ex.metrics.fourier_MSE(u_1, u_0) == ex.metrics.MSE(u_1, u_0)
+    assert ex.metrics.fourier_MSE(u_0, u_1) == ex.metrics.MSE(u_0, u_1)
+
+
+def test_fourier_losses():
+    # Test specific features of Fourier-based losses like filtering and
+    # derivatives
+    pass
+
 
 # # Below always evaluates to 2 * pi no matter the values of k and l
 # def analytical_L2_diff_norm(k: int, l:int):
