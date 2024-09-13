@@ -95,6 +95,7 @@ nav:
             - 2D Solver Showcase: 'examples/solver_showcase_2d.ipynb'
         - Advanced:
             - 1D Burgers Emulator Training: 'examples/learning_burgers_autoregressive_neural_operator.ipynb'
+            - More on Metrics: 'examples/on_metrics_advanced.ipynb'
         - Additional:
             - Nice Features: 'examples/additional_features.ipynb'
             - Performance Hints: 'examples/performance_hints.ipynb'
@@ -165,9 +166,8 @@ nav:
         - Interpolation: 'api/utilities/interpolation.md'
         - Normalized & Difficulty: 'api/utilities/normalized_and_difficulty.md'
         - Metrics:
-            - MSE-based: 'api/utilities/metrics/mse_based.md'
-            - RMSE-based: 'api/utilities/metrics/rmse_based.md'
             - Correlation: 'api/utilities/metrics/correlation.md'
+            - Spatial: 'api/utilities/metrics/spatial.md'
             - Fourier-based: 'api/utilities/metrics/fourier.md'
         - Visualization:
             - Plot States: 'api/utilities/visualization/plot_states.md'
