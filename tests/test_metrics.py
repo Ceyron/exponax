@@ -67,6 +67,10 @@ def test_constant_offset(num_spatial_dims: int):
     # to Parseval's identity
     assert ex.metrics.fourier_MSE(u_1, u_0) == ex.metrics.MSE(u_1, u_0)
     assert ex.metrics.fourier_MSE(u_0, u_1) == ex.metrics.MSE(u_0, u_1)
+    assert ex.metrics.fourier_MAE(u_1, u_0) == ex.metrics.MAE(u_1, u_0)
+    assert ex.metrics.fourier_MAE(u_0, u_1) == ex.metrics.MAE(u_0, u_1)
+    assert ex.metrics.fourier_RMSE(u_1, u_0) == ex.metrics.RMSE(u_1, u_0)
+    assert ex.metrics.fourier_RMSE(u_0, u_1) == ex.metrics.RMSE(u_0, u_1)
 
 
 def test_fourier_losses():

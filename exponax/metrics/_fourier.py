@@ -239,3 +239,68 @@ def fourier_MSE(
         channel_handling=channel_handling,
         channel_handling_norm=channel_handling_norm,
     )
+
+
+def fourier_MAE(
+    u_pred: Float[Array, "C ... N"],
+    u_ref: Optional[Float[Array, "C ... N"]] = None,
+    *,
+    domain_extent: Optional[float] = None,
+    low: Optional[int] = None,
+    high: Optional[int] = None,
+    derivative_order: Optional[float] = None,
+    derivative_channel_handling: Literal["mean", "sum", None] = "sum",
+    scaling_mode: Literal[
+        "norm_compensation", "reconstruction", "coef_extraction", None
+    ] = "reconstruction",
+    channel_handling: Literal["spatial", "norm_before", "norm_after", None] = "spatial",
+    channel_handling_norm: int = 2,
+):
+    return fourier_aggregator_diff(
+        u_pred,
+        u_ref,
+        domain_extent=domain_extent,
+        inner_exponent=1.0,
+        outer_exponent=1.0,
+        low=low,
+        high=high,
+        derivative_order=derivative_order,
+        derivative_channel_handling=derivative_channel_handling,
+        scaling_mode=scaling_mode,
+        channel_handling=channel_handling,
+        channel_handling_norm=channel_handling_norm,
+    )
+
+
+def fourier_RMSE(
+    u_pred: Float[Array, "C ... N"],
+    u_ref: Optional[Float[Array, "C ... N"]] = None,
+    *,
+    domain_extent: Optional[float] = None,
+    low: Optional[int] = None,
+    high: Optional[int] = None,
+    derivative_order: Optional[float] = None,
+    derivative_channel_handling: Literal["mean", "sum", None] = "sum",
+    scaling_mode: Literal[
+        "norm_compensation", "reconstruction", "coef_extraction", None
+    ] = "reconstruction",
+    channel_handling: Literal["spatial", "norm_before", "norm_after", None] = "spatial",
+    channel_handling_norm: int = 2,
+):
+    return jnp.sqrt(
+        fourier_MSE(
+            u_pred,
+            u_ref,
+            domain_extent=domain_extent,
+            low=low,
+            high=high,
+            derivative_order=derivative_order,
+            derivative_channel_handling=derivative_channel_handling,
+            scaling_mode=scaling_mode,
+            channel_handling=channel_handling,
+            channel_handling_norm=channel_handling_norm,
+        )
+    )
+
+
+# TODO: Add rest

@@ -2,7 +2,9 @@ from ._fourier import (
     fourier_aggregator,
     fourier_aggregator_diff,
     fourier_aggregator_normalized,
+    fourier_MAE,
     fourier_MSE,
+    fourier_RMSE,
 )
 from ._spatial import (
     MAE,
@@ -41,5 +43,7 @@ __all__ = [
     "fourier_aggregator",
     "fourier_aggregator_diff",
     "fourier_aggregator_normalized",
+    "fourier_MAE",
     "fourier_MSE",
+    "fourier_RMSE",
 ]
