@@ -1,3 +1,9 @@
+from ._fourier import (
+    fourier_aggregator,
+    fourier_aggregator_diff,
+    fourier_aggregator_normalized,
+    fourier_MSE,
+)
 from ._spatial import (
     MAE,
     MSE,
@@ -32,4 +38,8 @@ __all__ = [
     "mean_nMAE",
     "mean_nMSE",
     "mean_nRMSE",
+    "fourier_aggregator",
+    "fourier_aggregator_diff",
+    "fourier_aggregator_normalized",
+    "fourier_MSE",
 ]
