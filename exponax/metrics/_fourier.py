@@ -1,8 +1,8 @@
-from typing import Literal, Optional, TypeVar, Union
+from typing import Literal, Optional
 
 import jax
 import jax.numpy as jnp
-from jaxtyping import Array, Complex, Float
+from jaxtyping import Array, Float
 
 from .._spectral import (
     build_derivative_operator,
@@ -11,271 +11,234 @@ from .._spectral import (
     low_pass_filter_mask,
 )
 
-N = TypeVar("N")
-C = TypeVar("C")
-D = TypeVar("D")
 
-
-def _fourier_aggregator_hat(
-    state_no_channel_hat: Complex[Array, "... (N//2)+1"],
+def fourier_aggregator(
+    state_no_channel: Float[Array, "... N"],
     *,
     num_spatial_dims: Optional[int] = None,
+    domain_extent: float = 1.0,
     num_points: Optional[int] = None,
-    domain_extent: Optional[float] = None,
     inner_exponent: float = 2.0,
     outer_exponent: Optional[float] = None,
     low: Optional[int] = None,
     high: Optional[int] = None,
     derivative_order: Optional[float] = None,
-    derivative_channel_handling: Literal["mean", "sum", None] = "sum",
-    scaling_mode: Literal[
-        "norm_compensation", "reconstruction", "coef_extraction", None
-    ] = "reconstruction",
-) -> Union[float, Float[Array, "D"]]:
+) -> float:
+    """
+    Sums up the gradient contirbutions
+    """
     if num_spatial_dims is None:
-        num_spatial_dims = state_no_channel_hat.ndim
+        num_spatial_dims = state_no_channel.ndim
     if num_points is None:
-        if num_spatial_dims >= 2:
-            num_points = state_no_channel_hat.shape[-2]
-        else:
-            raise ValueError("num_points must be provided for 1D")
-    if domain_extent is None:
-        domain_extent = 1.0
+        num_points = state_no_channel.shape[-1]
 
     if outer_exponent is None:
         outer_exponent = 1 / inner_exponent
 
+    # Transform to Fourier space
+    state_no_channel_hat = fft(state_no_channel, num_spatial_dims=num_spatial_dims)
+
+    # Remove small values that occured due to rounding errors, can become
+    # problematic for "normalized" norms
+    state_no_channel_hat = jnp.where(
+        jnp.abs(state_no_channel_hat) < 1e-5,
+        jnp.zeros_like(state_no_channel_hat),
+        state_no_channel_hat,
+    )
+
     # Filtering out if desired
-    if low is None:
-        low = 0
-    if high is None:
-        high = (num_points // 2) + 1
+    if low is not None or high is not None:
+        if low is None:
+            low = 0
+        if high is None:
+            high = (num_points // 2) + 1
 
-    low_mask = low_pass_filter_mask(
-        num_spatial_dims,
-        num_points,
-        cutoff=low - 1,  # Need to subtract 1 because the cutoff is inclusive
-    )
-    high_mask = low_pass_filter_mask(
-        num_spatial_dims,
-        num_points,
-        cutoff=high,
-    )
+        low_mask = low_pass_filter_mask(
+            num_spatial_dims,
+            num_points,
+            cutoff=low - 1,  # Need to subtract 1 because the cutoff is inclusive
+        )
+        high_mask = low_pass_filter_mask(
+            num_spatial_dims,
+            num_points,
+            cutoff=high,
+        )
 
-    mask = jnp.invert(low_mask) & high_mask
+        mask = jnp.invert(low_mask) & high_mask
 
-    state_no_channel_hat = state_no_channel_hat * mask
+        state_no_channel_hat = state_no_channel_hat * mask
 
     # Taking derivatives if desired
     if derivative_order is not None:
         derivative_operator = build_derivative_operator(
             num_spatial_dims, domain_extent, num_points
         )
-        state_no_channel_hat *= derivative_operator**derivative_order
+        state_with_derivative_channel_hat = (
+            state_no_channel_hat * derivative_operator**derivative_order
+        )
     else:
         # Add singleton derivative axis to have subsequent code work
-        state_no_channel_hat = state_no_channel_hat[None]
+        state_with_derivative_channel_hat = state_no_channel_hat[None]
 
-    # Scale coefficients
-    if scaling_mode is not None:
-        scaling_array_recon = build_scaling_array(
-            num_spatial_dims,
-            num_points,
-            mode="reconstruction",
-        )
+    # Scale coefficients to extract the correct form, this is needed because we
+    # use the rfft
+    scaling_array_recon = build_scaling_array(
+        num_spatial_dims,
+        num_points,
+        mode="reconstruction",
+    )
+
+    scale = (domain_extent / num_points) ** num_spatial_dims
 
     def aggregate(s):
-        return (
-            jnp.sum(
-                jnp.abs(s) ** inner_exponent
-                / (scaling_array_recon * num_points**num_spatial_dims)
-            )
-            ** outer_exponent
+        scaled_coefficient_magnitude = (
+            jnp.abs(s) ** inner_exponent / scaling_array_recon
         )
+        aggregated = jnp.sum(scaled_coefficient_magnitude)
+        return (scale * aggregated) ** outer_exponent
 
-    aggregated = jax.vmap(aggregate)(state_no_channel_hat)
+    aggregated_per_derivative = jax.vmap(aggregate)(state_with_derivative_channel_hat)
 
-    if derivative_channel_handling == "mean":
-        return jnp.mean(aggregated)
-    elif derivative_channel_handling == "sum":
-        return jnp.sum(aggregated)
-    else:
-        return aggregated
+    return jnp.sum(aggregated_per_derivative)
 
 
-def fourier_aggregator(
+def fourier_norm(
     state: Float[Array, "C ... N"],
+    state_ref: Optional[Float[Array, "C ... N"]] = None,
     *,
-    domain_extent: Optional[float] = None,
+    mode: Literal["absolute", "normalized"] = "absolute",
+    domain_extent: float = 1.0,
     inner_exponent: float = 2.0,
     outer_exponent: Optional[float] = None,
     low: Optional[int] = None,
     high: Optional[int] = None,
     derivative_order: Optional[float] = None,
-    derivative_channel_handling: Literal["mean", "sum", None] = "sum",
-    scaling_mode: Literal[
-        "norm_compensation", "reconstruction", "coef_extraction", None
-    ] = "reconstruction",
-    channel_handling: Literal["spatial", "norm_before", "norm_after", None] = "spatial",
-    channel_handling_norm: int = 2,
-) -> Union[float, Float[Array, "D"], Float[Array, "C"], Float[Array, "C D"]]:
-    num_spatial_dims = state.ndim - 1
-    num_points = state.shape[-1]
-    state_hat = fft(state, num_spatial_dims=num_spatial_dims)
+) -> float:
+    """Under normalized mode each channel is normalized separately. The channel is summed"""
+    if state_ref is None:
+        if mode == "normalized":
+            raise ValueError("mode 'normalized' requires state_ref")
+        diff = state
+    else:
+        diff = state - state_ref
 
-    if channel_handling == "spatial":
-        return _fourier_aggregator_hat(
-            state_hat,
-            num_spatial_dims=num_spatial_dims,
-            num_points=num_points,
+    diff_norm_per_channel = jax.vmap(
+        lambda s: fourier_aggregator(
+            s,
             domain_extent=domain_extent,
             inner_exponent=inner_exponent,
             outer_exponent=outer_exponent,
             low=low,
             high=high,
             derivative_order=derivative_order,
-            derivative_channel_handling=derivative_channel_handling,
-            scaling_mode=scaling_mode,
-        )
-    elif channel_handling is None:
-        aggregated_per_channel = jax.vmap(
-            lambda s: _fourier_aggregator_hat(
-                s,
-                num_spatial_dims=num_spatial_dims,
-                num_points=num_points,
+        ),
+    )(diff)
+
+    if mode == "normalized":
+        ref_norm_per_channel = jax.vmap(
+            lambda r: fourier_aggregator(
+                r,
                 domain_extent=domain_extent,
                 inner_exponent=inner_exponent,
                 outer_exponent=outer_exponent,
                 low=low,
                 high=high,
                 derivative_order=derivative_order,
-                derivative_channel_handling=derivative_channel_handling,
-                scaling_mode=scaling_mode,
-            )
-        )(state_hat)
-        return aggregated_per_channel
-    elif channel_handling in ["norm_before", "norm_after"]:
-        raise NotImplementedError("This channel handling is not implemented yet")
+            ),
+        )(state_ref)
+        normalized_diff_per_channel = diff_norm_per_channel / ref_norm_per_channel
+        norm_per_channel = normalized_diff_per_channel
     else:
-        raise ValueError(f"Invalid channel_handling: {channel_handling}")
+        norm_per_channel = diff_norm_per_channel
 
-
-def fourier_aggregator_diff(
-    u_pred: Float[Array, "C ... N"],
-    u_ref: Optional[Float[Array, "C ... N"]] = None,
-    *,
-    domain_extent: Optional[float] = None,
-    inner_exponent: float = 2.0,
-    outer_exponent: Optional[float] = None,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
-    derivative_order: Optional[float] = None,
-    derivative_channel_handling: Literal["mean", "sum", None] = "sum",
-    scaling_mode: Literal[
-        "norm_compensation", "reconstruction", "coef_extraction", None
-    ] = "reconstruction",
-    channel_handling: Literal["spatial", "norm_before", "norm_after", None] = "spatial",
-    channel_handling_norm: int = 2,
-) -> Union[float, Float[Array, "D"], Float[Array, "C"], Float[Array, "C D"]]:
-    if u_ref is None:
-        diff = u_pred
-    else:
-        diff = u_pred - u_ref
-
-    return fourier_aggregator(
-        diff,
-        domain_extent=domain_extent,
-        inner_exponent=inner_exponent,
-        outer_exponent=outer_exponent,
-        low=low,
-        high=high,
-        derivative_order=derivative_order,
-        derivative_channel_handling=derivative_channel_handling,
-        scaling_mode=scaling_mode,
-        channel_handling=channel_handling,
-        channel_handling_norm=channel_handling_norm,
-    )
-
-
-def fourier_aggregator_normalized(
-    u_pred: Float[Array, "C ... N"],
-    u_ref: Float[Array, "C ... N"],
-    *,
-    domain_extent: Optional[float] = None,
-    inner_exponent: float = 2.0,
-    outer_exponent: Optional[float] = None,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
-    derivative_order: Optional[float] = None,
-    derivative_channel_handling: Literal["mean", "sum", None] = "sum",
-    scaling_mode: Literal[
-        "norm_compensation", "reconstruction", "coef_extraction", None
-    ] = "reconstruction",
-    channel_handling: Literal["spatial", "norm_before", "norm_after", None] = "spatial",
-    channel_handling_norm: int = 2,
-):
-    pass
-
-
-def fourier_MSE(
-    u_pred: Float[Array, "C ... N"],
-    u_ref: Optional[Float[Array, "C ... N"]] = None,
-    *,
-    domain_extent: Optional[float] = None,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
-    derivative_order: Optional[float] = None,
-    derivative_channel_handling: Literal["mean", "sum", None] = "sum",
-    scaling_mode: Literal[
-        "norm_compensation", "reconstruction", "coef_extraction", None
-    ] = "reconstruction",
-    channel_handling: Literal["spatial", "norm_before", "norm_after", None] = "spatial",
-    channel_handling_norm: int = 2,
-):
-    return fourier_aggregator_diff(
-        u_pred,
-        u_ref,
-        domain_extent=domain_extent,
-        inner_exponent=2.0,
-        outer_exponent=1.0,
-        low=low,
-        high=high,
-        derivative_order=derivative_order,
-        derivative_channel_handling=derivative_channel_handling,
-        scaling_mode=scaling_mode,
-        channel_handling=channel_handling,
-        channel_handling_norm=channel_handling_norm,
-    )
+    return jnp.sum(norm_per_channel)
 
 
 def fourier_MAE(
     u_pred: Float[Array, "C ... N"],
     u_ref: Optional[Float[Array, "C ... N"]] = None,
     *,
-    domain_extent: Optional[float] = None,
+    domain_extent: float = 1.0,
     low: Optional[int] = None,
     high: Optional[int] = None,
     derivative_order: Optional[float] = None,
-    derivative_channel_handling: Literal["mean", "sum", None] = "sum",
-    scaling_mode: Literal[
-        "norm_compensation", "reconstruction", "coef_extraction", None
-    ] = "reconstruction",
-    channel_handling: Literal["spatial", "norm_before", "norm_after", None] = "spatial",
-    channel_handling_norm: int = 2,
-):
-    return fourier_aggregator_diff(
+) -> float:
+    return fourier_norm(
         u_pred,
         u_ref,
+        mode="absolute",
         domain_extent=domain_extent,
         inner_exponent=1.0,
         outer_exponent=1.0,
         low=low,
         high=high,
         derivative_order=derivative_order,
-        derivative_channel_handling=derivative_channel_handling,
-        scaling_mode=scaling_mode,
-        channel_handling=channel_handling,
-        channel_handling_norm=channel_handling_norm,
+    )
+
+
+def fourier_nMAE(
+    u_pred: Float[Array, "C ... N"],
+    u_ref: Float[Array, "C ... N"] = None,
+    *,
+    domain_extent: float = 1.0,
+    low: Optional[int] = None,
+    high: Optional[int] = None,
+    derivative_order: Optional[float] = None,
+) -> float:
+    return fourier_norm(
+        u_pred,
+        u_ref,
+        mode="normalized",
+        domain_extent=domain_extent,
+        inner_exponent=1.0,
+        outer_exponent=1.0,
+        low=low,
+        high=high,
+        derivative_order=derivative_order,
+    )
+
+
+def fourier_MSE(
+    u_pred: Float[Array, "C ... N"],
+    u_ref: Optional[Float[Array, "C ... N"]] = None,
+    *,
+    domain_extent: float = 1.0,
+    low: Optional[int] = None,
+    high: Optional[int] = None,
+    derivative_order: Optional[float] = None,
+) -> float:
+    return fourier_norm(
+        u_pred,
+        u_ref,
+        mode="absolute",
+        domain_extent=domain_extent,
+        inner_exponent=2.0,
+        outer_exponent=1.0,
+        low=low,
+        high=high,
+        derivative_order=derivative_order,
+    )
+
+
+def fourier_nMSE(
+    u_pred: Float[Array, "C ... N"],
+    u_ref: Float[Array, "C ... N"],
+    *,
+    domain_extent: float = 1.0,
+    low: Optional[int] = None,
+    high: Optional[int] = None,
+    derivative_order: Optional[float] = None,
+) -> float:
+    return fourier_norm(
+        u_pred,
+        u_ref,
+        mode="normalized",
+        domain_extent=domain_extent,
+        inner_exponent=2.0,
+        outer_exponent=1.0,
+        low=low,
+        high=high,
+        derivative_order=derivative_order,
     )
 
 
@@ -283,31 +246,41 @@ def fourier_RMSE(
     u_pred: Float[Array, "C ... N"],
     u_ref: Optional[Float[Array, "C ... N"]] = None,
     *,
-    domain_extent: Optional[float] = None,
+    domain_extent: float = 1.0,
     low: Optional[int] = None,
     high: Optional[int] = None,
     derivative_order: Optional[float] = None,
-    derivative_channel_handling: Literal["mean", "sum", None] = "sum",
-    scaling_mode: Literal[
-        "norm_compensation", "reconstruction", "coef_extraction", None
-    ] = "reconstruction",
-    channel_handling: Literal["spatial", "norm_before", "norm_after", None] = "spatial",
-    channel_handling_norm: int = 2,
-):
-    return jnp.sqrt(
-        fourier_MSE(
-            u_pred,
-            u_ref,
-            domain_extent=domain_extent,
-            low=low,
-            high=high,
-            derivative_order=derivative_order,
-            derivative_channel_handling=derivative_channel_handling,
-            scaling_mode=scaling_mode,
-            channel_handling=channel_handling,
-            channel_handling_norm=channel_handling_norm,
-        )
+) -> float:
+    return fourier_norm(
+        u_pred,
+        u_ref,
+        mode="absolute",
+        domain_extent=domain_extent,
+        inner_exponent=2.0,
+        outer_exponent=0.5,
+        low=low,
+        high=high,
+        derivative_order=derivative_order,
     )
 
 
-# TODO: Add rest
+def fourier_nRMSE(
+    u_pred: Float[Array, "C ... N"],
+    u_ref: Float[Array, "C ... N"],
+    *,
+    domain_extent: float = 1.0,
+    low: Optional[int] = None,
+    high: Optional[int] = None,
+    derivative_order: Optional[float] = None,
+) -> float:
+    return fourier_norm(
+        u_pred,
+        u_ref,
+        mode="normalized",
+        domain_extent=domain_extent,
+        inner_exponent=2.0,
+        outer_exponent=0.5,
+        low=low,
+        high=high,
+        derivative_order=derivative_order,
+    )
