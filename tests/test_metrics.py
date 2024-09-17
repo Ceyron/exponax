@@ -65,12 +65,12 @@ def test_constant_offset(num_spatial_dims: int):
 
     # The Fourier based losses must be similar to their spatial counterparts due
     # to Parseval's identity
-    assert ex.metrics.fourier_MSE(u_1, u_0) == ex.metrics.MSE(u_1, u_0)
-    assert ex.metrics.fourier_MSE(u_0, u_1) == ex.metrics.MSE(u_0, u_1)
-    assert ex.metrics.fourier_MAE(u_1, u_0) == ex.metrics.MAE(u_1, u_0)
-    assert ex.metrics.fourier_MAE(u_0, u_1) == ex.metrics.MAE(u_0, u_1)
-    assert ex.metrics.fourier_RMSE(u_1, u_0) == ex.metrics.RMSE(u_1, u_0)
-    assert ex.metrics.fourier_RMSE(u_0, u_1) == ex.metrics.RMSE(u_0, u_1)
+    assert ex.metrics.fourier_MSE(u_1, u_0) == pytest.approx(ex.metrics.MSE(u_1, u_0))
+    assert ex.metrics.fourier_MSE(u_0, u_1) == pytest.approx(ex.metrics.MSE(u_0, u_1))
+    assert ex.metrics.fourier_MAE(u_1, u_0) == pytest.approx(ex.metrics.MAE(u_1, u_0))
+    assert ex.metrics.fourier_MAE(u_0, u_1) == pytest.approx(ex.metrics.MAE(u_0, u_1))
+    assert ex.metrics.fourier_RMSE(u_1, u_0) == pytest.approx(ex.metrics.RMSE(u_1, u_0))
+    assert ex.metrics.fourier_RMSE(u_0, u_1) == pytest.approx(ex.metrics.RMSE(u_0, u_1))
 
 
 def test_fourier_losses():
