@@ -20,6 +20,7 @@ from ._spatial import (
     spatial_aggregator,
     spatial_norm,
 )
+from ._utils import mean_metric
 
 __all__ = [
     "spatial_aggregator",
@@ -45,4 +46,5 @@ __all__ = [
     "H1_nMSE",
     "H1_RMSE",
     "H1_nRMSE",
+    "mean_metric",
 ]
