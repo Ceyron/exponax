@@ -78,13 +78,17 @@ def _fourier_aggregator_hat(
 
     # Scale coefficients
     if scaling_mode is not None:
-        scaling_array = build_scaling_array(
-            num_spatial_dims, num_points, mode=scaling_mode
+        scaling_array_recon = build_scaling_array(
+            num_spatial_dims,
+            num_points,
+            mode="reconstruction",
         )
-        state_no_channel_hat /= scaling_array
 
     def aggregate(s):
-        return jnp.sum(jnp.abs(s) ** inner_exponent) ** outer_exponent
+        return (
+            jnp.sum(jnp.abs(s) ** inner_exponent / (scaling_array_recon * num_points))
+            ** outer_exponent
+        )
 
     aggregated = jax.vmap(aggregate)(state_no_channel_hat)
 
