@@ -169,6 +169,7 @@ nav:
         - Metrics:
             - Spatial: 'api/utilities/metrics/spatial.md'
             - Fourier-based: 'api/utilities/metrics/fourier.md'
+            - Derivative-based: 'api/utilities/metrics/derivative.md'
             - Correlation: 'api/utilities/metrics/correlation.md'
         - Visualization:
             - Plot States: 'api/utilities/visualization/plot_states.md'
