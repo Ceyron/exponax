@@ -86,7 +86,10 @@ def _fourier_aggregator_hat(
 
     def aggregate(s):
         return (
-            jnp.sum(jnp.abs(s) ** inner_exponent / (scaling_array_recon * num_points))
+            jnp.sum(
+                jnp.abs(s) ** inner_exponent
+                / (scaling_array_recon * num_points**num_spatial_dims)
+            )
             ** outer_exponent
         )
 
