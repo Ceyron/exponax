@@ -1,4 +1,4 @@
-from ._correlation import correlation, mean_correlation
+from ._correlation import correlation
 from ._fourier import (
     fourier_aggregator,
     fourier_MAE,
@@ -38,5 +38,4 @@ __all__ = [
     "fourier_nMSE",
     "fourier_nRMSE",
     "correlation",
-    "mean_correlation",
 ]

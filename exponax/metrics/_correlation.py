@@ -54,35 +54,3 @@ def correlation(
     channel_wise_correlation = jax.vmap(_correlation)(u_pred, u_ref)
     correlation = jnp.mean(channel_wise_correlation)
     return correlation
-
-
-def mean_correlation(
-    u_pred: Float[Array, "B C ... N"],
-    u_ref: Float[Array, "B C ... N"],
-) -> float:
-    """
-    Compute the mean correlation between multiple samples of two fields.
-
-    This function assumes that the arrays have one leading batch axis, followed
-    by a channel axis and an arbitrary number of following spatial axes.
-
-    If you want to apply this function on two trajectories of fields, you can
-    use `jax.vmap` to transform it, use `jax.vmap(mean_correlation, in_axes=I)`
-    with `I` being the index of the time axis (e.g. `I=0` for time axis at the
-    beginning of the array, or `I=1` for time axis at the second position,
-    depending on the convention).
-
-    **Arguments**:
-
-    - `u_pred` (array): The first tensor of fields to be used in the error
-        computation.
-    - `u_ref` (array): The second tensor of fields to be used in the error
-        computation.
-
-    **Returns**:
-
-    - `mean_correlation` (float): The mean correlation between the fields
-    """
-    batch_wise_correlation = jax.vmap(correlation)(u_pred, u_ref)
-    mean_correlation = jnp.mean(batch_wise_correlation)
-    return mean_correlation
