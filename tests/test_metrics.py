@@ -92,23 +92,25 @@ def test_fourier_losses():
     ],
 )
 def test_fourier_equals_spatial_aggreation(num_spatial_dims, ic_gen):
+    """
+    Must be identical due to Parseval's identity
+    """
     NUM_POINTS = 40
-    # DOMAIN_EXTENT = 5.0
-    DOMAIN_EXTENT = 1.0
+    DOMAIN_EXTENT = 5.0
 
     u_0 = ic_gen(NUM_POINTS, key=jax.random.PRNGKey(0))
     u_1 = ic_gen(NUM_POINTS, key=jax.random.PRNGKey(1))
 
-    assert ex.metrics.fourier_MSE(u_1, u_0) == pytest.approx(
-        ex.metrics.MSE(u_1, u_0, domain_extent=DOMAIN_EXTENT)
-    )
+    assert ex.metrics.fourier_MSE(
+        u_1, u_0, domain_extent=DOMAIN_EXTENT
+    ) == pytest.approx(ex.metrics.MSE(u_1, u_0, domain_extent=DOMAIN_EXTENT))
     # # This equivalence does not hold for the MAE
-    # assert ex.metrics.fourier_MAE(u_1, u_0) == pytest.approx(
+    # assert ex.metrics.fourier_MAE(u_1, u_0, domain_extent=DOMAIN_EXTENT) == pytest.approx(
     #     ex.metrics.MAE(u_1, u_0, domain_extent=DOMAIN_EXTENT)
     # )
-    assert ex.metrics.fourier_RMSE(u_1, u_0) == pytest.approx(
-        ex.metrics.RMSE(u_1, u_0, domain_extent=DOMAIN_EXTENT)
-    )
+    assert ex.metrics.fourier_RMSE(
+        u_1, u_0, domain_extent=DOMAIN_EXTENT
+    ) == pytest.approx(ex.metrics.RMSE(u_1, u_0, domain_extent=DOMAIN_EXTENT))
 
 
 # # Below always evaluates to 2 * pi no matter the values of k and l
