@@ -1,3 +1,4 @@
+import jax
 import jax.numpy as jnp
 import pytest
 
@@ -67,8 +68,9 @@ def test_constant_offset(num_spatial_dims: int):
     # to Parseval's identity
     assert ex.metrics.fourier_MSE(u_1, u_0) == pytest.approx(ex.metrics.MSE(u_1, u_0))
     assert ex.metrics.fourier_MSE(u_0, u_1) == pytest.approx(ex.metrics.MSE(u_0, u_1))
-    assert ex.metrics.fourier_MAE(u_1, u_0) == pytest.approx(ex.metrics.MAE(u_1, u_0))
-    assert ex.metrics.fourier_MAE(u_0, u_1) == pytest.approx(ex.metrics.MAE(u_0, u_1))
+    # This equivalence does not hold for the MAE
+    # assert ex.metrics.fourier_MAE(u_1, u_0) == pytest.approx(ex.metrics.MAE(u_1, u_0))
+    # assert ex.metrics.fourier_MAE(u_0, u_1) == pytest.approx(ex.metrics.MAE(u_0, u_1))
     assert ex.metrics.fourier_RMSE(u_1, u_0) == pytest.approx(ex.metrics.RMSE(u_1, u_0))
     assert ex.metrics.fourier_RMSE(u_0, u_1) == pytest.approx(ex.metrics.RMSE(u_0, u_1))
 
@@ -77,6 +79,36 @@ def test_fourier_losses():
     # Test specific features of Fourier-based losses like filtering and
     # derivatives
     pass
+
+
+@pytest.mark.parametrize(
+    "num_spatial_dims,ic_gen",
+    [
+        (num_spatial_dims, ic_gen)
+        for num_spatial_dims in [1, 2, 3]
+        for ic_gen in [
+            ex.ic.RandomTruncatedFourierSeries(num_spatial_dims, offset_range=(-1, 1)),
+        ]
+    ],
+)
+def test_fourier_equals_spatial_aggreation(num_spatial_dims, ic_gen):
+    NUM_POINTS = 40
+    # DOMAIN_EXTENT = 5.0
+    DOMAIN_EXTENT = 1.0
+
+    u_0 = ic_gen(NUM_POINTS, key=jax.random.PRNGKey(0))
+    u_1 = ic_gen(NUM_POINTS, key=jax.random.PRNGKey(1))
+
+    assert ex.metrics.fourier_MSE(u_1, u_0) == pytest.approx(
+        ex.metrics.MSE(u_1, u_0, domain_extent=DOMAIN_EXTENT)
+    )
+    # # This equivalence does not hold for the MAE
+    # assert ex.metrics.fourier_MAE(u_1, u_0) == pytest.approx(
+    #     ex.metrics.MAE(u_1, u_0, domain_extent=DOMAIN_EXTENT)
+    # )
+    assert ex.metrics.fourier_RMSE(u_1, u_0) == pytest.approx(
+        ex.metrics.RMSE(u_1, u_0, domain_extent=DOMAIN_EXTENT)
+    )
 
 
 # # Below always evaluates to 2 * pi no matter the values of k and l
