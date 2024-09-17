@@ -1,4 +1,5 @@
 from ._correlation import correlation
+from ._derivative import H1_MAE, H1_MSE, H1_RMSE, H1_nMAE, H1_nMSE, H1_nRMSE
 from ._fourier import (
     fourier_aggregator,
     fourier_MAE,
@@ -38,4 +39,10 @@ __all__ = [
     "fourier_nMSE",
     "fourier_nRMSE",
     "correlation",
+    "H1_MAE",
+    "H1_nMAE",
+    "H1_MSE",
+    "H1_nMSE",
+    "H1_RMSE",
+    "H1_nRMSE",
 ]
