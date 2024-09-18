@@ -178,7 +178,7 @@ def fourier_MAE(
 
 def fourier_nMAE(
     u_pred: Float[Array, "C ... N"],
-    u_ref: Float[Array, "C ... N"] = None,
+    u_ref: Float[Array, "C ... N"],
     *,
     domain_extent: float = 1.0,
     low: Optional[int] = None,
