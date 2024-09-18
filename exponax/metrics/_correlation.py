@@ -38,17 +38,21 @@ def correlation(
     Compute the correlation between two fields. Average over all channels.
 
     This function assumes that the arrays have one leading channel axis and an
-    arbitrary number of following spatial axes. For operation on batched arrays
-    use `mean_correlation`.
+    arbitrary number of following spatial axes.
+
+    !!! tip
+        To apply this function to a state tensor with a leading batch axis, use
+        `jax.vmap`. Then the batch axis can be reduced, e.g., by `jnp.mean`. As
+        a helper for this, [`exponax.metrics.mean_metric`][] is provided.
 
     **Arguments**:
 
-    - `u_pred` (array): The first field to be used in the error computation.
-    - `u_ref` (array): The second field to be used in the error computation.
+    - `u_pred`: The first field to be used in the error computation.
+    - `u_ref`: The second field to be used in the error computation.
 
     **Returns**:
 
-    - `correlation` (float): The correlation between the fields, averaged over
+    - `correlation`: The correlation between the fields, averaged over
         all channels.
     """
     channel_wise_correlation = jax.vmap(_correlation)(u_pred, u_ref)
