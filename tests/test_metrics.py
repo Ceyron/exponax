@@ -113,6 +113,41 @@ def test_fourier_equals_spatial_aggreation(num_spatial_dims, ic_gen):
     ) == pytest.approx(ex.metrics.RMSE(u_1, u_0, domain_extent=DOMAIN_EXTENT))
 
 
+@pytest.mark.parametrize(
+    "num_spatial_dims,metric_fn_name",
+    [
+        (num_spatial_dims, metric_fn_name)
+        for num_spatial_dims in [1, 2, 3]
+        for metric_fn_name in [
+            "MAE",
+            "nMAE",
+            "MSE",
+            "nMSE",
+            "RMSE",
+            "nRMSE",
+        ]
+    ],
+)
+def test_sobolev_vs_manual(num_spatial_dims, metric_fn_name):
+    NUM_POINTS = 40
+    DOMAIN_EXTENT = 5.0
+
+    ic_gen = ex.ic.RandomTruncatedFourierSeries(num_spatial_dims, offset_range=(-1, 1))
+    u_0 = ic_gen(NUM_POINTS, key=jax.random.PRNGKey(0))
+    u_1 = ic_gen(NUM_POINTS, key=jax.random.PRNGKey(1))
+
+    fourier_metric_fn = getattr(ex.metrics, "fourier_" + metric_fn_name)
+    sobolev_metric_fn = getattr(ex.metrics, "H1_" + metric_fn_name)
+
+    correct_metric_value = fourier_metric_fn(
+        u_0, u_1, domain_extent=DOMAIN_EXTENT
+    ) + fourier_metric_fn(u_0, u_1, domain_extent=DOMAIN_EXTENT, derivative_order=1)
+
+    assert sobolev_metric_fn(u_0, u_1, domain_extent=DOMAIN_EXTENT) == pytest.approx(
+        correct_metric_value
+    )
+
+
 # # Below always evaluates to 2 * pi no matter the values of k and l
 # def analytical_L2_diff_norm(k: int, l:int):
 #     term1 = 2 * jnp.pi
