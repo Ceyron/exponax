@@ -251,7 +251,7 @@ def fourier_MAE(
 
     The channel axis is summed **after** the aggregation.
 
-    While conceptually similar to [`exponax.metrics.spatial_MAE`][], this
+    While conceptually similar to [`exponax.metrics.MAE`][], this
     function is **not** consistent with the `L¹(Ω)` functional norm. However, it
     additionally allows filtering specific frequency ranges and to take
     derivatives. In higher dimensions, the derivative contributions (i.e., the
@@ -311,7 +311,7 @@ def fourier_nMAE(
 
     The channel axis is summed **after** the aggregation.
 
-    While conceptually similar to [`exponax.metrics.spatial_nMAE`][], this
+    While conceptually similar to [`exponax.metrics.nMAE`][], this
     function is **not** consistent with the `L¹(Ω)` functional norm. However, it
     additionally allows filtering specific frequency ranges and to take
     derivatives. In higher dimensions, the derivative contributions (i.e., the
