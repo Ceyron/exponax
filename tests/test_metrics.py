@@ -91,7 +91,7 @@ def test_fourier_losses():
         ]
     ],
 )
-def test_fourier_equals_spatial_aggreation(num_spatial_dims, ic_gen):
+def test_fourier_equals_spatial_aggregation(num_spatial_dims, ic_gen):
     """
     Must be identical due to Parseval's identity
     """
