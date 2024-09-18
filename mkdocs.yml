@@ -171,6 +171,7 @@ nav:
             - Fourier-based: 'api/utilities/metrics/fourier.md'
             - Derivative-based: 'api/utilities/metrics/derivative.md'
             - Correlation: 'api/utilities/metrics/correlation.md'
+            - Utilities: 'api/utilities/metrics/utils.md'
         - Visualization:
             - Plot States: 'api/utilities/visualization/plot_states.md'
             - Plot Spatio-Temporal: 'api/utilities/visualization/plot_spatio_temporal.md'
