@@ -114,6 +114,61 @@ def test_fourier_equals_spatial_aggregation(num_spatial_dims, ic_gen):
 
 
 @pytest.mark.parametrize(
+    "num_spatial_dims,num_points",
+    [
+        (num_spatial_dims, num_points)
+        for num_spatial_dims in [1, 2, 3]
+        for num_points in [40, 41]
+    ],
+)
+def test_fourier_metric_filtering(num_spatial_dims, num_points):
+    # It is sufficient only test one fourier_XXXXX metric because they all use
+    # exponax.metrics.fourier_aggegator to perform the filtering
+    DOMAIN_EXTENT = 2 * jnp.pi
+    grid = ex.make_grid(num_spatial_dims, DOMAIN_EXTENT, num_points)
+
+    u = jnp.sin(4 * grid[0:1])
+    if num_spatial_dims > 1:
+        u *= jnp.sin(4 * grid[1:2])
+    if num_spatial_dims > 2:
+        u *= jnp.sin(4 * grid[2:3])
+
+    # If all modi are included, metric must be non-zero
+    assert float(ex.metrics.fourier_MSE(u)) != pytest.approx(0.0, abs=1e-6)
+    # If the lower bound is higher than the active modi, the metric must be zero
+    assert float(ex.metrics.fourier_MSE(u, low=8)) == pytest.approx(0.0, abs=1e-6)
+    # If the upper bound is higher than the active modi, the metric must be non-zero
+    assert float(ex.metrics.fourier_MSE(u, high=8)) != pytest.approx(0.0, abs=1e-6)
+    # If the upper bound is lower than the active modi, the metric must be zero
+    assert float(ex.metrics.fourier_MSE(u, high=2)) == pytest.approx(0.0, abs=1e-6)
+    # If the lower bound is lower than the active modi, the metric must be non-zero
+    assert float(ex.metrics.fourier_MSE(u, low=2)) != pytest.approx(0.0, abs=1e-6)
+    # If the selected frequency interval includes all active modi, the metric
+    # must be non-zero
+    assert float(ex.metrics.fourier_MSE(u, low=2, high=8)) != pytest.approx(
+        0.0, abs=1e-6
+    )
+    # If the selected frequency interval only considers inactive modi, the metric
+    # must be zero
+    assert float(ex.metrics.fourier_MSE(u, low=8, high=16)) == pytest.approx(
+        0.0, abs=1e-6
+    )
+    assert float(ex.metrics.fourier_MSE(u, low=0, high=2)) == pytest.approx(
+        0.0, abs=1e-6
+    )
+    # If the active modi is on the lower end of frequency space, the metric must
+    # be non-zero
+    assert float(ex.metrics.fourier_MSE(u, low=4, high=8)) != pytest.approx(
+        0.0, abs=1e-6
+    )
+    # If the active modi is on the upper end of frequency space, the metric must
+    # be non-zero
+    assert float(ex.metrics.fourier_MSE(u, low=0, high=4)) != pytest.approx(
+        0.0, abs=1e-6
+    )
+
+
+@pytest.mark.parametrize(
     "num_spatial_dims,metric_fn_name",
     [
         (num_spatial_dims, metric_fn_name)
