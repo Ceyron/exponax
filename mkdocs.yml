@@ -89,12 +89,14 @@ nav:
             - 1D Advection: 'examples/simple_advection_example_1d.ipynb'
             - 1D Solver Showcase: 'examples/solver_showcase_1d.ipynb'
             - 1D Initial Condition Showcase: 'examples/initial_condition_showcase_1d.ipynb'
+            - Basics on Metrics: 'examples/on_metrics_simple.ipynb' 
             - Understanding General and Normalized Stepper: 'examples/understanding_general_and_normalized_stepper.ipynb'
             - Subclassing a custom Solver: 'examples/creating_your_own_solvers_1d.ipynb'
             - 2D Advection: 'examples/simple_advection_example_2d.ipynb'
             - 2D Solver Showcase: 'examples/solver_showcase_2d.ipynb'
         - Advanced:
             - 1D Burgers Emulator Training: 'examples/learning_burgers_autoregressive_neural_operator.ipynb'
+            - More on Metrics: 'examples/on_metrics_advanced.ipynb'
         - Additional:
             - Nice Features: 'examples/additional_features.ipynb'
             - Performance Hints: 'examples/performance_hints.ipynb'
@@ -165,10 +167,11 @@ nav:
         - Interpolation: 'api/utilities/interpolation.md'
         - Normalized & Difficulty: 'api/utilities/normalized_and_difficulty.md'
         - Metrics:
-            - MSE-based: 'api/utilities/metrics/mse_based.md'
-            - RMSE-based: 'api/utilities/metrics/rmse_based.md'
+            - Spatial: 'api/utilities/metrics/spatial.md'
+            - Fourier-based: 'api/utilities/metrics/fourier.md'
+            - Derivative-based: 'api/utilities/metrics/derivative.md'
             - Correlation: 'api/utilities/metrics/correlation.md'
-            - Fourier nRMSE: 'api/utilities/metrics/fourier_nrmse.md'
+            - Utilities: 'api/utilities/metrics/utils.md'
         - Visualization:
             - Plot States: 'api/utilities/visualization/plot_states.md'
             - Plot Spatio-Temporal: 'api/utilities/visualization/plot_spatio_temporal.md'

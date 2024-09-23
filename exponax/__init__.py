@@ -1,7 +1,6 @@
-from . import _metrics as metrics
 from . import _poisson as poisson
 from . import _spectral as spectral
-from . import etdrk, ic, nonlin_fun, stepper, viz
+from . import etdrk, ic, metrics, nonlin_fun, stepper, viz
 from ._base_stepper import BaseStepper
 from ._forced_stepper import ForcedStepper
 from ._interpolation import FourierInterpolator, map_between_resolutions
