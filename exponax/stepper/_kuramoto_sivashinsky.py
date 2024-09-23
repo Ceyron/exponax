@@ -205,6 +205,14 @@ class KuramotoSivashinskyConservative(BaseStepper):
         self.single_channel = single_channel
         self.dealiasing_fraction = dealiasing_fraction
 
+        if num_spatial_dims > 1:
+            print(
+                "Warning: The KS equation in conservative format does not generalize well to higher dimensions."
+            )
+            print(
+                "Consider using the combustion format (`exponax.stepper.KuramotoSivashinsky`) instead."
+            )
+
         if single_channel:
             num_channels = 1
         else:
