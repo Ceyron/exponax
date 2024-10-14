@@ -132,7 +132,8 @@ def spatial_norm(
     - `state_ref`: The reference state tensor. Must have the same shape as
         `state`. If not specified, only the absolute norm of `state` is
         computed.
-    - `mode`: The mode of the norm. Either `"absolute"` or `"normalized"`.
+    - `mode`: The mode of the norm. Either `"absolute"`, `"normalized"`, or
+        `"symmetric"`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
     - `inner_exponent`: The exponent `p` in the L^p norm.
     - `outer_exponent`: The exponent `q` the result after aggregation is raised
@@ -141,6 +142,8 @@ def spatial_norm(
     if state_ref is None:
         if mode == "normalized":
             raise ValueError("mode 'normalized' requires state_ref")
+        if mode == "symmetric":
+            raise ValueError("mode 'symmetric' requires state_ref")
         diff = state
     else:
         diff = state - state_ref
@@ -165,6 +168,27 @@ def spatial_norm(
         )(state_ref)
         normalized_diff_per_channel = diff_norm_per_channel / ref_norm_per_channel
         norm_per_channel = normalized_diff_per_channel
+    elif mode == "symmetric":
+        state_norm_per_channel = jax.vmap(
+            lambda s: spatial_aggregator(
+                s,
+                domain_extent=domain_extent,
+                inner_exponent=inner_exponent,
+                outer_exponent=outer_exponent,
+            ),
+        )(state)
+        ref_norm_per_channel = jax.vmap(
+            lambda r: spatial_aggregator(
+                r,
+                domain_extent=domain_extent,
+                inner_exponent=inner_exponent,
+                outer_exponent=outer_exponent,
+            ),
+        )(state_ref)
+        symmetric_diff_per_channel = (
+            2 * diff_norm_per_channel / (state_norm_per_channel + ref_norm_per_channel)
+        )
+        norm_per_channel = symmetric_diff_per_channel
     else:
         norm_per_channel = diff_norm_per_channel
 
