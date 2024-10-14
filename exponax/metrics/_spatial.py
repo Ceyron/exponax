@@ -84,7 +84,7 @@ def spatial_norm(
     state: Float[Array, "C ... N"],
     state_ref: Optional[Float[Array, "C ... N"]] = None,
     *,
-    mode: Literal["absolute", "normalized"] = "absolute",
+    mode: Literal["absolute", "normalized", "symmetric"] = "absolute",
     domain_extent: float = 1.0,
     inner_exponent: float = 2.0,
     outer_exponent: Optional[float] = None,
@@ -97,13 +97,18 @@ def spatial_norm(
     control, consider using [`exponax.metrics.spatial_aggregator`][] directly.
 
     This function allows providing a second state (`state_ref`) to compute
-    either the absolute or normalized difference. The `"absolute"` mode computes
+    either the absolute, normalized, or symmetric difference. The `"absolute"`
+    mode computes
 
-        (‖|uₕ − uₕʳ|ᵖ ‖_L²(Ω))^q
+        (‖uₕ - uₕʳ‖_L^p(Ω))^(q*p)
 
     while the `"normalized"` mode computes
 
-        (‖|uₕ − uₕʳ|ᵖ‖_ L²(Ω))^q / (‖|uₕʳ|ᵖ‖_ L²(Ω))^q
+        (‖uₕ - uₕʳ‖_L^p(Ω))^(q*p) / (‖uₕʳ‖_L^p(Ω))^(q*p)
+
+    and the `"symmetric"` mode computes
+
+        2 * (‖uₕ - uₕʳ‖_L^p(Ω))^(q*p) / (‖uₕ‖_L^p(Ω))^(q*p) + (‖uₕʳ‖_L^p(Ω))^(q*p)
 
     In either way, the channels are summed **after** the aggregation. The
     `inner_exponent` corresponds to `p` in the above formulas. The
