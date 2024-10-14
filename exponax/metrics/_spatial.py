@@ -107,11 +107,11 @@ def spatial_norm(
 
     while the `"normalized"` mode computes
 
-        (‖uₕ - uₕʳ‖_L^p(Ω))^(q*p) / (‖uₕʳ‖_L^p(Ω))^(q*p)
+        (‖uₕ - uₕʳ‖_L^p(Ω))^(q*p) / ((‖uₕʳ‖_L^p(Ω))^(q*p))
 
     and the `"symmetric"` mode computes
 
-        2 * (‖uₕ - uₕʳ‖_L^p(Ω))^(q*p) / (‖uₕ‖_L^p(Ω))^(q*p) + (‖uₕʳ‖_L^p(Ω))^(q*p)
+        2 * (‖uₕ - uₕʳ‖_L^p(Ω))^(q*p) / ((‖uₕ‖_L^p(Ω))^(q*p) + (‖uₕʳ‖_L^p(Ω))^(q*p))
 
     In either way, the channels are summed **after** the aggregation. The
     `inner_exponent` corresponds to `p` in the above formulas. The
