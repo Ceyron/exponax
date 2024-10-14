@@ -393,7 +393,7 @@ def RMSE(
     Given the correct `domain_extent`, this is consistent to the following
     functional norm:
 
-        (‖ u - uʳ ‖_L²(Ω)) = (∫_Ω |u(x) - uʳ(x)|² dx)
+        (‖ u - uʳ ‖_L²(Ω)) = √(∫_Ω |u(x) - uʳ(x)|² dx)
 
     The channel axis is summed **after** the aggregation. Hence, it is also
     summed **after** the square root. If you need the RMSE per channel, consider
@@ -443,7 +443,7 @@ def nRMSE(
     Given the correct `domain_extent`, this is consistent to the following
     functional norm:
 
-        (‖ u - uʳ ‖_L²(Ω) / ‖ uʳ ‖_L²(Ω)) = (∫_Ω |u(x) - uʳ(x)|² dx / ∫_Ω
+        (‖ u - uʳ ‖_L²(Ω) / ‖ uʳ ‖_L²(Ω)) = √(∫_Ω |u(x) - uʳ(x)|² dx / ∫_Ω
         |uʳ(x)|² dx
 
     The channel axis is summed **after** the aggregation. Hence, it is also
