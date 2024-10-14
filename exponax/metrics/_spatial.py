@@ -25,13 +25,16 @@ def spatial_aggregator(
     and the right is not, there is the following relation between a continuous
     function `u(x)` and its discretely sampled counterpart `uₕ`
 
-        ‖ u(x) ‖ᵖ_Lᵖ(Ω) = (∫_Ω |u(x)|ᵖ dx)^(1/p) = ( (L/N)ᴰ ∑ᵢ|uᵢ|ᵖ )^(1/p)
+        ‖ u(x) ‖_Lᵖ(Ω) = (∫_Ω |u(x)|ᵖ dx)^(1/p) ≈ ( (L/N)ᴰ ∑ᵢ|uᵢ|ᵖ )^(1/p)
 
     where the summation `∑ᵢ` must be understood as a sum over all `Nᴰ` points
     across all spatial dimensions. The `inner_exponent` corresponds to `p` in
-    the above formula. This function allows setting the outer exponent `q`
-    manually. If it is not specified, it is set to `1/q = 1/p` to get a valid
-    norm.
+    the above formula. This function also allows setting the outer exponent `q`
+    which via
+
+        ( (L/N)ᴰ ∑ᵢ|uᵢ|ᵖ )^q
+
+    If it is not specified, it is set to `q = 1/p` to get a valid norm.
 
     !!! tip
         To apply this function to a state tensor with a leading channel axis,
@@ -40,7 +43,7 @@ def spatial_aggregator(
     **Arguments:**
 
     - `state_no_channel`: The state tensor **without a leading channel
-        dimension**.
+        axis**.
     - `num_spatial_dims`: The number of spatial dimensions. If not specified,
         it is inferred from the number of axes in `state_no_channel`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
