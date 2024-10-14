@@ -17,8 +17,11 @@ from ._spatial import (
     nMAE,
     nMSE,
     nRMSE,
+    sMAE,
+    sMSE,
     spatial_aggregator,
     spatial_norm,
+    sRMSE,
 )
 from ._utils import mean_metric
 
@@ -31,6 +34,9 @@ __all__ = [
     "nMAE",
     "nMSE",
     "nRMSE",
+    "sMAE",
+    "sMSE",
+    "sRMSE",
     "fourier_aggregator",
     "fourier_norm",
     "fourier_MAE",
