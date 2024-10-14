@@ -24,6 +24,18 @@
 
 ---
 
+::: exponax.metrics.sMAE
+
+---
+
+::: exponax.metrics.sMSE
+
+---
+
+::: exponax.metrics.sRMSE
+
+---
+
 ::: exponax.metrics.spatial_norm
 
 ---

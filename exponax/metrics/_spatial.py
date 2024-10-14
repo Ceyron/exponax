@@ -25,13 +25,16 @@ def spatial_aggregator(
     and the right is not, there is the following relation between a continuous
     function `u(x)` and its discretely sampled counterpart `uₕ`
 
-        ‖ u(x) ‖ᵖ_Lᵖ(Ω) = (∫_Ω |u(x)|ᵖ dx)^(1/p) = ( (L/N)ᴰ ∑ᵢ|uᵢ|ᵖ )^(1/p)
+        ‖ u(x) ‖_Lᵖ(Ω) = (∫_Ω |u(x)|ᵖ dx)^(1/p) ≈ ( (L/N)ᴰ ∑ᵢ|uᵢ|ᵖ )^(1/p)
 
     where the summation `∑ᵢ` must be understood as a sum over all `Nᴰ` points
     across all spatial dimensions. The `inner_exponent` corresponds to `p` in
-    the above formula. This function allows setting the outer exponent `q`
-    manually. If it is not specified, it is set to `1/q = 1/p` to get a valid
-    norm.
+    the above formula. This function also allows setting the outer exponent `q`
+    which via
+
+        ( (L/N)ᴰ ∑ᵢ|uᵢ|ᵖ )^q
+
+    If it is not specified, it is set to `q = 1/p` to get a valid norm.
 
     !!! tip
         To apply this function to a state tensor with a leading channel axis,
@@ -40,7 +43,7 @@ def spatial_aggregator(
     **Arguments:**
 
     - `state_no_channel`: The state tensor **without a leading channel
-        dimension**.
+        axis**.
     - `num_spatial_dims`: The number of spatial dimensions. If not specified,
         it is inferred from the number of axes in `state_no_channel`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
@@ -84,7 +87,7 @@ def spatial_norm(
     state: Float[Array, "C ... N"],
     state_ref: Optional[Float[Array, "C ... N"]] = None,
     *,
-    mode: Literal["absolute", "normalized"] = "absolute",
+    mode: Literal["absolute", "normalized", "symmetric"] = "absolute",
     domain_extent: float = 1.0,
     inner_exponent: float = 2.0,
     outer_exponent: Optional[float] = None,
@@ -97,13 +100,18 @@ def spatial_norm(
     control, consider using [`exponax.metrics.spatial_aggregator`][] directly.
 
     This function allows providing a second state (`state_ref`) to compute
-    either the absolute or normalized difference. The `"absolute"` mode computes
+    either the absolute, normalized, or symmetric difference. The `"absolute"`
+    mode computes
 
-        (‖|uₕ − uₕʳ|ᵖ ‖_L²(Ω))^q
+        (‖uₕ - uₕʳ‖_L^p(Ω))^(q*p)
 
     while the `"normalized"` mode computes
 
-        (‖|uₕ − uₕʳ|ᵖ‖_ L²(Ω))^q / (‖|uₕʳ|ᵖ‖_ L²(Ω))^q
+        (‖uₕ - uₕʳ‖_L^p(Ω))^(q*p) / ((‖uₕʳ‖_L^p(Ω))^(q*p))
+
+    and the `"symmetric"` mode computes
+
+        2 * (‖uₕ - uₕʳ‖_L^p(Ω))^(q*p) / ((‖uₕ‖_L^p(Ω))^(q*p) + (‖uₕʳ‖_L^p(Ω))^(q*p))
 
     In either way, the channels are summed **after** the aggregation. The
     `inner_exponent` corresponds to `p` in the above formulas. The
@@ -124,7 +132,8 @@ def spatial_norm(
     - `state_ref`: The reference state tensor. Must have the same shape as
         `state`. If not specified, only the absolute norm of `state` is
         computed.
-    - `mode`: The mode of the norm. Either `"absolute"` or `"normalized"`.
+    - `mode`: The mode of the norm. Either `"absolute"`, `"normalized"`, or
+        `"symmetric"`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
     - `inner_exponent`: The exponent `p` in the L^p norm.
     - `outer_exponent`: The exponent `q` the result after aggregation is raised
@@ -133,6 +142,8 @@ def spatial_norm(
     if state_ref is None:
         if mode == "normalized":
             raise ValueError("mode 'normalized' requires state_ref")
+        if mode == "symmetric":
+            raise ValueError("mode 'symmetric' requires state_ref")
         diff = state
     else:
         diff = state - state_ref
@@ -157,6 +168,27 @@ def spatial_norm(
         )(state_ref)
         normalized_diff_per_channel = diff_norm_per_channel / ref_norm_per_channel
         norm_per_channel = normalized_diff_per_channel
+    elif mode == "symmetric":
+        state_norm_per_channel = jax.vmap(
+            lambda s: spatial_aggregator(
+                s,
+                domain_extent=domain_extent,
+                inner_exponent=inner_exponent,
+                outer_exponent=outer_exponent,
+            ),
+        )(state)
+        ref_norm_per_channel = jax.vmap(
+            lambda r: spatial_aggregator(
+                r,
+                domain_extent=domain_extent,
+                inner_exponent=inner_exponent,
+                outer_exponent=outer_exponent,
+            ),
+        )(state_ref)
+        symmetric_diff_per_channel = (
+            2 * diff_norm_per_channel / (state_norm_per_channel + ref_norm_per_channel)
+        )
+        norm_per_channel = symmetric_diff_per_channel
     else:
         norm_per_channel = diff_norm_per_channel
 
@@ -255,6 +287,55 @@ def nMAE(
     )
 
 
+def sMAE(
+    u_pred: Float[Array, "C ... N"],
+    u_ref: Float[Array, "C ... N"],
+    *,
+    domain_extent: float = 1.0,
+) -> float:
+    """
+    Compute the symmetric mean absolute error (sMAE) between two states.
+
+        ∑_(channels) [2 ∑_(space) (L/N)ᴰ |uₕ - uₕʳ| / (∑_(space) (L/N)ᴰ |uₕ| + ∑_(space) (L/N)ᴰ |uₕʳ|)]
+
+    Given the correct `domain_extent`, this is consistent to the following
+    functional norm:
+
+        2 ∫_Ω |u(x) - uʳ(x)| dx / (∫_Ω |u(x)| dx + ∫_Ω |uʳ(x)| dx)
+
+    The channel axis is summed **after** the aggregation.
+
+    !!! tip
+        To apply this function to a state tensor with a leading batch axis, use
+        `jax.vmap`. Then the batch axis can be reduced, e.g., by `jnp.mean`. As
+        a helper for this, [`exponax.metrics.mean_metric`][] is provided.
+
+    !!! info
+        This symmetric metric is bounded between 0 and C with C being the number
+        of channels.
+
+
+    **Arguments:**
+
+    - `u_pred`: The state array, must follow the `Exponax` convention with a
+        leading channel axis, and either one, two, or three subsequent spatial
+        axes.
+    - `u_ref`: The reference state array. Must have the same shape as `u_pred`.
+    - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`. Must be
+        provide to get the correctly consistent norm. If this metric is used an
+        optimization objective, it can often be ignored since it only
+        contributes a multiplicative factor.
+    """
+    return spatial_norm(
+        u_pred,
+        u_ref,
+        mode="symmetric",
+        domain_extent=domain_extent,
+        inner_exponent=1.0,
+        outer_exponent=1.0,
+    )
+
+
 def MSE(
     u_pred: Float[Array, "C ... N"],
     u_ref: Optional[Float[Array, "C ... N"]] = None,
@@ -347,6 +428,55 @@ def nMSE(
     )
 
 
+def sMSE(
+    u_pred: Float[Array, "C ... N"],
+    u_ref: Float[Array, "C ... N"],
+    *,
+    domain_extent: float = 1.0,
+) -> float:
+    """
+    Compute the symmetric mean squared error (sMSE) between two states.
+
+        ∑_(channels) [2 ∑_(space) (L/N)ᴰ |uₕ - uₕʳ|² / (∑_(space) (L/N)ᴰ |uₕ|² + ∑_(space) (L/N)ᴰ |uₕʳ|²)]
+
+    Given the correct `domain_extent`, this is consistent to the following
+    functional norm:
+
+        2 ∫_Ω |u(x) - uʳ(x)|² dx / (∫_Ω |u(x)|² dx + ∫_Ω |uʳ(x)|² dx)
+
+    The channel axis is summed **after** the aggregation.
+
+    !!! tip
+        To apply this function to a state tensor with a leading batch axis, use
+        `jax.vmap`. Then the batch axis can be reduced, e.g., by `jnp.mean`. As
+        a helper for this, [`exponax.metrics.mean_metric`][] is provided.
+
+    !!! info
+        This symmetric metric is bounded between 0 and C with C being the number
+        of channels.
+
+
+    **Arguments:**
+
+    - `u_pred`: The state array, must follow the `Exponax` convention with a
+        leading channel axis, and either one, two, or three subsequent spatial
+        axes.
+    - `u_ref`: The reference state array. Must have the same shape as `u_pred`.
+    - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`. Must be
+        provide to get the correctly consistent norm. If this metric is used an
+        optimization objective, it can often be ignored since it only
+        contributes a multiplicative factor.
+    """
+    return spatial_norm(
+        u_pred,
+        u_ref,
+        mode="symmetric",
+        domain_extent=domain_extent,
+        inner_exponent=2.0,
+        outer_exponent=1.0,
+    )
+
+
 def RMSE(
     u_pred: Float[Array, "C ... N"],
     u_ref: Optional[Float[Array, "C ... N"]] = None,
@@ -361,7 +491,7 @@ def RMSE(
     Given the correct `domain_extent`, this is consistent to the following
     functional norm:
 
-        (‖ u - uʳ ‖_L²(Ω)) = (∫_Ω |u(x) - uʳ(x)|² dx)
+        (‖ u - uʳ ‖_L²(Ω)) = √(∫_Ω |u(x) - uʳ(x)|² dx)
 
     The channel axis is summed **after** the aggregation. Hence, it is also
     summed **after** the square root. If you need the RMSE per channel, consider
@@ -411,7 +541,7 @@ def nRMSE(
     Given the correct `domain_extent`, this is consistent to the following
     functional norm:
 
-        (‖ u - uʳ ‖_L²(Ω) / ‖ uʳ ‖_L²(Ω)) = (∫_Ω |u(x) - uʳ(x)|² dx / ∫_Ω
+        (‖ u - uʳ ‖_L²(Ω) / ‖ uʳ ‖_L²(Ω)) = √(∫_Ω |u(x) - uʳ(x)|² dx / ∫_Ω
         |uʳ(x)|² dx
 
     The channel axis is summed **after** the aggregation. Hence, it is also
@@ -440,6 +570,59 @@ def nRMSE(
         u_pred,
         u_ref,
         mode="normalized",
+        domain_extent=domain_extent,
+        inner_exponent=2.0,
+        outer_exponent=0.5,
+    )
+
+
+def sRMSE(
+    u_pred: Float[Array, "C ... N"],
+    u_ref: Float[Array, "C ... N"],
+    *,
+    domain_extent: float = 1.0,
+) -> float:
+    """
+    Compute the symmetric root mean squared error (sRMSE) between two states.
+
+        ∑_(channels) [2 √(∑_(space) (L/N)ᴰ |uₕ - uₕʳ|²) / (√(∑_(space) (L/N)ᴰ
+        |uₕ|²) + √(∑_(space) (L/N)ᴰ |uₕʳ|²))]
+
+    Given the correct `domain_extent`, this is consistent to the following
+    functional norm:
+
+        2 √(∫_Ω |u(x) - uʳ(x)|² dx) / (√(∫_Ω |u(x)|² dx) + √(∫_Ω |uʳ(x)|² dx))
+
+    The channel axis is summed **after** the aggregation. Hence, it is also
+    summed **after** the square root and after normalization. If you need more
+    fine-grained control, consider using
+    [`exponax.metrics.spatial_aggregator`][] directly.
+
+    !!! tip
+        To apply this function to a state tensor with a leading batch axis, use
+        `jax.vmap`. Then the batch axis can be reduced, e.g., by `jnp.mean`. As
+        a helper for this, [`exponax.metrics.mean_metric`][] is provided.
+
+    !!! info
+        This symmetric metric is bounded between 0 and C with C being the number
+        of channels.
+
+
+    **Arguments:**
+
+    - `u_pred`: The state array, must follow the `Exponax` convention with a
+        leading channel axis, and either one, two, or three subsequent spatial
+        axes.
+    - `u_ref`: The reference state array. Must have the same shape as `u_pred`.
+    - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`. Must be
+        provide to get the correctly consistent norm. If this metric is used an
+        optimization objective, it can often be ignored since it only contributes
+        a multiplicative factor
+    """
+    return spatial_norm(
+        u_pred,
+        u_ref,
+        mode="symmetric",
         domain_extent=domain_extent,
         inner_exponent=2.0,
         outer_exponent=0.5,

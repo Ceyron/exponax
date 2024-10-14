@@ -36,7 +36,7 @@ def fourier_aggregator(
     !!! info
         The result of this function (under default settings) is (up to rounding
         errors) identical to [`exponax.metrics.spatial_aggregator`][] for
-        `inner_exponent=1.0`. As such, it can be a consistent counterpart for
+        `inner_exponent=2.0`. As such, it can be a consistent counterpart for
         metrics based on the `L²(Ω)` functional norm.
 
     !!! tip
