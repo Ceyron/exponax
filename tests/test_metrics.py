@@ -35,6 +35,15 @@ def test_constant_offset(num_spatial_dims: int):
     assert ex.metrics.nMSE(u_0, u_1) == pytest.approx((2.0 - 4.0) ** 2 / (4.0) ** 2)
     assert ex.metrics.nMSE(u_0, u_1) == pytest.approx(1 / 4)
 
+    # == approx(0.4
+    assert ex.metrics.sMSE(u_1, u_0) == pytest.approx(
+        2.0 * (4.0 - 2.0) ** 2 / ((2.0) ** 2 + (4.0) ** 2)
+    )
+    assert ex.metrics.sMSE(u_1, u_0) == pytest.approx(0.4)
+
+    # Symmetric metric must be symmetric
+    assert ex.metrics.sMSE(u_0, u_1) == ex.metrics.sMSE(u_1, u_0)
+
     assert ex.metrics.RMSE(u_1, u_0, domain_extent=1.0) == pytest.approx(2.0)
     assert ex.metrics.RMSE(u_1, u_0, domain_extent=DOMAIN_EXTENT) == pytest.approx(
         jnp.sqrt(DOMAIN_EXTENT**num_spatial_dims * 4.0)
@@ -59,6 +68,9 @@ def test_constant_offset(num_spatial_dims: int):
         jnp.sqrt((2.0 - 4.0) ** 2 / 4.0**2)
     )
     assert ex.metrics.nRMSE(u_0, u_1) == pytest.approx(0.5)
+
+    # == approx(2/3)
+    assert ex.metrics.sRMSE(u_1, u_0) == pytest.approx(2 / 3)
 
     # The Fourier nRMSE should be identical to the spatial nRMSE
     # assert ex.metrics.fourier_nRMSE(u_1, u_0) == ex.metrics.nRMSE(u_1, u_0)
