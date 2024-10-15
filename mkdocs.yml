@@ -1,3 +1,5 @@
+# Settings are inspired by
+# https://github.com/patrick-kidger/equinox/blob/main/mkdocs.yml
 site_name: Exponax
 site_description: Fast & Differentiable PDE solvers in JAX.
 site_author: Felix Koehler
@@ -5,14 +7,14 @@ site_url: https://fkoehler.site/exponax
 
 repo_url: https://github.com/Ceyron/exponax
 repo_name: Ceyron/exponax
-edit_uri: ""  # No edit button, as some of our pages are in /docs and some in /examples via symlink, so it's impossible for them all to be accurate
+edit_uri: ""  # No edit button
 
 theme:
     name: material
     features:
-        - navigation.sections  # Sections are included in the navigation on the left.
-        - toc.integrate  # Table of contents is integrated on the left; does not appear separately on the right.
+        - navigation.sections
         - header.autohide  # header disappears as you scroll
+        # - navigation.top  # render button to quickly scroll up
     palette:
         - scheme: default
           primary: teal
@@ -61,7 +63,7 @@ extra_javascript:
     - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 plugins:
-    - search  # default search plugin; needs manually re-enabling when using any other plugins
+    - search  # requires re-enabling
     - autorefs  # Cross-links to headings
     - mknotebooks  # Jupyter notebooks
     - mkdocstrings:
@@ -87,55 +89,59 @@ nav:
             - 1D Advection: 'examples/simple_advection_example_1d.ipynb'
             - 1D Solver Showcase: 'examples/solver_showcase_1d.ipynb'
             - 1D Initial Condition Showcase: 'examples/initial_condition_showcase_1d.ipynb'
+            - Basics on Metrics: 'examples/on_metrics_simple.ipynb' 
             - Understanding General and Normalized Stepper: 'examples/understanding_general_and_normalized_stepper.ipynb'
             - Subclassing a custom Solver: 'examples/creating_your_own_solvers_1d.ipynb'
             - 2D Advection: 'examples/simple_advection_example_2d.ipynb'
             - 2D Solver Showcase: 'examples/solver_showcase_2d.ipynb'
         - Advanced:
             - 1D Burgers Emulator Training: 'examples/learning_burgers_autoregressive_neural_operator.ipynb'
+            - More on Metrics: 'examples/on_metrics_advanced.ipynb'
         - Additional:
             - Nice Features: 'examples/additional_features.ipynb'
             - Performance Hints: 'examples/performance_hints.ipynb'
     - Stepper:
-        - Physical:
-            - Linear:
-                - Advection: 'api/stepper/physical/linear/advection.md'
-                - Diffusion: 'api/stepper/physical/linear/diffusion.md'
-                - Advection-Diffusion: 'api/stepper/physical/linear/advection_diffusion.md'
-                - Dispersion: 'api/stepper/physical/linear/dispersion.md'
-                - Hyper-Diffusion: 'api/stepper/physical/linear/hyper_diffusion.md'
-            - Burgers: 'api/stepper/physical/burgers.md'
-            - Korteweg-de Vries: 'api/stepper/physical/kdv.md'
-            - Kuramoto-Sivashinsky: 'api/stepper/physical/ks.md'
-            - Kuramoto-Sivashinsky (Conservative): 'api/stepper/physical/ks_cons.md'
-            - Navier-Stokes: 'api/stepper/physical/navier_stokes.md'
-            - Reaction-Diffusion:
-                - Fisher-KPP: 'api/stepper/physical/reaction_diffusion/fisher_kpp.md'
-                - Allen-Cahn: 'api/stepper/physical/reaction_diffusion/allen_cahn.md'
-                - Cahn-Hilliard: 'api/stepper/physical/reaction_diffusion/cahn_hilliard.md'
-                - Swift-Hohenberg: 'api/stepper/physical/reaction_diffusion/swift_hohenberg.md'
-                - Gray-Scott: 'api/stepper/physical/reaction_diffusion/gray_scott.md'
-            - General:
-                - General Linear: 'api/stepper/physical/general/general_linear.md'
-                - General Convection: 'api/stepper/physical/general/general_convection.md'
-                - General Gradient Norm: 'api/stepper/physical/general/general_gradient_norm.md'
-                - General Polynomial: 'api/stepper/physical/general/general_polynomial.md'
-                - General Nonlinear: 'api/stepper/physical/general/general_nonlinear.md'
-                - General Vorticity Convection: 'api/stepper/physical/general/general_vorticity_convection.md'
-            - Poisson: 'api/stepper/physical/poisson.md'
-        - Normalized:
-            - Linear: 'api/stepper/normalized/linear.md'
-            - Convection: 'api/stepper/normalized/convection.md'
-            - Gradient Norm: 'api/stepper/normalized/gradient_norm.md'
-            - Polynomial: 'api/stepper/normalized/polynomial.md'
-            - Nonlinear: 'api/stepper/normalized/nonlinear.md'
-            - Vorticity Convection: 'api/stepper/normalized/vorticity_convection.md'
-        - Difficulty:
-            - Linear: 'api/stepper/difficulty/linear.md'
-            - Convection: 'api/stepper/difficulty/convection.md'
-            - Gradient Norm: 'api/stepper/difficulty/gradient_norm.md'
-            - Polynomial: 'api/stepper/difficulty/polynomial.md'
-            - Nonlinear: 'api/stepper/difficulty/nonlinear.md'
+        - Overview: 'api/stepper/overview.md'
+        - Linear:
+            - Advection: 'api/stepper/linear/advection.md'
+            - Diffusion: 'api/stepper/linear/diffusion.md'
+            - Advection-Diffusion: 'api/stepper/linear/advection_diffusion.md'
+            - Dispersion: 'api/stepper/linear/dispersion.md'
+            - Hyper-Diffusion: 'api/stepper/linear/hyper_diffusion.md'
+        - Nonlinear:
+            - Burgers: 'api/stepper/nonlinear/burgers.md'
+            - Korteweg-de Vries: 'api/stepper/nonlinear/kdv.md'
+            - Kuramoto-Sivashinsky: 'api/stepper/nonlinear/ks.md'
+            - Kuramoto-Sivashinsky (Conservative): 'api/stepper/nonlinear/ks_cons.md'
+            - Navier-Stokes: 'api/stepper/nonlinear/navier_stokes.md'
+        - Reaction:
+            - Fisher-KPP: 'api/stepper/reaction/fisher_kpp.md'
+            - Allen-Cahn: 'api/stepper/reaction/allen_cahn.md'
+            - Cahn-Hilliard: 'api/stepper/reaction/cahn_hilliard.md'
+            - Swift-Hohenberg: 'api/stepper/reaction/swift_hohenberg.md'
+            - Gray-Scott: 'api/stepper/reaction/gray_scott.md'
+        - Generic:
+            - Physical:
+                - General Linear: 'api/stepper/generic/physical/general_linear.md'
+                - General Convection: 'api/stepper/generic/physical/general_convection.md'
+                - General Gradient Norm: 'api/stepper/generic/physical/general_gradient_norm.md'
+                - General Polynomial: 'api/stepper/generic/physical/general_polynomial.md'
+                - General Nonlinear: 'api/stepper/generic/physical/general_nonlinear.md'
+                - General Vorticity Convection: 'api/stepper/generic/physical/general_vorticity_convection.md'
+            - Normalized:
+                - Linear: 'api/stepper/generic/normalized/normalized_linear.md'
+                - Convection: 'api/stepper/generic/normalized/normalized_convection.md'
+                - Gradient Norm: 'api/stepper/generic/normalized/normalized_gradient_norm.md'
+                - Polynomial: 'api/stepper/generic/normalized/normalized_polynomial.md'
+                - Nonlinear: 'api/stepper/generic/normalized/normalized_nonlinear.md'
+            - Difficulty:
+                - Linear: 'api/stepper/generic/difficulty/difficulty_linear.md'
+                - Convection: 'api/stepper/generic/difficulty/difficulty_convection.md'
+                - Gradient Norm: 'api/stepper/generic/difficulty/difficulty_gradient_norm.md'
+                - Polynomial: 'api/stepper/generic/difficulty/difficulty_polynomial.md'
+                - Nonlinear: 'api/stepper/generic/difficulty/difficulty_nonlinear.md'
+        - Additional:
+            - Poisson: 'api/stepper/additional/poisson.md'
     - Utilities:
         - Nonlinear Functions:
             - Zero: 'api/utilities/nonlin_fun/zero.md'
@@ -157,12 +163,15 @@ nav:
         - Rollout & Repeat: 'api/utilities/rollout_and_repeat.md'
         - Grid Generation: 'api/utilities/grid_generation.md'
         - Derivatives: 'api/utilities/derivatives.md'
+        - Spectral: 'api/utilities/spectral.md'
+        - Interpolation: 'api/utilities/interpolation.md'
         - Normalized & Difficulty: 'api/utilities/normalized_and_difficulty.md'
         - Metrics:
-            - MSE-based: 'api/utilities/metrics/mse_based.md'
-            - RMSE-based: 'api/utilities/metrics/rmse_based.md'
+            - Spatial: 'api/utilities/metrics/spatial.md'
+            - Fourier-based: 'api/utilities/metrics/fourier.md'
+            - Derivative-based: 'api/utilities/metrics/derivative.md'
             - Correlation: 'api/utilities/metrics/correlation.md'
-            - Fourier nRMSE: 'api/utilities/metrics/fourier_nrmse.md'
+            - Utilities: 'api/utilities/metrics/utils.md'
         - Visualization:
             - Plot States: 'api/utilities/visualization/plot_states.md'
             - Plot Spatio-Temporal: 'api/utilities/visualization/plot_spatio_temporal.md'

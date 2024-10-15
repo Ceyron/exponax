@@ -18,13 +18,59 @@ class GeneralNonlinearFun(BaseNonlinearFun):
         *,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
         dealiasing_fraction: float,
-        scale_list: tuple[float, ...] = [0.0, -1.0, 0.0],
+        scale_list: tuple[float, float, float] = (0.0, -1.0, 0.0),
         zero_mode_fix: bool = True,
     ):
         """
-        Uses an additional scaling of 0.5 on the latter two components only
+        Fourier pseudo-spectral evaluation of a nonlinear differential operator
+        that has a square, convection (with single-channel hack), and gradient
+        norm term. In 1D and state space, this reads
 
-        By default: Burgers equation
+        ```
+            𝒩(u) = b₀ u² + b₁ 1/2 (u²)ₓ + b₂ 1/2 (uₓ)²
+        ```
+
+        The higher-dimensional extension is designed for a single-channel state
+        `u` (i.e., the number of channels do not grow with the number of spatial
+        dimensions, see also the description of
+        `exponax.nonlin_fun.ConvectionNonlinearFun`). The extension reads
+
+        ```
+            𝒩(u) = b₀ u² + b₁ 1/2 (1⃗ ⋅ ∇)(u²) + b₂ 1/2 ‖∇u‖₂²
+        ```
+
+        !!! warning
+            In contrast to the individual nonlinear functions
+            `exponax.nonlin_fun.ConvectionNonlinearFun` and
+            `exponax.nonlin_fun.GradientNormNonlinearFun`, there is no minus.
+            Hence, to have a "propoper" convection term, consider supplying a
+            negative scale for the convection term, etc.
+
+        **Arguments**:
+
+        - `num_spatial_dims`: The number of spatial dimensions `D`.
+        - `num_points`: The number of points `N` used to discretize the domain.
+            This **includes** the left boundary point and **excludes** the right
+            boundary point. In higher dimensions; the number of points in each
+            dimension is the same.
+        - `derivative_operator`: A complex array of shape `(D, ..., N//2+1)`
+            that represents the derivative operator in Fourier space.
+        - `dealiasing_fraction`: The fraction of the highest resolved modes that
+            are not aliased. Defaults to `2/3` which corresponds to Orszag's 2/3
+            rule.
+        - `scale_list`: A tuple of three floats `[b₀, b₁, b₂]` that represent
+            the scales of the square, (single-channel) convection, and gradient
+            norm term, respectively. Defaults to `[0.0, -1.0, 0.0]` which
+            corresponds to a pure convection term (i.e, in 1D together with a
+            diffusion linear term, this would be the Burgers equation). !!!
+            important: note that negation has to be manually provided!
+        - `zero_mode_fix`: Whether to set the zero mode to zero. In other words,
+            whether to have mean zero energy after nonlinear function activation.
+            This exists because the nonlinear operation happens after the
+            derivative operator is applied. Naturally, the derivative sets any
+            constant offset to zero. However, the square nonlinearity introduces
+            again a new constant offset. Setting this argument to `True` removes
+            this offset. Defaults to `True`.
         """
         if len(scale_list) != 3:
             raise ValueError("The scale list must have exactly 3 elements")

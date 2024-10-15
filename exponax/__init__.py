@@ -1,10 +1,11 @@
-from . import _metrics as metrics
 from . import _poisson as poisson
-from . import etdrk, ic, nonlin_fun, normalized, reaction, stepper, viz
+from . import _spectral as spectral
+from . import etdrk, ic, metrics, nonlin_fun, stepper, viz
 from ._base_stepper import BaseStepper
 from ._forced_stepper import ForcedStepper
+from ._interpolation import FourierInterpolator, map_between_resolutions
 from ._repeated_stepper import RepeatedStepper
-from ._spectral import derivative, make_incompressible
+from ._spectral import derivative, fft, get_spectrum, ifft
 from ._utils import (
     build_ic_set,
     make_grid,
@@ -22,7 +23,9 @@ __all__ = [
     "poisson",
     "RepeatedStepper",
     "derivative",
-    "make_incompressible",
+    "fft",
+    "ifft",
+    "get_spectrum",
     "make_grid",
     "rollout",
     "repeat",
@@ -33,8 +36,9 @@ __all__ = [
     "etdrk",
     "ic",
     "nonlin_fun",
-    "normalized",
-    "reaction",
     "stepper",
     "viz",
+    "spectral",
+    "FourierInterpolator",
+    "map_between_resolutions",
 ]

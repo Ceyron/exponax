@@ -23,8 +23,9 @@ class ScaledICGenerator(BaseRandomICGenerator):
         `max_one=True` or `std_one=True`.
 
         **Arguments**:
-            - `ic_gen`: The initial condition generator.
-            - `scale`: The scaling factor.
+
+        - `ic_gen`: The initial condition generator.
+        - `scale`: The scaling factor.
         """
         self.ic_gen = ic_gen
         self.scale = scale

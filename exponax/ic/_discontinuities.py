@@ -42,14 +42,15 @@ class Discontinuities(BaseIC):
         A state described by a collection of discontinuities.
 
         **Arguments**:
-            - `discontinuity_list`: A tuple of discontinuities.
-            - `zero_mean`: Whether the state should have zero mean.
-            - `std_one`: Whether to normalize the state to have a standard
-                deviation of one. Defaults to `False`. Only works if the offset
-                is zero.
-            - `max_one`: Whether to normalize the state to have the maximum
-                absolute value of one. Defaults to `False`. Only one of
-                `std_one` and `max_one` can be `True`.
+
+        - `discontinuity_list`: A tuple of discontinuities.
+        - `zero_mean`: Whether the state should have zero mean.
+        - `std_one`: Whether to normalize the state to have a standard
+            deviation of one. Defaults to `False`. Only works if the offset is
+            zero.
+        - `max_one`: Whether to normalize the state to have the maximum
+            absolute value of one. Defaults to `False`. Only one of `std_one`
+            and `max_one` can be `True`.
         """
         if not zero_mean and std_one:
             raise ValueError("Cannot have `zero_mean=False` and `std_one=True`.")
@@ -102,17 +103,18 @@ class RandomDiscontinuities(BaseRandomICGenerator):
         discontinuities.
 
         **Arguments**:
-            - `num_spatial_dims`: The number of spatial dimensions.
-            - `domain_extent`: The extent of the domain in each spatial direction.
-            - `num_discontinuities`: The number of discontinuities.
-            - `value_range`: The range of values for the discontinuities.
-            - `zero_mean`: Whether the state should have zero mean.
-            - `std_one`: Whether to normalize the state to have a standard
-                deviation of one. Defaults to `False`. Only works if the offset
-                is zero.
-            - `max_one`: Whether to normalize the state to have the maximum
-                absolute value of one. Defaults to `False`. Only one of
-                `std_one` and `max_one` can be `True`.
+
+        - `num_spatial_dims`: The number of spatial dimensions.
+        - `domain_extent`: The extent of the domain in each spatial direction.
+        - `num_discontinuities`: The number of discontinuities.
+        - `value_range`: The range of values for the discontinuities.
+        - `zero_mean`: Whether the state should have zero mean.
+        - `std_one`: Whether to normalize the state to have a standard
+            deviation of one. Defaults to `False`. Only works if the offset is
+            zero.
+        - `max_one`: Whether to normalize the state to have the maximum
+            absolute value of one. Defaults to `False`. Only one of `std_one`
+            and `max_one` can be `True`.
         """
         if not zero_mean and std_one:
             raise ValueError("Cannot have `zero_mean=False` and `std_one=True`.")
@@ -129,6 +131,9 @@ class RandomDiscontinuities(BaseRandomICGenerator):
         self.max_one = max_one
 
     def gen_one_ic_fn(self, *, key: PRNGKeyArray) -> Discontinuity:
+        """
+        Generates a single discontinuity.
+        """
         lower_limits = []
         upper_limits = []
         for i in range(self.num_spatial_dims):

@@ -20,6 +20,52 @@ class ETDRK2(BaseETDRK):
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
+        r"""
+        Solve a semi-linear PDE using Exponential Time Differencing Runge-Kutta
+        with a **second order approximation**.
+
+        Adopted from Eq. (22) of [Cox and Matthews
+        (2002)](https://doi.org/10.1006/jcph.2002.6995):
+
+        $$
+            \begin{aligned}
+                \hat{u}_h^* &= \exp(\hat{\mathcal{L}}_h \Delta t) \odot
+                \hat{u}_h^{[t]} + \frac{\exp(\hat{\mathcal{L}}_h \Delta t) -
+                1}{\hat{\mathcal{L}}_h} \odot
+                \hat{\mathcal{N}}_h(\hat{u}_h^{[t]}). \\ \hat{u}_h^{[t+1]} &=
+                \hat{u}_h^* + \frac{\exp(\hat{\mathcal{L}}_h \Delta t) - 1 -
+                \hat{\mathcal{L}}_h \Delta t}{\hat{\mathcal{L}}_h^2 \Delta t}
+                \left( \hat{\mathcal{N}}_h(\hat{u}_h^*) -
+                \hat{\mathcal{N}}_h(\hat{u}_h^{[t]}) \right)
+            \end{aligned}
+        $$
+
+        where $\hat{\mathcal{N}}_h$ is the Fourier pseudo-spectral treatment of
+        the nonlinear differential operator.
+
+        **Arguments:**
+
+        - `dt`: The time step size.
+        - `linear_operator`: The linear operator of the PDE. Must have a leading
+            channel axis, followed by one, two or three spatial axes whereas the
+            last axis must be of size `(N//2)+1` where `N` is the number of
+            dimensions in the former spatial axes.
+        - `nonlinear_fun`: The Fourier pseudo-spectral treatment of the
+            nonlinear differential operator. ! The operator must take care of
+            proper dealiasing.
+        - `num_circle_points`: The number of points on the unit circle used to
+            approximate the numerically challenging coefficients.
+        - `circle_radius`: The radius of the circle used to approximate the
+            numerically challenging coefficients.
+
+        !!! warning
+            The nonlinear function must take care of proper dealiasing.
+
+        !!! note
+            The numerically stable evaluation of the coefficients follows
+            [Kassam and Trefethen
+            (2005)](https://doi.org/10.1137/S1064827502410633).
+        """
         super().__init__(dt, linear_operator)
         self._nonlinear_fun = nonlinear_fun
 

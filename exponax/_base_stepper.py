@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 
 import equinox as eqx
-import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
 
 from ._spectral import (
     build_derivative_operator,
-    space_indices,
+    fft,
+    ifft,
     spatial_shape,
     wavenumber_shape,
 )
@@ -164,12 +164,14 @@ class BaseStepper(eqx.Module, ABC):
         Assemble the L operator in Fourier space.
 
         **Arguments:**
-            - `derivative_operator`: The derivative operator, shape `( D, ...,
-              N//2+1 )`. The ellipsis are (D-1) axis of size N (**not** of size
-              N//2+1).
+
+        - `derivative_operator`: The derivative operator, shape `( D, ...,
+            N//2+1 )`. The ellipsis are (D-1) axis of size N (**not** of size
+            N//2+1).
 
         **Returns:**
-            - `L`: The linear operator, shape `( C, ..., N//2+1 )`.
+
+        - `L`: The linear operator, shape `( C, ..., N//2+1 )`.
         """
         pass
 
@@ -183,12 +185,15 @@ class BaseStepper(eqx.Module, ABC):
         transforms to Fourier space, and evaluates derivatives there.
 
         **Arguments:**
-            - `derivative_operator`: The derivative operator, shape `( D, ..., N//2+1 )`.
+
+        - `derivative_operator`: The derivative operator, shape `( D, ...,
+            N//2+1 )`.
 
         **Returns:**
-            - `nonlinear_fun`: A function that evaluates the nonlinearities in
-                time space, transforms to Fourier space, and evaluates the
-                derivatives there. Should be a subclass of `BaseNonlinearFun`.
+
+        - `nonlinear_fun`: A function that evaluates the nonlinearities in
+            time space, transforms to Fourier space, and evaluates the
+            derivatives there. Should be a subclass of `BaseNonlinearFun`.
         """
         pass
 
@@ -197,17 +202,19 @@ class BaseStepper(eqx.Module, ABC):
         Perform one step of the time integration.
 
         **Arguments:**
-            - `u`: The state vector, shape `(C, ..., N,)`.
+
+        - `u`: The state vector, shape `(C, ..., N,)`.
 
         **Returns:**
-            - `u_next`: The state vector after one step, shape `(C, ..., N,)`.
+
+        - `u_next`: The state vector after one step, shape `(C, ..., N,)`.
         """
-        u_hat = jnp.fft.rfftn(u, axes=space_indices(self.num_spatial_dims))
+        u_hat = fft(u, num_spatial_dims=self.num_spatial_dims)
         u_next_hat = self.step_fourier(u_hat)
-        u_next = jnp.fft.irfftn(
+        u_next = ifft(
             u_next_hat,
-            s=spatial_shape(self.num_spatial_dims, self.num_points),
-            axes=space_indices(self.num_spatial_dims),
+            num_spatial_dims=self.num_spatial_dims,
+            num_points=self.num_points,
         )
         return u_next
 
@@ -220,11 +227,13 @@ class BaseStepper(eqx.Module, ABC):
         transforms.
 
         **Arguments:**
-            - `u_hat`: The (real) Fourier transform of the state vector
+
+        - `u_hat`: The (real) Fourier transform of the state vector
 
         **Returns:**
-            - `u_next_hat`: The (real) Fourier transform of the state vector
-                after one step
+
+        - `u_next_hat`: The (real) Fourier transform of the state vector
+            after one step
         """
         return self._integrator.step_fourier(u_hat)
 
@@ -233,7 +242,22 @@ class BaseStepper(eqx.Module, ABC):
         u: Float[Array, "C ... N"],
     ) -> Float[Array, "C ... N"]:
         """
-        Performs a check
+        Perform one step of the time integration for a single state.
+
+        **Arguments:**
+
+        - `u`: The state vector, shape `(C, ..., N,)`.
+
+        **Returns:**
+
+        - `u_next`: The state vector after one step, shape `(C, ..., N,)`.
+
+        !!! tip
+            Use this call method together with `exponax.rollout` to efficiently
+            produce temporal trajectories.
+
+        !!! info
+            For batched operation, use `jax.vmap` on this function.
         """
         expected_shape = (self.num_channels,) + spatial_shape(
             self.num_spatial_dims, self.num_points

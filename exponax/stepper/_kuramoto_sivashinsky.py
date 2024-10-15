@@ -31,7 +31,7 @@ class KuramotoSivashinsky(BaseStepper):
         equation on periodic boundary conditions. Uses the **combustion format**
         (or non-conservative format). Most deep learning papers in 1d considered
         the conservative format available as
-        [`KuramotoSivashinskyConservative`](exponax/stepper/KuramotoSivashinskyConservative).
+        [`exponax.stepper.KuramotoSivashinskyConservative`][].
 
         In 1d, the KS equation is given by
 
@@ -204,6 +204,14 @@ class KuramotoSivashinskyConservative(BaseStepper):
         self.fourth_order_diffusivity = fourth_order_diffusivity
         self.single_channel = single_channel
         self.dealiasing_fraction = dealiasing_fraction
+
+        if num_spatial_dims > 1:
+            print(
+                "Warning: The KS equation in conservative format does not generalize well to higher dimensions."
+            )
+            print(
+                "Consider using the combustion format (`exponax.stepper.KuramotoSivashinsky`) instead."
+            )
 
         if single_channel:
             num_channels = 1
