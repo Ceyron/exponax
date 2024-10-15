@@ -19,6 +19,7 @@ class KortewegDeVries(BaseStepper):
     advect_over_diffuse: bool
     diffuse_over_diffuse: bool
     single_channel: bool
+    conservaitve: bool
 
     def __init__(
         self,
@@ -34,6 +35,7 @@ class KortewegDeVries(BaseStepper):
         advect_over_diffuse: bool = False,
         diffuse_over_diffuse: bool = False,
         single_channel: bool = False,
+        conservative: bool = False,
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,
@@ -108,6 +110,8 @@ class KortewegDeVries(BaseStepper):
             dimensions. In this case the the convection is `b₁ (∇ ⋅ 1)(u²)`. In
             this case, the state always has a single channel, no matter the
             spatial dimension. Default: False.
+        - `conservative`: Whether to use the conservative form of the convection
+            term. Default: False.
         - `order`: The order of the Exponential Time Differencing Runge
             Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
             solves the linear part of the equation. Use higher values for higher
@@ -145,6 +149,7 @@ class KortewegDeVries(BaseStepper):
         self.advect_over_diffuse = advect_over_diffuse
         self.diffuse_over_diffuse = diffuse_over_diffuse
         self.single_channel = single_channel
+        self.conservative = conservative
         self.dealiasing_fraction = dealiasing_fraction
 
         if single_channel:
@@ -210,4 +215,5 @@ class KortewegDeVries(BaseStepper):
             dealiasing_fraction=self.dealiasing_fraction,
             scale=self.convection_scale,
             single_channel=self.single_channel,
+            conservative=self.conservative,
         )

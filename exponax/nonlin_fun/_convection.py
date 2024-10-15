@@ -117,7 +117,7 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
             )
         u_hat_dealiased = self.dealias(u_hat)
         u = self.ifft(u_hat_dealiased)
-        u_outer_product = u[:, None] * u[None, :]
+        u_outer_product = u[None, :] * u[:, None]
         u_outer_product_hat = self.fft(u_outer_product)
         convection = jnp.sum(
             self.derivative_operator[None, :] * u_outer_product_hat,
@@ -136,9 +136,14 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
             )
         u_hat_dealiased = self.dealias(u_hat)
         u = self.ifft(u_hat_dealiased)
-        conv_u=sum(
-            [u[i:i+1]*self.ifft(self.derivative_operator[i:i+1]*u_hat) for i in range(num_channels)]
+        nabla_u = self.ifft(self.derivative_operator[None, :] * u_hat[:, None])
+        conv_u = jnp.sum(
+            u[None, :] * nabla_u,
+            axis=1,
         )
+        #conv_u=sum(
+        #    [u[i:i+1]*self.ifft(self.derivative_operator[i:i+1]*u_hat) for i in range(num_channels)]
+        #)
         # Requires minus to move term to the rhs
         return -self.scale * self.fft(conv_u)
 

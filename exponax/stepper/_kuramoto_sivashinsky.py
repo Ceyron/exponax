@@ -176,6 +176,7 @@ class KuramotoSivashinskyConservative(BaseStepper):
     second_order_diffusivity: float
     fourth_order_diffusivity: float
     single_channel: bool
+    conservative: bool
     dealiasing_fraction: float
 
     def __init__(
@@ -189,6 +190,7 @@ class KuramotoSivashinskyConservative(BaseStepper):
         second_order_diffusivity: float = 1.0,
         fourth_order_diffusivity: float = 1.0,
         single_channel: bool = False,
+        conservative: bool = False,
         dealiasing_fraction: float = 2 / 3,
         order: int = 2,
         num_circle_points: int = 16,
@@ -203,6 +205,7 @@ class KuramotoSivashinskyConservative(BaseStepper):
         self.second_order_diffusivity = second_order_diffusivity
         self.fourth_order_diffusivity = fourth_order_diffusivity
         self.single_channel = single_channel
+        self.conservative = conservative
         self.dealiasing_fraction = dealiasing_fraction
 
         if num_spatial_dims > 1:
@@ -252,4 +255,5 @@ class KuramotoSivashinskyConservative(BaseStepper):
             dealiasing_fraction=self.dealiasing_fraction,
             scale=self.convection_scale,
             single_channel=self.single_channel,
+            conservative=self.conservative,
         )
