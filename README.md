@@ -1,3 +1,4 @@
+ ⚠️ ⚠️ ⚠️ This is a pre-release version of the package to test the PyPI workflow. Proper release **with breaking API changes** will be by end of October. ⚠️ ⚠️ ⚠️
 
 <h1 align="center">
   <img src="docs/imgs/exponax_logo.png" width="200">
