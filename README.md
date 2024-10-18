@@ -1,12 +1,5 @@
  ⚠️ ⚠️ ⚠️ This is a pre-release version of the package to test the PyPI workflow. Proper release **with breaking API changes** will be by end of October. ⚠️ ⚠️ ⚠️
 
-<h1 align="center">
-  <img src="docs/imgs/exponax_logo.png" width="200">
-  <br>
-    Exponax
-  <br>
-</h1>
-
 <h4 align="center">Efficient Differentiable PDE solvers built on top of <a href="https://github.com/google/jax" target="_blank">JAX</a> & <a href="https://github.com/patrick-kidger/equinox" target="_blank">Equinox</a>.</h4>
 
 <p align="center">
@@ -16,7 +9,7 @@
   <a href="#documentation">Documentation</a> •
   <a href="#background">Background</a> •
   <a href="#related">Related</a> •
-  <a href="#license">License</a>
+    <a href="#acknowledgements">Acknowledgements</a>
 </p>
 
 <p align="center">
@@ -26,10 +19,10 @@
 ## Installation
 
 ```bash
-pip install git+ssh://git@github.com/Ceyron/exponax@main
+pip install exponax
 ```
 
-Requires Python 3.10+ and JAX 0.4.13+ (and Equinox & Matplotlib). 👉 [JAX install guide](https://jax.readthedocs.io/en/latest/installation.html).
+Requires Python 3.10+ and JAX 0.4.13+. 👉 [JAX install guide](https://jax.readthedocs.io/en/latest/installation.html).
 
 ## Quickstart
 
@@ -91,13 +84,7 @@ For a next step, check out the [simple_advection_example_1d.ipynb](examples/simp
 
 ## Documentation
 
-The following Jupyter notebooks showcase the usage of the package:
-
-1. [Simple Advection Example in 1d](docs/examples/simple_advection_example_1d.ipynb)
-2. ...
-
-The documentation is still in progress. For now, the best way to get started is
-to look at the examples and the docstrings in the code.
+Documentation is available at [fkoehler.site/exponax](https://fkoehler.site/exponax/).
 
 ## Background
 
@@ -169,12 +156,23 @@ This package also took much inspiration from the
 integral method of [2] and how to handle (de)aliasing.
 
 
-## License
+## Acknowledgements
 
-MIT, see [here](LICENSE.txt)
+### Citation
+
+This package was developed as part of the `APEBench paper` (accepted at Neurips 2024), we will soon add the citation here.
+
+### Funding
+
+The main author (Felix Koehler) is a PhD student in the group of [Prof. Thuerey at TUM](https://ge.in.tum.de/) and his research is funded by the [Munich Center for Machine Learning](https://mcml.ai/).
+
+### License
+
+MIT, see [here](https://github.com/Ceyron/exponax/blob/main/LICENSE.txt)
 
 ---
 
 > [fkoehler.site](https://fkoehler.site/) &nbsp;&middot;&nbsp;
 > GitHub [@ceyron](https://github.com/ceyron) &nbsp;&middot;&nbsp;
-> X [@felix_m_koehler](https://twitter.com/felix_m_koehler)
+> X [@felix_m_koehler](https://twitter.com/felix_m_koehler) &nbsp;&middot;&nbsp;
+> LinkedIn [Felix Köhler](www.linkedin.com/in/felix-koehler)
