@@ -14,6 +14,7 @@ class GeneralConvectionStepper(BaseStepper):
     convection_scale: float
     dealiasing_fraction: float
     single_channel: bool
+    conservative: bool
 
     def __init__(
         self,
@@ -25,6 +26,7 @@ class GeneralConvectionStepper(BaseStepper):
         coefficients: tuple[float, ...] = (0.0, 0.0, 0.01),
         convection_scale: float = 1.0,
         single_channel: bool = False,
+        conservative: bool = False,
         order=2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,
@@ -83,6 +85,8 @@ class GeneralConvectionStepper(BaseStepper):
             dimensions. In this case the the convection is `b₁ (∇ ⋅ 1)(u²)`. In
             this case, the state always has a single channel, no matter the
             spatial dimension. Default: False.
+        - `conservative`: Whether to use the conservative form of the convection
+            term. Default: False.
         - `order`: The order of the Exponential Time Differencing Runge
             Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
             solves the linear part of the equation. Use higher values for higher
@@ -103,6 +107,7 @@ class GeneralConvectionStepper(BaseStepper):
         self.convection_scale = convection_scale
         self.single_channel = single_channel
         self.dealiasing_fraction = dealiasing_fraction
+        self.conservative = conservative
 
         if single_channel:
             num_channels = 1
@@ -146,6 +151,7 @@ class GeneralConvectionStepper(BaseStepper):
             dealiasing_fraction=self.dealiasing_fraction,
             scale=self.convection_scale,
             single_channel=self.single_channel,
+            conservative=self.conservative,
         )
 
 
@@ -161,6 +167,7 @@ class NormalizedConvectionStepper(GeneralConvectionStepper):
         normalized_coefficients: tuple[float, ...] = (0.0, 0.0, 0.01 * 0.1),
         normalized_convection_scale: float = 1.0 * 0.1,
         single_channel: bool = False,
+        conservative: bool = False,
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,
@@ -210,6 +217,8 @@ class NormalizedConvectionStepper(GeneralConvectionStepper):
             dimensions. In this case the the convection is `β (∇ ⋅ 1)(u²)`. In
             this case, the state always has a single channel, no matter the
             spatial dimension. Default: False.
+        - `conservative`: Whether to use the conservative form of the convection
+            term. Default: False.
         - `order`: The order of the Exponential Time Differencing Runge
             Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
             solves the linear part of the equation. Use higher values for higher
@@ -240,6 +249,7 @@ class NormalizedConvectionStepper(GeneralConvectionStepper):
             num_circle_points=num_circle_points,
             circle_radius=circle_radius,
             single_channel=single_channel,
+            conservative=conservative,
         )
 
 
@@ -255,6 +265,7 @@ class DifficultyConvectionStepper(NormalizedConvectionStepper):
         linear_difficulties: tuple[float, ...] = (0.0, 0.0, 4.5),
         convection_difficulty: float = 5.0,
         single_channel: bool = False,
+        conservative: bool = False,
         maximum_absolute: float = 1.0,
         order: int = 2,
         dealiasing_fraction: float = 2 / 3,
@@ -315,6 +326,7 @@ class DifficultyConvectionStepper(NormalizedConvectionStepper):
             dimensions. In this case the the convection is `δ (∇ ⋅ 1)(u²)`. In
             this case, the state always has a single channel, no matter the
             spatial dimension. Default: False.
+        - `conservative`: Whether to use the conservative form of the convection
         - `maximum_absolute`: The maximum absolute value of the state. This is
             used to extract the normalized dynamics from the convection
             difficulty.
@@ -359,4 +371,5 @@ class DifficultyConvectionStepper(NormalizedConvectionStepper):
             dealiasing_fraction=dealiasing_fraction,
             num_circle_points=num_circle_points,
             circle_radius=circle_radius,
+            conservative=conservative,
         )
