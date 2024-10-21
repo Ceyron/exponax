@@ -19,7 +19,7 @@ class KortewegDeVries(BaseStepper):
     advect_over_diffuse: bool
     diffuse_over_diffuse: bool
     single_channel: bool
-    conservaitve: bool
+    conservative: bool
 
     def __init__(
         self,

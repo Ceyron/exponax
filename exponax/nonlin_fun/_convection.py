@@ -41,22 +41,20 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         ```
             𝒩(u) = -b₁ u ⋅ ∇ u
         ```
-        
-        with `∇ ⋅` the divergence operator and the outer product `u ⊗ u`.
 
         Meanwhile, if you use a conservative form, the convection term is given by
 
         ```
-            𝒩(u) = -b₁ u (u)ₓ
+            𝒩(u) = -1/2 b₁ (u²)ₓ
         ```
-        
+
         for 1D and
 
         ```
-            𝒩(u) = -b₁ ∇ ⋅ (u ⊗ u)
+            𝒩(u) = -1/2 b₁ ∇ ⋅ (u ⊗ u)
         ```
 
-        for 2D and 3D.
+        for 2D and 3D with `∇ ⋅` the divergence operator and the outer product `u ⊗ u`.
 
         Another option is a "single-channel" hack requiring only one channel no
         matter the spatial dimensions. This reads
@@ -64,11 +62,11 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         ```
             𝒩(u) = -b₁ 1/2 (1⃗ ⋅ ∇)(u²)
         ```
-        
+
         for the conservative form and
-        
+
         ```
-            𝒩(u) = -b₁ 1/2 u (1⃗ ⋅ ∇)u
+            𝒩(u) = -b₁ u (1⃗ ⋅ ∇)u
         ```
 
         for the non-conservative form.
@@ -92,7 +90,7 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         self.derivative_operator = derivative_operator
         self.scale = scale
         self.single_channel = single_channel
-        self.conservative=conservative
+        self.conservative = conservative
         super().__init__(
             num_spatial_dims,
             num_points,
@@ -135,7 +133,7 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         )
         # Requires minus to move term to the rhs
         return -self.scale * convection
-    
+
     def _multi_channel_nonconservative_eval(
         self, u_hat: Complex[Array, "C ... (N//2)+1"]
     ) -> Complex[Array, "C ... (N//2)+1"]:
@@ -167,9 +165,6 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
             u[None, :] * nabla_u,
             axis=1,
         )
-        #conv_u=sum(
-        #    [u[i:i+1]*self.ifft(self.derivative_operator[i:i+1]*u_hat) for i in range(num_channels)]
-        #)
         # Requires minus to move term to the rhs
         return -self.scale * self.fft(conv_u)
 
@@ -213,7 +208,7 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         Fourier space. The convection term is given by
 
         ```
-            𝒩(u) = -b₁ 1/2 u (1⃗ ⋅ ∇)u
+            𝒩(u) = -b₁ u (1⃗ ⋅ ∇)u
         ```
 
         **Arguments:**
@@ -228,7 +223,9 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         u = self.ifft(u_hat_dealiased)
         nabla_u = self.ifft(self.derivative_operator * u_hat)
         conv_u = jnp.sum(
-            u * nabla_u,axis=0,keepdims=True,
+            u * nabla_u,
+            axis=0,
+            keepdims=True,
         )
         # Requires minus to bring convection to the right-hand side
         return -self.scale * self.fft(conv_u)
