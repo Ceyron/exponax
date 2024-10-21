@@ -42,7 +42,8 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
             𝒩(u) = -b₁ u ⋅ ∇ u
         ```
 
-        Meanwhile, if you use a conservative form, the convection term is given by
+        Meanwhile, if you use a conservative form, the convection term is given
+        by
 
         ```
             𝒩(u) = -1/2 b₁ (u²)ₓ
@@ -54,7 +55,8 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
             𝒩(u) = -1/2 b₁ ∇ ⋅ (u ⊗ u)
         ```
 
-        for 2D and 3D with `∇ ⋅` the divergence operator and the outer product `u ⊗ u`.
+        for 2D and 3D with `∇ ⋅` the divergence operator and the outer product
+        `u ⊗ u`.
 
         Another option is a "single-channel" hack requiring only one channel no
         matter the spatial dimensions. This reads
@@ -72,6 +74,7 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         for the non-conservative form.
 
         **Arguments:**
+
         - `num_spatial_dims`: The number of spatial dimensions `d`.
         - `num_points`: The number of points `N` used to discretize the
             domain. This **includes** the left boundary point and **excludes**
@@ -85,7 +88,8 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         - `scale`: The scale `b₁` of the convection term. Defaults to `1.0`.
         - `single_channel`: Whether to use the single-channel hack. Defaults
             to `False`.
-        - `conservative`: Whether to use the conservative form. Defaults to `False`.
+        - `conservative`: Whether to use the conservative form. Defaults to
+          `False`.
         """
         self.derivative_operator = derivative_operator
         self.scale = scale
@@ -101,8 +105,8 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         self, u_hat: Complex[Array, "C ... (N//2)+1"]
     ) -> Complex[Array, "C ... (N//2)+1"]:
         """
-        Evaluates the conservative convection term for a multi-channel state `u_hat` in
-        Fourier space. The convection term is given by
+        Evaluates the conservative convection term for a multi-channel state
+        `u_hat` in Fourier space. The convection term is given by
 
         ```
             𝒩(u) = -b₁ 1/2 ∇ ⋅ (u ⊗ u)
@@ -138,8 +142,8 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         self, u_hat: Complex[Array, "C ... (N//2)+1"]
     ) -> Complex[Array, "C ... (N//2)+1"]:
         """
-        Evaluates the non-conservative convection term for a multi-channel state `u_hat` in
-        Fourier space. The convection term is given by
+        Evaluates the non-conservative convection term for a multi-channel state
+        `u_hat` in Fourier space. The convection term is given by
 
         ```
             𝒩(u) = -b₁ u ⋅ ∇ u
@@ -172,8 +176,8 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         self, u_hat: Complex[Array, "C ... (N//2)+1"]
     ) -> Complex[Array, "C ... (N//2)+1"]:
         """
-        Evaluates the conservative convection term for a single-channel state `u_hat` in
-        Fourier space. The convection term is given by
+        Evaluates the conservative convection term for a single-channel state
+        `u_hat` in Fourier space. The convection term is given by
 
         ```
             𝒩(u) = -b₁ 1/2 (1⃗ ⋅ ∇)(u²)
@@ -204,8 +208,8 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         self, u_hat: Complex[Array, "C ... (N//2)+1"]
     ) -> Complex[Array, "C ... (N//2)+1"]:
         """
-        Evaluates the non-conservative convection term for a single-channel state `u_hat` in
-        Fourier space. The convection term is given by
+        Evaluates the non-conservative convection term for a single-channel
+        state `u_hat` in Fourier space. The convection term is given by
 
         ```
             𝒩(u) = -b₁ u (1⃗ ⋅ ∇)u
