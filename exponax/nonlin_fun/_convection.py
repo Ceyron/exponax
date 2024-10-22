@@ -164,7 +164,9 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
             )
         u_hat_dealiased = self.dealias(u_hat)
         u = self.ifft(u_hat_dealiased)
-        nabla_u = self.ifft(self.derivative_operator[None, :] * u_hat[:, None])
+        nabla_u = self.ifft(
+            self.derivative_operator[None, :] * u_hat_dealiased[:, None]
+        )
         conv_u = jnp.sum(
             u[None, :] * nabla_u,
             axis=1,
@@ -225,7 +227,7 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         """
         u_hat_dealiased = self.dealias(u_hat)
         u = self.ifft(u_hat_dealiased)
-        nabla_u = self.ifft(self.derivative_operator * u_hat)
+        nabla_u = self.ifft(self.derivative_operator * u_hat_dealiased)
         conv_u = jnp.sum(
             u * nabla_u,
             axis=0,
