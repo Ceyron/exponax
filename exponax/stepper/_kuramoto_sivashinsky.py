@@ -7,8 +7,8 @@ from ..nonlin_fun import ConvectionNonlinearFun, GradientNormNonlinearFun
 
 class KuramotoSivashinsky(BaseStepper):
     gradient_norm_scale: float
-    second_order_diffusivity: float
-    fourth_order_diffusivity: float
+    second_order_scale: float
+    fourth_order_scale: float
     dealiasing_fraction: float
 
     def __init__(
@@ -19,8 +19,8 @@ class KuramotoSivashinsky(BaseStepper):
         dt: float,
         *,
         gradient_norm_scale: float = 1.0,
-        second_order_diffusivity: float = 1.0,
-        fourth_order_diffusivity: float = 1.0,
+        second_order_scale: float = 1.0,
+        fourth_order_scale: float = 1.0,
         dealiasing_fraction: float = 2 / 3,
         order: int = 2,
         num_circle_points: int = 16,
@@ -36,24 +36,25 @@ class KuramotoSivashinsky(BaseStepper):
         In 1d, the KS equation is given by
 
         ```
-            uₜ + b₂ 1/2 (uₓ)² + ν uₓₓ + μ uₓₓₓₓ = 0
+            uₜ + b₂ 1/2 (uₓ)² + ψ₁ uₓₓ + ψ₂ uₓₓₓₓ = 0
         ```
 
-        with `b₂` the gradient-norm coefficient, `ν` the diffusivity and `μ` the
-        hyper viscosity. Note that both viscosity terms are on the left-hand
-        side. As such for `ν, μ > 0`, the second-order term acts destabilizing
-        (increases the energy of the system) and the fourth-order term acts
-        stabilizing (decreases the energy of the system). A common configuration
-        is `b₂ = ν = μ = 1` and the dynamics are only adapted using the
-        `domain_extent`. For this, we espect the KS equation to experience
-        spatio-temporal chaos roughly once `L > 60`.
+        with `b₂` the gradient-norm coefficient, `ψ₁` the second-order scale and
+        `ψ₂` the fourth-order. If the latter two terms were on the right-hand
+        side, they could be interpreted as diffusivity and hyper-diffusivity,
+        respectively. Here, the second-order term acts destabilizing (increases
+        the energy of the system) and the fourth-order term acts stabilizing
+        (decreases the energy of the system). A common configuration is `b₂ = ψ₁
+        = ψ₂ = 1` and the dynamics are only adapted using the `domain_extent`.
+        For this, we espect the KS equation to experience spatio-temporal chaos
+        roughly once `L > 60`.
 
         In this combustion (=non-conservative) format, the number of channels
         does **not** grow with the spatial dimension. A 2d KS still only has a
         single channel. In higher dimensions, the equation reads
 
         ```
-            uₜ + b₂ 1/2 ‖ ∇u ‖₂² + ν (∇ ⋅ ∇) u + μ ((∇ ⊗ ∇) ⋅ (∇ ⊗ ∇))u = 0
+            uₜ + b₂ 1/2 ‖ ∇u ‖₂² + ψ₁ν (∇ ⋅ ∇) u + ψ₂ ((∇ ⊗ ∇) ⋅ (∇ ⊗ ∇))u = 0
         ```
 
         with `‖ ∇u ‖₂` the gradient norm, `∇ ⋅ ∇` effectively is the Laplace
@@ -75,14 +76,9 @@ class KuramotoSivashinsky(BaseStepper):
         - `gradient_norm_scale`: The gradient-norm coefficient `b₂`. Note
             that the gradient norm is already scaled by 1/2. This factor allows
             for further modification. Default: 1.0.
-        - `second_order_diffusivity`: The diffusivity `ν` in the KS
-            equation. The sign of this coefficient is interpreted as if the term
-            was on the left-hand side. Hence it should have a positive value to
-            act destabilizing. Default: 1.0.
-        - `fourth_order_diffusivity`: The hyper viscosity `μ` in the KS
-            equation. The sign of this coefficient is interpreted as if the term
-            was on the left-hand side. Hence it should have a positive value to
-            act stabilizing. Default: 1.0.
+        - `second_order_scale`: The "diffusivity" `ψ₁` in the KS equation.
+        - `fourth_order_diffusivity`: The "hyper-diffusivity" `ψ₂` in the KS
+            equation.
         - `order`: The order of the Exponential Time Differencing Runge
             Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
             solves the linear part of the equation. Use higher values for higher
@@ -132,8 +128,8 @@ class KuramotoSivashinsky(BaseStepper):
             the transitional phase, after that the chaotic attractor is reached.
         """
         self.gradient_norm_scale = gradient_norm_scale
-        self.second_order_diffusivity = second_order_diffusivity
-        self.fourth_order_diffusivity = fourth_order_diffusivity
+        self.second_order_scale = second_order_scale
+        self.fourth_order_scale = fourth_order_scale
         self.dealiasing_fraction = dealiasing_fraction
         super().__init__(
             num_spatial_dims=num_spatial_dims,
@@ -150,9 +146,10 @@ class KuramotoSivashinsky(BaseStepper):
         self,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> Complex[Array, "1 ... (N//2)+1"]:
-        linear_operator = -self.second_order_diffusivity * build_laplace_operator(
+        # Minuses are required to move the terms to the right-hand side
+        linear_operator = -self.second_order_scale * build_laplace_operator(
             derivative_operator, order=2
-        ) - self.fourth_order_diffusivity * build_laplace_operator(
+        ) - self.fourth_order_scale * build_laplace_operator(
             derivative_operator, order=4
         )
         return linear_operator
