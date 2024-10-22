@@ -154,5 +154,5 @@ class Burgers(BaseStepper):
             dealiasing_fraction=self.dealiasing_fraction,
             scale=self.convection_scale,
             single_channel=self.single_channel,
-            conservative=False,
+            conservative=self.conservative,
         )
