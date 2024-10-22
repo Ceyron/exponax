@@ -94,6 +94,7 @@ nav:
             - Subclassing a custom Solver: 'examples/creating_your_own_solvers_1d.ipynb'
             - 2D Advection: 'examples/simple_advection_example_2d.ipynb'
             - 2D Solver Showcase: 'examples/solver_showcase_2d.ipynb'
+            - 3D Solver Showcase: 'examples/solver_showcase_3d.ipynb'
         - Advanced:
             - 1D Burgers Emulator Training: 'examples/learning_burgers_autoregressive_neural_operator.ipynb'
             - More on Metrics: 'examples/on_metrics_advanced.ipynb'
