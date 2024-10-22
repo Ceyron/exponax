@@ -170,8 +170,8 @@ class KuramotoSivashinsky(BaseStepper):
 
 class KuramotoSivashinskyConservative(BaseStepper):
     convection_scale: float
-    second_order_diffusivity: float
-    fourth_order_diffusivity: float
+    second_order_scale: float
+    fourth_order_scale: float
     single_channel: bool
     conservative: bool
     dealiasing_fraction: float
@@ -184,8 +184,8 @@ class KuramotoSivashinskyConservative(BaseStepper):
         dt: float,
         *,
         convection_scale: float = 1.0,
-        second_order_diffusivity: float = 1.0,
-        fourth_order_diffusivity: float = 1.0,
+        second_order_scale: float = 1.0,
+        fourth_order_scale: float = 1.0,
         single_channel: bool = False,
         conservative: bool = True,
         dealiasing_fraction: float = 2 / 3,
@@ -199,8 +199,8 @@ class KuramotoSivashinskyConservative(BaseStepper):
         the number of spatial dimensions.
         """
         self.convection_scale = convection_scale
-        self.second_order_diffusivity = second_order_diffusivity
-        self.fourth_order_diffusivity = fourth_order_diffusivity
+        self.second_order_scale = second_order_scale
+        self.fourth_order_scale = fourth_order_scale
         self.single_channel = single_channel
         self.conservative = conservative
         self.dealiasing_fraction = dealiasing_fraction
@@ -234,9 +234,10 @@ class KuramotoSivashinskyConservative(BaseStepper):
         self,
         derivative_operator: Complex[Array, "D ... (N//2)+1"],
     ) -> Complex[Array, "1 ... (N//2)+1"]:
-        linear_operator = -self.second_order_diffusivity * build_laplace_operator(
+        # Minuses are required to move the terms to the right-hand side
+        linear_operator = -self.second_order_scale * build_laplace_operator(
             derivative_operator, order=2
-        ) - self.fourth_order_diffusivity * build_laplace_operator(
+        ) - self.fourth_order_scale * build_laplace_operator(
             derivative_operator, order=4
         )
         return linear_operator
