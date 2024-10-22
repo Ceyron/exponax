@@ -10,7 +10,7 @@ from ._utils import (
 
 
 class GeneralConvectionStepper(BaseStepper):
-    coefficients: tuple[float, ...]
+    linear_coefficients: tuple[float, ...]
     convection_scale: float
     dealiasing_fraction: float
     single_channel: bool
@@ -23,7 +23,7 @@ class GeneralConvectionStepper(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        coefficients: tuple[float, ...] = (0.0, 0.0, 0.01),
+        linear_coefficients: tuple[float, ...] = (0.0, 0.0, 0.01),
         convection_scale: float = 1.0,
         single_channel: bool = False,
         conservative: bool = False,
@@ -74,7 +74,7 @@ class GeneralConvectionStepper(BaseStepper):
             in each dimension is the same. Hence, the total number of degrees of
             freedom is `Nᵈ`.
         - `dt`: The timestep size `Δt` between two consecutive states.
-        - `coefficients` (keyword-only): The list of coefficients `a_j`
+        - `linear_coefficients` (keyword-only): The list of coefficients `a_j`
             corresponding to the derivatives. The length of this tuple
             represents the highest occuring derivative. The default value `(0.0,
             0.0, 0.01)` corresponds to the Burgers equation (because of the
@@ -103,7 +103,7 @@ class GeneralConvectionStepper(BaseStepper):
             coefficients of the exponential time differencing Runge Kutta
             method. Default: 1.0.
         """
-        self.coefficients = coefficients
+        self.linear_coefficients = linear_coefficients
         self.convection_scale = convection_scale
         self.single_channel = single_channel
         self.dealiasing_fraction = dealiasing_fraction
@@ -136,7 +136,7 @@ class GeneralConvectionStepper(BaseStepper):
                 axis=0,
                 keepdims=True,
             )
-            for i, c in enumerate(self.coefficients)
+            for i, c in enumerate(self.linear_coefficients)
         )
         return linear_operator
 
@@ -156,7 +156,7 @@ class GeneralConvectionStepper(BaseStepper):
 
 
 class NormalizedConvectionStepper(GeneralConvectionStepper):
-    normalized_coefficients: tuple[float, ...]
+    normalized_linear_coefficients: tuple[float, ...]
     normalized_convection_scale: float
 
     def __init__(
@@ -164,7 +164,7 @@ class NormalizedConvectionStepper(GeneralConvectionStepper):
         num_spatial_dims: int,
         num_points: int,
         *,
-        normalized_coefficients: tuple[float, ...] = (0.0, 0.0, 0.01 * 0.1),
+        normalized_linear_coefficients: tuple[float, ...] = (0.0, 0.0, 0.01 * 0.1),
         normalized_convection_scale: float = 1.0 * 0.1,
         single_channel: bool = False,
         conservative: bool = False,
@@ -205,7 +205,7 @@ class NormalizedConvectionStepper(GeneralConvectionStepper):
             boundary point. In higher dimensions; the number of points in each
             dimension is the same. Hence, the total number of degrees of freedom
             is `Nᵈ`.
-        - `normalized_coefficients`: The list of coefficients
+        - `normalized_linear_coefficients`: The list of coefficients
             `α_j` corresponding to the derivatives. The length of this tuple
             represents the highest occuring derivative. The default value `(0.0,
             0.0, 0.01)` corresponds to the Burgers equation (because of the
@@ -235,14 +235,14 @@ class NormalizedConvectionStepper(GeneralConvectionStepper):
             coefficients of the exponential time differencing Runge Kutta
             method. Default: 1.0.
         """
-        self.normalized_coefficients = normalized_coefficients
+        self.normalized_linear_coefficients = normalized_linear_coefficients
         self.normalized_convection_scale = normalized_convection_scale
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             domain_extent=1.0,  # Derivative operator is just scaled with 2 * jnp.pi
             num_points=num_points,
             dt=1.0,
-            coefficients=normalized_coefficients,
+            linear_coefficients=normalized_linear_coefficients,
             convection_scale=normalized_convection_scale,
             order=order,
             dealiasing_fraction=dealiasing_fraction,
@@ -364,7 +364,7 @@ class DifficultyConvectionStepper(NormalizedConvectionStepper):
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             num_points=num_points,
-            normalized_coefficients=normalized_coefficients,
+            normalized_linear_coefficients=normalized_coefficients,
             normalized_convection_scale=normalized_convection_scale,
             single_channel=single_channel,
             order=order,

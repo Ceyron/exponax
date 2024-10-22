@@ -10,8 +10,8 @@ from ._utils import (
 
 
 class GeneralNonlinearStepper(BaseStepper):
-    coefficients_linear: tuple[float, ...]
-    coefficients_nonlinear: tuple[float, float, float]
+    linear_coefficients: tuple[float, ...]
+    nonlinear_coefficients: tuple[float, float, float]
     dealiasing_fraction: float
 
     def __init__(
@@ -21,8 +21,8 @@ class GeneralNonlinearStepper(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        coefficients_linear: tuple[float, ...] = (0.0, 0.0, 0.01),
-        coefficients_nonlinear: tuple[float, float, float] = (0.0, -1.0, 0.0),
+        linear_coefficients: tuple[float, ...] = (0.0, 0.0, 0.01),
+        nonlinear_coefficients: tuple[float, float, float] = (0.0, -1.0, 0.0),
         order=2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,
@@ -83,12 +83,12 @@ class GeneralNonlinearStepper(BaseStepper):
             dimension is the same. Hence, the total number of degrees of freedom
             is `Nᵈ`.
         - `dt`: The timestep size `Δt` between two consecutive states.
-        - `coefficients_linear`: The list of coefficients `a_j` corresponding to
+        - `linear_coefficients`: The list of coefficients `a_j` corresponding to
             the derivatives. The length of this tuple represents the highest
             occuring derivative. The default value `(0.0, 0.0, 0.01)` together
-            with the default `coefficients_nonlinear` corresponds to the Burgers
+            with the default `nonlinear_coefficients` corresponds to the Burgers
             equation.
-        - `coefficients_nonlinear`: The list of coefficients `b₀`, `b₁`, `b₂`
+        - `nonlinear_coefficients`: The list of coefficients `b₀`, `b₁`, `b₂`
             (in this order). The default value `(0.0, -1.0, 0.0)` corresponds to
             a (single-channel) convection nonlinearity scaled with `1.0`. Note
             that all nonlinear contributions are considered to be on the
@@ -107,12 +107,12 @@ class GeneralNonlinearStepper(BaseStepper):
         - `circle_radius`: The radius of the contour used to compute the
             coefficients of the exponential time differencing Runge Kutta method.
         """
-        if len(coefficients_nonlinear) != 3:
+        if len(nonlinear_coefficients) != 3:
             raise ValueError(
                 "The nonlinear coefficients list must have exactly 3 elements"
             )
-        self.coefficients_linear = coefficients_linear
-        self.coefficients_nonlinear = coefficients_nonlinear
+        self.linear_coefficients = linear_coefficients
+        self.nonlinear_coefficients = nonlinear_coefficients
         self.dealiasing_fraction = dealiasing_fraction
 
         super().__init__(
@@ -136,7 +136,7 @@ class GeneralNonlinearStepper(BaseStepper):
                 axis=0,
                 keepdims=True,
             )
-            for i, c in enumerate(self.coefficients_linear)
+            for i, c in enumerate(self.linear_coefficients)
         )
         return linear_operator
 
@@ -149,22 +149,22 @@ class GeneralNonlinearStepper(BaseStepper):
             self.num_points,
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
-            scale_list=self.coefficients_nonlinear,
+            scale_list=self.nonlinear_coefficients,
             zero_mode_fix=True,  # ToDo: check this
         )
 
 
 class NormalizedNonlinearStepper(GeneralNonlinearStepper):
-    normalized_coefficients_linear: tuple[float, ...]
-    normalized_coefficients_nonlinear: tuple[float, float, float]
+    normalized_linear_coefficients: tuple[float, ...]
+    normalized_nonlinear_coefficients: tuple[float, float, float]
 
     def __init__(
         self,
         num_spatial_dims: int,
         num_points: int,
         *,
-        normalized_coefficients_linear: tuple[float, ...] = (0.0, 0.0, 0.1 * 0.1),
-        normalized_coefficients_nonlinear: tuple[float, float, float] = (
+        normalized_linear_coefficients: tuple[float, ...] = (0.0, 0.0, 0.1 * 0.1),
+        normalized_nonlinear_coefficients: tuple[float, float, float] = (
             0.0,
             -1.0 * 0.1,
             0.0,
@@ -227,13 +227,13 @@ class NormalizedNonlinearStepper(GeneralNonlinearStepper):
             boundary point. In higher dimensions; the number of points in each
             dimension is the same. Hence, the total number of degrees of freedom
             is `Nᵈ`.
-        - `normalized_coefficients_linear`: The list of coefficients `αⱼ`
+        - `normalized_linear_coefficients`: The list of coefficients `αⱼ`
             corresponding to the linear derivatives. The length of this tuple
             represents the highest occuring derivative. The default value `(0.0,
             0.0, 0.1 * 0.1)` together with the default
-            `normalized_coefficients_nonlinear` corresponds to the Burgers
+            `normalized_nonlinear_coefficients` corresponds to the Burgers
             equation (in single-channel mode).
-        - `normalized_coefficients_nonlinear`: The list of coefficients `β₀`,
+        - `normalized_nonlinear_coefficients`: The list of coefficients `β₀`,
             `β₁`, and `β₂` (in this order) corresponding to the quadratic,
             (single-channel) convection, and gradient norm nonlinearity,
             respectively. The default value `(0.0, -1.0 * 0.1, 0.0)` corresponds
@@ -256,16 +256,16 @@ class NormalizedNonlinearStepper(GeneralNonlinearStepper):
             coefficients of the exponential time differencing Runge Kutta method.
         """
 
-        self.normalized_coefficients_linear = normalized_coefficients_linear
-        self.normalized_coefficients_nonlinear = normalized_coefficients_nonlinear
+        self.normalized_linear_coefficients = normalized_linear_coefficients
+        self.normalized_nonlinear_coefficients = normalized_nonlinear_coefficients
 
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             domain_extent=1.0,  # Derivative operator is just scaled with 2 * jnp.pi
             num_points=num_points,
             dt=1.0,
-            coefficients_linear=normalized_coefficients_linear,
-            coefficients_nonlinear=normalized_coefficients_nonlinear,
+            linear_coefficients=normalized_linear_coefficients,
+            nonlinear_coefficients=normalized_nonlinear_coefficients,
             order=order,
             dealiasing_fraction=dealiasing_fraction,
             num_circle_points=num_circle_points,
@@ -394,8 +394,8 @@ class DifficultyNonlinearStepper(NormalizedNonlinearStepper):
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             num_points=num_points,
-            normalized_coefficients_linear=normalized_coefficients_linear,
-            normalized_coefficients_nonlinear=normalized_coefficients_nonlinear,
+            normalized_linear_coefficients=normalized_coefficients_linear,
+            normalized_nonlinear_coefficients=normalized_coefficients_nonlinear,
             order=order,
             dealiasing_fraction=dealiasing_fraction,
             num_circle_points=num_circle_points,

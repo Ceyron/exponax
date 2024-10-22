@@ -10,7 +10,7 @@ from ._utils import (
 
 
 class GeneralGradientNormStepper(BaseStepper):
-    coefficients: tuple[float, ...]
+    linear_coefficients: tuple[float, ...]
     gradient_norm_scale: float
     dealiasing_fraction: float
 
@@ -21,7 +21,7 @@ class GeneralGradientNormStepper(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        coefficients: tuple[float, ...] = (0.0, 0.0, -1.0, 0.0, -1.0),
+        linear_coefficients: tuple[float, ...] = (0.0, 0.0, -1.0, 0.0, -1.0),
         gradient_norm_scale: float = 1.0,
         order=2,
         dealiasing_fraction: float = 2 / 3,
@@ -66,7 +66,7 @@ class GeneralGradientNormStepper(BaseStepper):
             in each dimension is the same. Hence, the total number of degrees of
             freedom is `Nᵈ`.
         - `dt`: The timestep size `Δt` between two consecutive states.
-        - `coefficients` (keyword-only): The list of coefficients `a_j`
+        - `linear_coefficients` (keyword-only): The list of coefficients `a_j`
             corresponding to the derivatives. The length of this tuple
             represents the highest occuring derivative. The default value `(0.0,
             0.0, -1.0, 0.0, -1.0)` corresponds to the Kuramoto- Sivashinsky
@@ -89,7 +89,7 @@ class GeneralGradientNormStepper(BaseStepper):
             coefficients of the exponential time differencing Runge Kutta
             method. Default: 1.0.
         """
-        self.coefficients = coefficients
+        self.linear_coefficients = linear_coefficients
         self.gradient_norm_scale = gradient_norm_scale
         self.dealiasing_fraction = dealiasing_fraction
         super().__init__(
@@ -113,7 +113,7 @@ class GeneralGradientNormStepper(BaseStepper):
                 axis=0,
                 keepdims=True,
             )
-            for i, c in enumerate(self.coefficients)
+            for i, c in enumerate(self.linear_coefficients)
         )
         return linear_operator
 
@@ -132,7 +132,7 @@ class GeneralGradientNormStepper(BaseStepper):
 
 
 class NormalizedGradientNormStepper(GeneralGradientNormStepper):
-    normalized_coefficients: tuple[float, ...]
+    normalized_linear_coefficients: tuple[float, ...]
     normalized_gradient_norm_scale: float
 
     def __init__(
@@ -140,7 +140,7 @@ class NormalizedGradientNormStepper(GeneralGradientNormStepper):
         num_spatial_dims: int,
         num_points: int,
         *,
-        normalized_coefficients: tuple[float, ...] = (
+        normalized_linear_coefficients: tuple[float, ...] = (
             0.0,
             0.0,
             -1.0 * 0.1 / (60.0**2),
@@ -217,14 +217,14 @@ class NormalizedGradientNormStepper(GeneralGradientNormStepper):
             coefficients of the exponential time differencing Runge Kutta
             method. Default: 1.0.
         """
-        self.normalized_coefficients = normalized_coefficients
+        self.normalized_linear_coefficients = normalized_linear_coefficients
         self.normalized_gradient_norm_scale = normalized_gradient_norm_scale
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             domain_extent=1.0,
             num_points=num_points,
             dt=1.0,
-            coefficients=normalized_coefficients,
+            linear_coefficients=normalized_linear_coefficients,
             gradient_norm_scale=normalized_gradient_norm_scale,
             order=order,
             dealiasing_fraction=dealiasing_fraction,
@@ -339,7 +339,7 @@ class DifficultyGradientNormStepper(NormalizedGradientNormStepper):
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             num_points=num_points,
-            normalized_coefficients=normalized_coefficients,
+            normalized_linear_coefficients=normalized_coefficients,
             normalized_gradient_norm_scale=normalized_gradient_norm_scale,
             order=order,
             dealiasing_fraction=dealiasing_fraction,

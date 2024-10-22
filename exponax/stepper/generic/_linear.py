@@ -11,7 +11,7 @@ D = TypeVar("D")
 
 
 class GeneralLinearStepper(BaseStepper):
-    coefficients: tuple[float, ...]
+    linear_coefficients: tuple[float, ...]
 
     def __init__(
         self,
@@ -20,7 +20,7 @@ class GeneralLinearStepper(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        coefficients: tuple[float, ...] = (0.0, -0.1, 0.01),
+        linear_coefficients: tuple[float, ...] = (0.0, -0.1, 0.01),
     ):
         """
         General timestepper for a d-dimensional (`d ∈ {1, 2, 3}`) linear
@@ -67,7 +67,7 @@ class GeneralLinearStepper(BaseStepper):
                 number of points in each dimension is the same. Hence, the total
                 number of degrees of freedom is `Nᵈ`.
             - `dt`: The timestep size `Δt` between two consecutive states.
-            - `coefficients` (keyword-only): The list of coefficients `a_j`
+            - `linear_coefficients` (keyword-only): The list of coefficients `a_j`
                 corresponding to the derivatives. Default: `[0.0, -0.1, 0.01]`.
 
         **Notes:**
@@ -137,7 +137,7 @@ class GeneralLinearStepper(BaseStepper):
                 the function [`exponax.stepper.generic.normalize_coefficients`][] to
                 obtain the normalized coefficients.
         """
-        self.coefficients = coefficients
+        self.linear_coefficients = linear_coefficients
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             domain_extent=domain_extent,
@@ -157,7 +157,7 @@ class GeneralLinearStepper(BaseStepper):
                 axis=0,
                 keepdims=True,
             )
-            for i, c in enumerate(self.coefficients)
+            for i, c in enumerate(self.linear_coefficients)
         )
         return linear_operator
 
@@ -172,14 +172,14 @@ class GeneralLinearStepper(BaseStepper):
 
 
 class NormalizedLinearStepper(GeneralLinearStepper):
-    normalized_coefficients: tuple[float, ...]
+    normalized_linear_coefficients: tuple[float, ...]
 
     def __init__(
         self,
         num_spatial_dims: int,
         num_points: int,
         *,
-        normalized_coefficients: tuple[float, ...] = (0.0, -0.5, 0.01),
+        normalized_linear_coefficients: tuple[float, ...] = (0.0, -0.5, 0.01),
     ):
         """
         Timestepper for d-dimensional (`d ∈ {1, 2, 3}`) linear PDEs on periodic
@@ -218,25 +218,25 @@ class NormalizedLinearStepper(GeneralLinearStepper):
             dynamics. This must a tuple of floats. The length of the tuple
             defines the highest occuring linear derivative in the PDE.
         """
-        self.normalized_coefficients = normalized_coefficients
+        self.normalized_linear_coefficients = normalized_linear_coefficients
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             domain_extent=1.0,
             num_points=num_points,
             dt=1.0,
-            coefficients=normalized_coefficients,
+            linear_coefficients=normalized_linear_coefficients,
         )
 
 
 class DifficultyLinearStepper(NormalizedLinearStepper):
-    difficulties: tuple[float, ...]
+    linear_difficulties: tuple[float, ...]
 
     def __init__(
         self,
         num_spatial_dims: int = 1,
         num_points: int = 48,
         *,
-        difficulties: tuple[float, ...] = (0.0, -2.0),
+        linear_difficulties: tuple[float, ...] = (0.0, -2.0),
     ):
         """
         Timestepper for d-dimensional (`d ∈ {1, 2, 3}`) linear PDEs on periodic
@@ -275,9 +275,9 @@ class DifficultyLinearStepper(NormalizedLinearStepper):
             be a tuple of floats. The length of the tuple defines the highest
             occuring linear derivative in the PDE. Default is `(0.0, -2.0)`.
         """
-        self.difficulties = difficulties
+        self.linear_difficulties = linear_difficulties
         normalized_coefficients = extract_normalized_coefficients_from_difficulty(
-            difficulties,
+            linear_difficulties,
             num_spatial_dims=num_spatial_dims,
             num_points=num_points,
         )
@@ -285,7 +285,7 @@ class DifficultyLinearStepper(NormalizedLinearStepper):
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             num_points=num_points,
-            normalized_coefficients=normalized_coefficients,
+            normalized_linear_coefficients=normalized_coefficients,
         )
 
 
@@ -318,7 +318,7 @@ class DiffultyLinearStepperSimple(DifficultyLinearStepper):
         """
         difficulties = (0.0,) * (order) + (difficulty,)
         super().__init__(
-            difficulties=difficulties,
+            linear_difficulties=difficulties,
             num_spatial_dims=num_spatial_dims,
             num_points=num_points,
         )
