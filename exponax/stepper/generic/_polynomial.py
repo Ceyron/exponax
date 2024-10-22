@@ -19,7 +19,7 @@ class GeneralPolynomialStepper(BaseStepper):
         dt: float,
         *,
         coefficients: tuple[float, ...] = (10.0, 0.0, 1.0),
-        polynomial_scales: tuple[float, ...] = (0.0, 0.0, 10.0),
+        polynomial_scales: tuple[float, ...] = (0.0, 0.0, -10.0),
         order=2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,
