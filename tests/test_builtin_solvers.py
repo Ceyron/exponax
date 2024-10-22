@@ -117,18 +117,20 @@ def test_specific_stepper_to_general_linear_stepper(
 
 
 @pytest.mark.parametrize(
-    "specific_stepper,general_stepper_scale,general_stepper_coefficients",
+    "specific_stepper,general_stepper_scale,general_stepper_coefficients,conservative",
     [
         # Linear problems
         (
             ex.stepper.Advection(1, 3.0, 50, 0.1, velocity=1.0),
             0.0,
             [0.0, -1.0],
+            False,
         ),
         (
             ex.stepper.Diffusion(1, 3.0, 50, 0.1, diffusivity=0.01),
             0.0,
             [0.0, 0.0, 0.01],
+            False,
         ),
         (
             ex.stepper.AdvectionDiffusion(
@@ -136,22 +138,26 @@ def test_specific_stepper_to_general_linear_stepper(
             ),
             0.0,
             [0.0, -1.0, 0.01],
+            False,
         ),
         (
             ex.stepper.Dispersion(1, 3.0, 50, 0.1, dispersivity=0.0001),
             0.0,
             [0.0, 0.0, 0.0, 0.0001],
+            False,
         ),
         (
             ex.stepper.HyperDiffusion(1, 3.0, 50, 0.1, hyper_diffusivity=0.00001),
             0.0,
             [0.0, 0.0, 0.0, 0.0, -0.00001],
+            False,
         ),
         # nonlinear problems
         (
             ex.stepper.Burgers(1, 3.0, 50, 0.1, diffusivity=0.05, convection_scale=1.0),
             1.0,
             [0.0, 0.0, 0.05],
+            False,
         ),
         (
             ex.stepper.KortewegDeVries(
@@ -159,6 +165,7 @@ def test_specific_stepper_to_general_linear_stepper(
             ),
             -6.0,
             [0.0, 0.0, 0.0, -1.0, -0.01],
+            False,
         ),
         (
             ex.stepper.KuramotoSivashinskyConservative(
@@ -172,6 +179,7 @@ def test_specific_stepper_to_general_linear_stepper(
             ),
             1.0,
             [0.0, 0.0, -1.0, 0.0, -1.0],
+            True,
         ),
     ],
 )
@@ -179,6 +187,7 @@ def test_specific_stepper_to_general_convection_stepper(
     specific_stepper,
     general_stepper_scale,
     general_stepper_coefficients,
+    conservative,
 ):
     num_spatial_dims = specific_stepper.num_spatial_dims
     domain_extent = specific_stepper.domain_extent
@@ -197,6 +206,7 @@ def test_specific_stepper_to_general_convection_stepper(
         dt,
         coefficients=general_stepper_coefficients,
         convection_scale=general_stepper_scale,
+        conservative=conservative,
     )
 
     specific_pred = specific_stepper(u_0)
