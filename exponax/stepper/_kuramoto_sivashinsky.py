@@ -190,7 +190,7 @@ class KuramotoSivashinskyConservative(BaseStepper):
         second_order_diffusivity: float = 1.0,
         fourth_order_diffusivity: float = 1.0,
         single_channel: bool = False,
-        conservative: bool = False,
+        conservative: bool = True,
         dealiasing_fraction: float = 2 / 3,
         order: int = 2,
         num_circle_points: int = 16,
