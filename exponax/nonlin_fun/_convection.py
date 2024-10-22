@@ -131,7 +131,7 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
         u = self.ifft(u_hat_dealiased)
         u_outer_product = u[None, :] * u[:, None]
         u_outer_product_hat = self.fft(u_outer_product)
-        convection = jnp.sum(
+        convection = 0.5 * jnp.sum(
             self.derivative_operator[None, :] * u_outer_product_hat,
             axis=1,
         )
