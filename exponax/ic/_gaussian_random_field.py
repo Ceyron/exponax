@@ -66,7 +66,7 @@ class GaussianRandomField(BaseRandomICGenerator):
         wavenumer_norm_grid = jnp.linalg.norm(wavenumber_grid, axis=0, keepdims=True)
         amplitude = jnp.power(wavenumer_norm_grid, -self.powerlaw_exponent / 2.0)
         amplitude = (
-            amplitude.flatten().at[0].set(0.0).reshape(wavenumer_norm_grid.shape)
+            amplitude.flatten().at[0].set(1.0).reshape(wavenumer_norm_grid.shape)
         )
 
         real_key, imag_key = jr.split(key, 2)
