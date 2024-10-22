@@ -64,6 +64,9 @@ class GaussianRandomField(BaseRandomICGenerator):
             self.num_spatial_dims, self.domain_extent, num_points
         )
         wavenumer_norm_grid = jnp.linalg.norm(wavenumber_grid, axis=0, keepdims=True)
+        # Further division by 2.0 in the exponent is because we want to have the
+        # **power-spectrum** follow a **power-law**. See
+        # https://github.com/Ceyron/exponax/issues/9 for more details.
         amplitude = jnp.power(wavenumer_norm_grid, -self.powerlaw_exponent / 2.0)
         amplitude = (
             amplitude.flatten().at[0].set(1.0).reshape(wavenumer_norm_grid.shape)
