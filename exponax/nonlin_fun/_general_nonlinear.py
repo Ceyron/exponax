@@ -89,6 +89,8 @@ class GeneralNonlinearFun(BaseNonlinearFun):
             # Minus required because it internally has another minus
             scale=-scale_list[1],
             single_channel=True,
+            # For legacy reasons, the single-channel convection term is conservative
+            conservative=True,
         )
         self.gradient_norm_nonlinear_fun = GradientNormNonlinearFun(
             num_spatial_dims,
