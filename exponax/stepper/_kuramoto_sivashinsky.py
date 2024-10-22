@@ -195,8 +195,67 @@ class KuramotoSivashinskyConservative(BaseStepper):
     ):
         """
         Using the fluid dynamics form of the KS equation (i.e. similar to the
-        Burgers equation). This also means that the number of channels grow with
-        the number of spatial dimensions.
+        Burgers equation).
+
+        In 1d, the KS equation is given by
+
+        ```
+            uₜ + b₁ 1/2 (u²)ₓ + ψ₁ uₓₓ + ψ₂ uₓₓₓₓ = 0
+        ```
+
+        with `b₁` the convection coefficient, `ψ₁` the second-order scale and
+        `ψ₂` the fourth-order. If the latter two terms were on the right-hand
+        side, they could be interpreted as diffusivity and hyper-diffusivity,
+        respectively. Here, the second-order term acts destabilizing (increases
+        the energy of the system) and the fourth-order term acts stabilizing
+        (decreases the energy of the system). A common configuration is `b₁ = ψ₁
+        = ψ₂ = 1` and the dynamics are only adapted using the `domain_extent`.
+        For this, we espect the KS equation to experience spatio-temporal chaos
+        roughly once `L > 60`.
+
+        !!! info
+            In this fluid dynamics (=conservative) format, the number of
+            channels grows with the spatial dimension. However, it seems that
+            this format does not generalize well to higher dimensions. For
+            higher dimensions, consider using the combustion format
+            (`exponax.stepper.KuramotoSivashinsky`) instead.
+
+        **Arguments:**
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `domain_extent`: The size of the domain `L`; in higher dimensions
+            the domain is assumed to be a scaled hypercube `Ω = (0, L)ᵈ`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. In higher dimensions; the number of points
+            in each dimension is the same. Hence, the total number of degrees of
+            freedom is `Nᵈ`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `convection_scale`: The convection coefficient `b₁`. Note that the
+            convection term is already scaled by 1/2. This factor allows for
+            further modification. Default: 1.0.
+        - `second_order_scale`: The "diffusivity" `ψ₁` in the KS equation.
+        - `fourth_order_diffusivity`: The "hyper-diffusivity" `ψ₂` in the KS
+            equation.
+        - `single_channel`: Whether to use a single channel for the spatial
+            dimension. Default: `False`.
+        - `conservative`: Whether to use the conservative format. Default:
+            `True`.
+        - `dealiasing_fraction`: The fraction of the wavenumbers to keep
+            before evaluating the nonlinearity. The default 2/3 corresponds to
+            Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2. Default:
+            2/3.
+        - `order`: The order of the Exponential Time Differencing Runge
+            Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
+            solves the linear part of the equation. Use higher values for higher
+            accuracy and stability. The default choice of `2` is a good
+            compromise for single precision floats.
+        - `num_circle_points`: How many points to use in the complex contour
+            integral method to compute the coefficients of the exponential time
+            differencing Runge Kutta method. Default: 16.
+        - `circle_radius`: The radius of the contour used to compute the
+            coefficients of the exponential time differencing Runge Kutta
+            method. Default: 1.0.
         """
         self.convection_scale = convection_scale
         self.second_order_scale = second_order_scale
