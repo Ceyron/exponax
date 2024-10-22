@@ -10,6 +10,7 @@ class Burgers(BaseStepper):
     convection_scale: float
     dealiasing_fraction: float
     single_channel: bool
+    conservative: bool
 
     def __init__(
         self,
@@ -21,6 +22,7 @@ class Burgers(BaseStepper):
         diffusivity: float = 0.1,
         convection_scale: float = 1.0,
         single_channel: bool = False,
+        conservative: bool = False,
         order=2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,
@@ -75,6 +77,8 @@ class Burgers(BaseStepper):
             dimensions. In this case the the convection is `b₁ (∇ ⋅ 1)(u²)`. In
             this case, the state always has a single channel, no matter the
             spatial dimension. Default: False.
+        - `conservative`: Whether to use the conservative form of the convection
+            term. Default: False.
         - `order`: The order of the Exponential Time Differencing Runge
             Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
             solves the linear part of the equation. Use higher values for higher
@@ -112,6 +116,7 @@ class Burgers(BaseStepper):
         self.diffusivity = diffusivity
         self.convection_scale = convection_scale
         self.single_channel = single_channel
+        self.conservative = conservative
         self.dealiasing_fraction = dealiasing_fraction
 
         if single_channel:
@@ -149,4 +154,5 @@ class Burgers(BaseStepper):
             dealiasing_fraction=self.dealiasing_fraction,
             scale=self.convection_scale,
             single_channel=self.single_channel,
+            conservative=False,
         )
