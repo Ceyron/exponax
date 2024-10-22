@@ -107,7 +107,7 @@ def test_specific_stepper_to_general_linear_stepper(
         domain_extent,
         num_points,
         dt,
-        coefficients=general_stepper_coefficients,
+        linear_coefficients=general_stepper_coefficients,
     )
 
     specific_pred = specific_stepper(u_0)
@@ -204,7 +204,7 @@ def test_specific_stepper_to_general_convection_stepper(
         domain_extent,
         num_points,
         dt,
-        coefficients=general_stepper_coefficients,
+        linear_coefficients=general_stepper_coefficients,
         convection_scale=general_stepper_scale,
         conservative=conservative,
     )
@@ -282,7 +282,7 @@ def test_specific_to_general_gradient_norm_stepper(
         domain_extent,
         num_points,
         dt,
-        coefficients=general_stepper_coefficients,
+        linear_coefficients=general_stepper_coefficients,
         gradient_norm_scale=general_stepper_scale,
     )
 
@@ -321,12 +321,12 @@ def test_linear_normalized_stepper(coefficients):
         domain_extent,
         num_points,
         dt,
-        coefficients=coefficients,
+        linear_coefficients=coefficients,
     )
     normalized_linear_stepper = ex.stepper.generic.NormalizedLinearStepper(
         num_spatial_dims,
         num_points,
-        normalized_coefficients=ex.stepper.generic.normalize_coefficients(
+        normalized_linear_coefficients=ex.stepper.generic.normalize_coefficients(
             coefficients,
             domain_extent=domain_extent,
             dt=dt,
@@ -361,7 +361,7 @@ def test_nonlinear_normalized_stepper():
     normalized_burgers_stepper = ex.stepper.generic.NormalizedConvectionStepper(
         num_spatial_dims,
         num_points,
-        normalized_coefficients=ex.stepper.generic.normalize_coefficients(
+        normalized_linear_coefficients=ex.stepper.generic.normalize_coefficients(
             [0.0, 0.0, diffusivity],
             domain_extent=domain_extent,
             dt=dt,

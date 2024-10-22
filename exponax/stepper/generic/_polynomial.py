@@ -7,8 +7,8 @@ from ._utils import extract_normalized_coefficients_from_difficulty
 
 
 class GeneralPolynomialStepper(BaseStepper):
-    coefficients: tuple[float, ...]
-    polynomial_scales: tuple[float, ...]
+    linear_coefficients: tuple[float, ...]
+    polynomial_coefficients: tuple[float, ...]
     dealiasing_fraction: float
 
     def __init__(
@@ -18,8 +18,8 @@ class GeneralPolynomialStepper(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        coefficients: tuple[float, ...] = (10.0, 0.0, 1.0),
-        polynomial_scales: tuple[float, ...] = (0.0, 0.0, -10.0),
+        linear_coefficients: tuple[float, ...] = (10.0, 0.0, 1.0),
+        polynomial_coefficients: tuple[float, ...] = (0.0, 0.0, -10.0),
         order=2,
         dealiasing_fraction: float = 2 / 3,
         num_circle_points: int = 16,
@@ -78,15 +78,15 @@ class GeneralPolynomialStepper(BaseStepper):
             in each dimension is the same. Hence, the total number of degrees of
             freedom is `Nᵈ`.
         - `dt`: The timestep size `Δt` between two consecutive states.
-        - `coefficients`: The list of coefficients `a_j` corresponding to the
+        - `linear_coefficients`: The list of coefficients `a_j` corresponding to the
             derivatives. The length of this tuple represents the highest
             occuring derivative. The default value `(10.0, 0.0, 0.01)` in
-            combination with the default `polynomial_scales` corresponds to the
+            combination with the default `polynomial_coefficients` corresponds to the
             Fisher-KPP equation.
-        - `polynomial_scales`: The list of scales `pₖ` corresponding to the
+        - `polynomial_coefficients`: The list of scales `pₖ` corresponding to the
             polynomial contributions. The length of this tuple represents the
             highest occuring polynomial. The default value `(0.0, 0.0, 10.0)` in
-            combination with the default `coefficients` corresponds to the
+            combination with the default `linear_coefficients` corresponds to the
             Fisher-KPP equation.
         - `order`: The order of the Exponential Time Differencing Runge
             Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
@@ -105,8 +105,8 @@ class GeneralPolynomialStepper(BaseStepper):
             coefficients of the exponential time differencing Runge Kutta
             method.
         """
-        self.coefficients = coefficients
-        self.polynomial_scales = polynomial_scales
+        self.linear_coefficients = linear_coefficients
+        self.polynomial_coefficients = polynomial_coefficients
         self.dealiasing_fraction = dealiasing_fraction
 
         super().__init__(
@@ -130,7 +130,7 @@ class GeneralPolynomialStepper(BaseStepper):
                 axis=0,
                 keepdims=True,
             )
-            for i, c in enumerate(self.coefficients)
+            for i, c in enumerate(self.linear_coefficients)
         )
         return linear_operator
 
@@ -142,25 +142,25 @@ class GeneralPolynomialStepper(BaseStepper):
             self.num_spatial_dims,
             self.num_points,
             dealiasing_fraction=self.dealiasing_fraction,
-            coefficients=self.polynomial_scales,
+            coefficients=self.polynomial_coefficients,
         )
 
 
 class NormalizedPolynomialStepper(GeneralPolynomialStepper):
-    normalized_coefficients: tuple[float, ...]
-    normalized_polynomial_scales: tuple[float, ...]
+    normalized_linear_coefficients: tuple[float, ...]
+    normalized_polynomial_coefficients: tuple[float, ...]
 
     def __init__(
         self,
         num_spatial_dims: int,
         num_points: int,
         *,
-        normalized_coefficients: tuple[float, ...] = (
+        normalized_linear_coefficients: tuple[float, ...] = (
             10.0 * 0.001 / (10.0**0),
             0.0,
             1.0 * 0.001 / (10.0**2),
         ),
-        normalized_polynomial_scales: tuple[float, ...] = (
+        normalized_polynomial_coefficients: tuple[float, ...] = (
             0.0,
             0.0,
             -10.0 * 0.001,
@@ -190,19 +190,19 @@ class NormalizedPolynomialStepper(GeneralPolynomialStepper):
             boundary point. In higher dimensions; the number of points in each
             dimension is the same. Hence, the total number of degrees of freedom
             is `Nᵈ`.
-        - `normalized_coefficients`: The list of coefficients `α_j` corresponding
-            to the derivatives. The length of this tuple represents the highest
-            occuring derivative. The default value corresponds to the Fisher-KPP
-            equation.
-        - `normalized_polynomial_scales`: The list of scales `βₖ` corresponding
-            to the polynomial contributions. The length of this tuple represents
-            the highest occuring polynomial. The default value corresponds to the
-            Fisher-KPP equation.
+        - `normalized_linear_coefficients`: The list of coefficients `α_j`
+            corresponding to the derivatives. The length of this tuple
+            represents the highest occuring derivative. The default value
+            corresponds to the Fisher-KPP equation.
+        - `normalized_polynomial_coefficients`: The list of scales `βₖ`
+            corresponding to the polynomial contributions. The length of this
+            tuple represents the highest occuring polynomial. The default value
+            corresponds to the Fisher-KPP equation.
         - `order`: The order of the Exponential Time Differencing Runge Kutta
             method. Must be one of {0, 1, 2, 3, 4}. The option `0` only solves
-            the linear part of the equation. Use higher values for higher accuracy
-            and stability. The default choice of `2` is a good compromise for
-            single precision floats.
+            the linear part of the equation. Use higher values for higher
+            accuracy and stability. The default choice of `2` is a good
+            compromise for single precision floats.
         - `dealiasing_fraction`: The fraction of the wavenumbers to keep before
             evaluating the nonlinearity. The default 2/3 corresponds to Orszag's
             2/3 rule which is sufficient if the highest occuring polynomial is
@@ -212,18 +212,19 @@ class NormalizedPolynomialStepper(GeneralPolynomialStepper):
             integral method to compute the coefficients of the exponential time
             differencing Runge Kutta method.
         - `circle_radius`: The radius of the contour used to compute the
-            coefficients of the exponential time differencing Runge Kutta method.
+            coefficients of the exponential time differencing Runge Kutta
+            method.
         """
-        self.normalized_coefficients = normalized_coefficients
-        self.normalized_polynomial_scales = normalized_polynomial_scales
+        self.normalized_linear_coefficients = normalized_linear_coefficients
+        self.normalized_polynomial_coefficients = normalized_polynomial_coefficients
 
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             domain_extent=1.0,  # Derivative operator is just scaled with 2 * jnp.pi
             num_points=num_points,
             dt=1.0,
-            coefficients=normalized_coefficients,
-            polynomial_scales=normalized_polynomial_scales,
+            linear_coefficients=normalized_linear_coefficients,
+            polynomial_coefficients=normalized_polynomial_coefficients,
             order=order,
             dealiasing_fraction=dealiasing_fraction,
             num_circle_points=num_circle_points,
@@ -328,8 +329,8 @@ class DifficultyPolynomialStepper(NormalizedPolynomialStepper):
         super().__init__(
             num_spatial_dims=num_spatial_dims,
             num_points=num_points,
-            normalized_coefficients=normalized_coefficients,
-            normalized_polynomial_scales=normalized_polynomial_scales,
+            normalized_linear_coefficients=normalized_coefficients,
+            normalized_polynomial_coefficients=normalized_polynomial_scales,
             order=order,
             dealiasing_fraction=dealiasing_fraction,
             num_circle_points=num_circle_points,

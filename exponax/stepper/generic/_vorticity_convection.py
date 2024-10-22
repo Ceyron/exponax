@@ -7,7 +7,7 @@ from ...nonlin_fun import VorticityConvection2d, VorticityConvection2dKolmogorov
 
 class GeneralVorticityConvectionStepper(BaseStepper):
     vorticity_convection_scale: float
-    coefficients: tuple[float, ...]
+    linear_coefficients: tuple[float, ...]
     injection_mode: int
     injection_scale: float
     dealiasing_fraction: float
@@ -20,7 +20,7 @@ class GeneralVorticityConvectionStepper(BaseStepper):
         dt: float,
         *,
         vorticity_convection_scale: float = 1.0,
-        coefficients: tuple[float, ...] = (0.0, 0.0, 0.001),
+        linear_coefficients: tuple[float, ...] = (0.0, 0.0, 0.001),
         injection_mode: int = 4,
         injection_scale: float = 0.0,
         order: int = 2,
@@ -61,7 +61,7 @@ class GeneralVorticityConvectionStepper(BaseStepper):
             in each dimension is the same. Hence, the total number of degrees of
             freedom is `Nᵈ`.
         - `dt`: The timestep size `Δt` between two consecutive states.
-        - `coefficients`: The list of coefficients `a_j`
+        - `linear_coefficients`: The list of coefficients `a_j`
             corresponding to the derivatives. The length of this tuple
             represents the highest occuring derivative. The default value `(0.0,
             0.0, 0.001)` corresponds to pure regular diffusion.
@@ -89,7 +89,7 @@ class GeneralVorticityConvectionStepper(BaseStepper):
         if num_spatial_dims != 2:
             raise ValueError(f"Expected num_spatial_dims = 2, got {num_spatial_dims}.")
         self.vorticity_convection_scale = vorticity_convection_scale
-        self.coefficients = coefficients
+        self.linear_coefficients = linear_coefficients
         self.injection_mode = injection_mode
         self.injection_scale = injection_scale
         self.dealiasing_fraction = dealiasing_fraction
@@ -114,7 +114,7 @@ class GeneralVorticityConvectionStepper(BaseStepper):
                 axis=0,
                 keepdims=True,
             )
-            for i, c in enumerate(self.coefficients)
+            for i, c in enumerate(self.linear_coefficients)
         )
         return linear_operator
 
