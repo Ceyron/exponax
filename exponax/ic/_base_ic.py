@@ -13,10 +13,12 @@ class BaseIC(eqx.Module, ABC):
         Evaluate the initial condition.
 
         **Arguments**:
-            - `x`: The grid points.
+
+        - `x`: The grid points.
 
         **Returns**:
-            - `u`: The initial condition evaluated at the grid points.
+
+        - `u`: The initial condition evaluated at the grid points.
         """
         pass
 
@@ -30,11 +32,13 @@ class BaseRandomICGenerator(eqx.Module):
         Generate an initial condition function.
 
         **Arguments**:
-            - `key`: A jax random key.
+
+        - `key`: A jax random key.
 
         **Returns**:
-            - `ic`: An initial condition function that can be evaluated at
-                degree of freedom locations.
+
+        - `ic`: An initial condition function that can be evaluated at
+            degree of freedom locations.
         """
         raise NotImplementedError(
             "This random ic generator cannot represent its initial condition as a function. Directly evaluate it."
@@ -47,15 +51,16 @@ class BaseRandomICGenerator(eqx.Module):
         key: PRNGKeyArray,
     ) -> Float[Array, "1 ... N"]:
         """
-        Generate a random initial condition.
+        Generate a random initial condition on a grid with `num_points` points.
 
         **Arguments**:
-            - `num_points`: The number of grid points in each dimension.
-            - `key`: A jax random key.
-            - `indexing`: The indexing convention for the grid.
+
+        - `num_points`: The number of grid points in each dimension.
+        - `key`: A jax random key.
 
         **Returns**:
-            - `u`: The initial condition evaluated at the grid points.
+
+        - `u`: The initial condition evaluated at the grid points.
         """
         ic_fun = self.gen_ic_fun(key=key)
         grid = make_grid(

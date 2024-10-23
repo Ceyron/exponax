@@ -2,6 +2,7 @@ import equinox as eqx
 from jaxtyping import Array, Complex, Float
 
 from ._base_stepper import BaseStepper
+from ._spectral import fft, ifft, spatial_shape
 from ._utils import repeat
 
 
@@ -25,6 +26,10 @@ class RepeatedStepper(eqx.Module):
         Sugarcoat the utility function `repeat` in a callable PyTree for easy
         composition with other equinox modules.
 
+        !!! info
+            Performs the substepping in Fourier space to avoid unnecessary
+            back-and-forth transformations.
+
         One intended usage is to get "more accurate" or "more stable" time steppers
         that perform substeps.
 
@@ -33,8 +38,9 @@ class RepeatedStepper(eqx.Module):
         time step of X/Y and then wrap it in a RepeatedStepper with num_sub_steps=Y.
 
         **Arguments:**
-            - `stepper`: The stepper to repeat.
-            - `num_sub_steps`: The number of substeps to perform.
+
+        - `stepper`: The stepper to repeat.
+        - `num_sub_steps`: The number of substeps to perform.
         """
         self.stepper = stepper
         self.num_sub_steps = num_sub_steps
@@ -52,10 +58,29 @@ class RepeatedStepper(eqx.Module):
         u: Float[Array, "C ... N"],
     ) -> Float[Array, "C ... N"]:
         """
-        Step the PDE forward in time by self.num_sub_steps time steps given the
+        Step the PDE forward in time by `self.num_sub_steps` time steps given the
         current state `u`.
+
+        !!! info
+            Performs the substepping in Fourier space to avoid unnecessary
+            back-and-forth transformations.
+
+        **Arguments:**
+
+        - `u`: The current state.
+
+        **Returns:**
+
+        - `u_next`: The state after `self.num_sub_steps` time steps.
         """
-        return repeat(self.stepper.step, self.num_sub_steps)(u)
+        u_hat = fft(u, num_spatial_dims=self.num_spatial_dims)
+        u_hat_after_steps = self.step_fourier(u_hat)
+        u_after_steps = ifft(
+            u_hat_after_steps,
+            num_spatial_dims=self.num_spatial_dims,
+            num_points=self.num_points,
+        )
+        return u_after_steps
 
     def step_fourier(
         self,
@@ -64,6 +89,15 @@ class RepeatedStepper(eqx.Module):
         """
         Step the PDE forward in time by self.num_sub_steps time steps given the
         current state `u_hat` in real-valued Fourier space.
+
+        **Arguments:**
+
+        - `u_hat`: The current state in Fourier space.
+
+        **Returns:**
+
+        - `u_next_hat`: The state after `self.num_sub_steps` time steps in Fourier
+            space.
         """
         return repeat(self.stepper.step_fourier, self.num_sub_steps)(u_hat)
 
@@ -74,5 +108,31 @@ class RepeatedStepper(eqx.Module):
         """
         Step the PDE forward in time by self.num_sub_steps time steps given the
         current state `u`.
+
+        !!! info
+            Performs the substepping in Fourier space to avoid unnecessary
+            back-and-forth transformations.
+
+        **Arguments:**
+
+        - `u`: The current state.
+
+        **Returns:**
+
+        - `u_next`: The state after `self.num_sub_steps` time steps.
+
+        !!! tip
+            Use this call method together with `exponax.rollout` to efficiently
+            produce temporal trajectories.
+
+        !!! info
+            For batched operation, use `jax.vmap` on this function.
         """
-        return repeat(self.stepper, self.num_sub_steps)(u)
+        expected_shape = (self.num_channels,) + spatial_shape(
+            self.num_spatial_dims, self.num_points
+        )
+        if u.shape != expected_shape:
+            raise ValueError(
+                f"Expected shape {expected_shape}, got {u.shape}. For batched operation use `jax.vmap` on this function."
+            )
+        return self.step(u)

@@ -15,9 +15,13 @@ class ClampingICGenerator(BaseRandomICGenerator):
         A generator based on another generator that clamps the output to a given
         range.
 
+        Some dynamics (like the Fisher-KPP equation) require such initial
+        conditions.
+
         **Arguments**:
-            - `ic_gen`: The initial condition generator to clamp.
-            - `limits`: The lower and upper limits of the clamping range.
+
+        - `ic_gen`: The initial condition generator to clamp.
+        - `limits`: The lower and upper limits of the clamping range.
         """
         self.ic_gen = ic_gen
         self.limits = limits

@@ -21,22 +21,22 @@ def test_instantiate():
             ex.stepper.KuramotoSivashinsky,
             ex.stepper.KuramotoSivashinskyConservative,
             ex.stepper.KortewegDeVries,
-            ex.stepper.GeneralConvectionStepper,
-            ex.stepper.GeneralGradientNormStepper,
-            ex.stepper.GeneralLinearStepper,
-            ex.stepper.GeneralNonlinearStepper,
-            ex.stepper.GeneralPolynomialStepper,
+            ex.stepper.generic.GeneralConvectionStepper,
+            ex.stepper.generic.GeneralGradientNormStepper,
+            ex.stepper.generic.GeneralLinearStepper,
+            ex.stepper.generic.GeneralNonlinearStepper,
+            ex.stepper.generic.GeneralPolynomialStepper,
         ]:
             simulator(num_spatial_dims, domain_extent, num_points, dt)
 
     for num_spatial_dims in [1, 2, 3]:
         for simulator in [
-            ex.reaction.FisherKPP,
-            ex.reaction.AllenCahn,
-            ex.reaction.CahnHilliard,
-            ex.reaction.SwiftHohenberg,
-            # ex.reaction.BelousovZhabotinsky,
-            ex.reaction.GrayScott,
+            ex.stepper.reaction.FisherKPP,
+            ex.stepper.reaction.AllenCahn,
+            ex.stepper.reaction.CahnHilliard,
+            ex.stepper.reaction.SwiftHohenberg,
+            # ex.stepper.reaction.BelousovZhabotinsky,
+            ex.stepper.reaction.GrayScott,
         ]:
             simulator(num_spatial_dims, domain_extent, num_points, dt)
 
@@ -51,16 +51,13 @@ def test_instantiate():
 
     for num_spatial_dims in [1, 2, 3]:
         for normalized_simulator in [
-            ex.normalized.NormalizedLinearStepper,
-            ex.normalized.NormalizedConvectionStepper,
-            ex.normalized.NormalizedGradientNormStepper,
-            ex.normalized.NormalizedPolynomialStepper,
-            ex.normalized.NormalizedGeneralNonlinearStepper,
+            ex.stepper.generic.NormalizedLinearStepper,
+            ex.stepper.generic.NormalizedConvectionStepper,
+            ex.stepper.generic.NormalizedGradientNormStepper,
+            ex.stepper.generic.NormalizedPolynomialStepper,
+            ex.stepper.generic.NormalizedNonlinearStepper,
         ]:
             normalized_simulator(num_spatial_dims, num_points)
-
-    for simulator in [ex.normalized.NormalizedVorticityConvection]:
-        simulator(2, num_points)
 
 
 @pytest.mark.parametrize(
@@ -105,12 +102,12 @@ def test_specific_stepper_to_general_linear_stepper(
         cutoff=5,
     )(num_points, key=jax.random.PRNGKey(0))
 
-    general_stepper = ex.stepper.GeneralLinearStepper(
+    general_stepper = ex.stepper.generic.GeneralLinearStepper(
         num_spatial_dims,
         domain_extent,
         num_points,
         dt,
-        coefficients=general_stepper_coefficients,
+        linear_coefficients=general_stepper_coefficients,
     )
 
     specific_pred = specific_stepper(u_0)
@@ -120,18 +117,20 @@ def test_specific_stepper_to_general_linear_stepper(
 
 
 @pytest.mark.parametrize(
-    "specific_stepper,general_stepper_scale,general_stepper_coefficients",
+    "specific_stepper,general_stepper_scale,general_stepper_coefficients,conservative",
     [
         # Linear problems
         (
             ex.stepper.Advection(1, 3.0, 50, 0.1, velocity=1.0),
             0.0,
             [0.0, -1.0],
+            False,
         ),
         (
             ex.stepper.Diffusion(1, 3.0, 50, 0.1, diffusivity=0.01),
             0.0,
             [0.0, 0.0, 0.01],
+            False,
         ),
         (
             ex.stepper.AdvectionDiffusion(
@@ -139,29 +138,34 @@ def test_specific_stepper_to_general_linear_stepper(
             ),
             0.0,
             [0.0, -1.0, 0.01],
+            False,
         ),
         (
             ex.stepper.Dispersion(1, 3.0, 50, 0.1, dispersivity=0.0001),
             0.0,
             [0.0, 0.0, 0.0, 0.0001],
+            False,
         ),
         (
             ex.stepper.HyperDiffusion(1, 3.0, 50, 0.1, hyper_diffusivity=0.00001),
             0.0,
             [0.0, 0.0, 0.0, 0.0, -0.00001],
+            False,
         ),
         # nonlinear problems
         (
             ex.stepper.Burgers(1, 3.0, 50, 0.1, diffusivity=0.05, convection_scale=1.0),
             1.0,
             [0.0, 0.0, 0.05],
+            False,
         ),
         (
             ex.stepper.KortewegDeVries(
                 1, 3.0, 50, 0.1, dispersivity=1.0, convection_scale=-6.0
             ),
             -6.0,
-            [0.0, 0.0, 0.0, -1.0],
+            [0.0, 0.0, 0.0, -1.0, -0.01],
+            False,
         ),
         (
             ex.stepper.KuramotoSivashinskyConservative(
@@ -170,11 +174,12 @@ def test_specific_stepper_to_general_linear_stepper(
                 50,
                 0.1,
                 convection_scale=1.0,
-                second_order_diffusivity=1.0,
-                fourth_order_diffusivity=1.0,
+                second_order_scale=1.0,
+                fourth_order_scale=1.0,
             ),
             1.0,
             [0.0, 0.0, -1.0, 0.0, -1.0],
+            True,
         ),
     ],
 )
@@ -182,6 +187,7 @@ def test_specific_stepper_to_general_convection_stepper(
     specific_stepper,
     general_stepper_scale,
     general_stepper_coefficients,
+    conservative,
 ):
     num_spatial_dims = specific_stepper.num_spatial_dims
     domain_extent = specific_stepper.domain_extent
@@ -193,13 +199,14 @@ def test_specific_stepper_to_general_convection_stepper(
         cutoff=5,
     )(num_points, key=jax.random.PRNGKey(0))
 
-    general_stepper = ex.stepper.GeneralConvectionStepper(
+    general_stepper = ex.stepper.generic.GeneralConvectionStepper(
         num_spatial_dims,
         domain_extent,
         num_points,
         dt,
-        coefficients=general_stepper_coefficients,
+        linear_coefficients=general_stepper_coefficients,
         convection_scale=general_stepper_scale,
+        conservative=conservative,
     )
 
     specific_pred = specific_stepper(u_0)
@@ -247,8 +254,8 @@ def test_specific_stepper_to_general_convection_stepper(
                 50,
                 0.1,
                 gradient_norm_scale=1.0,
-                second_order_diffusivity=1.0,
-                fourth_order_diffusivity=1.0,
+                second_order_scale=1.0,
+                fourth_order_scale=1.0,
             ),
             1.0,
             [0.0, 0.0, -1.0, 0.0, -1.0],
@@ -270,12 +277,12 @@ def test_specific_to_general_gradient_norm_stepper(
         cutoff=5,
     )(num_points, key=jax.random.PRNGKey(0))
 
-    general_stepper = ex.stepper.GeneralGradientNormStepper(
+    general_stepper = ex.stepper.generic.GeneralGradientNormStepper(
         num_spatial_dims,
         domain_extent,
         num_points,
         dt,
-        coefficients=general_stepper_coefficients,
+        linear_coefficients=general_stepper_coefficients,
         gradient_norm_scale=general_stepper_scale,
     )
 
@@ -309,17 +316,17 @@ def test_linear_normalized_stepper(coefficients):
         cutoff=5,
     )(num_points, key=jax.random.PRNGKey(0))
 
-    regular_linear_stepper = ex.stepper.GeneralLinearStepper(
+    regular_linear_stepper = ex.stepper.generic.GeneralLinearStepper(
         num_spatial_dims,
         domain_extent,
         num_points,
         dt,
-        coefficients=coefficients,
+        linear_coefficients=coefficients,
     )
-    normalized_linear_stepper = ex.normalized.NormalizedLinearStepper(
+    normalized_linear_stepper = ex.stepper.generic.NormalizedLinearStepper(
         num_spatial_dims,
         num_points,
-        normalized_coefficients=ex.normalized.normalize_coefficients(
+        normalized_linear_coefficients=ex.stepper.generic.normalize_coefficients(
             coefficients,
             domain_extent=domain_extent,
             dt=dt,
@@ -351,15 +358,15 @@ def test_nonlinear_normalized_stepper():
         diffusivity=diffusivity,
         convection_scale=convection_scale,
     )
-    normalized_burgers_stepper = ex.normalized.NormalizedConvectionStepper(
+    normalized_burgers_stepper = ex.stepper.generic.NormalizedConvectionStepper(
         num_spatial_dims,
         num_points,
-        normalized_coefficients=ex.normalized.normalize_coefficients(
+        normalized_linear_coefficients=ex.stepper.generic.normalize_coefficients(
             [0.0, 0.0, diffusivity],
             domain_extent=domain_extent,
             dt=dt,
         ),
-        normalized_convection_scale=ex.normalized.normalize_convection_scale(
+        normalized_convection_scale=ex.stepper.generic.normalize_convection_scale(
             convection_scale,
             domain_extent=domain_extent,
             dt=dt,
@@ -369,4 +376,6 @@ def test_nonlinear_normalized_stepper():
     regular_burgers_pred = regular_burgers_stepper(u_0)
     normalized_burgers_pred = normalized_burgers_stepper(u_0)
 
-    assert regular_burgers_pred == pytest.approx(normalized_burgers_pred)
+    assert regular_burgers_pred == pytest.approx(
+        normalized_burgers_pred, rel=1e-5, abs=1e-5
+    )

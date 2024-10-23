@@ -4,9 +4,8 @@ from jaxtyping import Array, Float, PRNGKeyArray
 
 from .._spectral import (
     build_scaling_array,
+    ifft,
     low_pass_filter_mask,
-    space_indices,
-    spatial_shape,
     wavenumber_shape,
 )
 from ._base_ic import BaseRandomICGenerator
@@ -60,22 +59,27 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
         in the range `amplitude_range`. Angles (=angular offsets) are drawn
         according to a uniform distribution in the range `angle_range`.
 
+        See also `exponax.ic.RandomSineWaves1d` for a simplified version that
+        only works in 1d but can also produce a functional representation of the
+        initial state.
+
         **Arguments**:
-            - `num_spatial_dims`: The number of spatial dimensions `d`.
-            - `cutoff`: The cutoff of the wavenumbers. This limits the
-                "complexity" of the initial state. Note that some dynamics are
-                very sensitive to high-frequency information.
-            - `amplitude_range`: The range of the amplitudes. Defaults to
-              `(-1.0, 1.0)`.
-            - `angle_range`: The range of the angles. Defaults to `(0.0, 2π)`.
-            - `offset_range`: The range of the offsets. Defaults to `(0.0,
-                0.0)`, meaning **zero-mean** by default.
-            - `std_one`: Whether to normalize the state to have a standard
-                deviation of one. Defaults to `False`. Only works if the offset
-                is zero.
-            - `max_one`: Whether to normalize the state to have the maximum
-                absolute value of one. Defaults to `False`. Only one of
-                `std_one` and `max_one` can be `True`.
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`.
+        - `cutoff`: The cutoff of the wavenumbers. This limits the
+            "complexity" of the initial state. Note that some dynamics are very
+            sensitive to high-frequency information.
+        - `amplitude_range`: The range of the amplitudes. Defaults to
+            `(-1.0, 1.0)`.
+        - `angle_range`: The range of the angles. Defaults to `(0.0, 2π)`.
+        - `offset_range`: The range of the offsets. Defaults to `(0.0,
+            0.0)`, meaning **zero-mean** by default.
+        - `std_one`: Whether to normalize the state to have a standard
+            deviation of one. Defaults to `False`. Only works if the offset is
+            zero.
+        - `max_one`: Whether to normalize the state to have the maximum
+            absolute value of one. Defaults to `False`. Only one of `std_one`
+            and `max_one` can be `True`.
         """
         if offset_range == (0.0, 0.0) and std_one:
             raise ValueError("Cannot have non-zero offset and `std_one=True`.")
@@ -128,13 +132,15 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
         )
 
         fourier_noise = fourier_noise * build_scaling_array(
-            self.num_spatial_dims, num_points
+            self.num_spatial_dims,
+            num_points,
+            mode="coef_extraction",
         )
 
-        u = jnp.fft.irfftn(
+        u = ifft(
             fourier_noise,
-            s=spatial_shape(self.num_spatial_dims, num_points),
-            axes=space_indices(self.num_spatial_dims),
+            num_spatial_dims=self.num_spatial_dims,
+            num_points=num_points,
         )
 
         if self.std_one:

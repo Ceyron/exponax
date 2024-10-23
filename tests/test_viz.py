@@ -28,6 +28,8 @@ def test_plot_state_2d():
     plt.close(fig)
 
 
+# # Requires a GPU and therefore cannot easily be tested on GitHub Actions
+
 # def test_plot_state_3d():
 #     state = jax.random.normal(jax.random.PRNGKey(0), (1, 32, 32, 32))
 

@@ -5,8 +5,7 @@ from jaxtyping import Array, Float, PRNGKeyArray
 from .._spectral import (
     build_scaled_wavenumbers,
     build_scaling_array,
-    space_indices,
-    spatial_shape,
+    ifft,
     wavenumber_shape,
 )
 from ._base_ic import BaseRandomICGenerator
@@ -32,19 +31,20 @@ class GaussianRandomField(BaseRandomICGenerator):
     ):
         """
         Random generator for initial states following a power-law spectrum in
-        Fourier space.
+        Fourier space, i.e., it decays polynomially with the wavenumber.
 
         **Arguments:**
-            - `num_spatial_dims`: The number of spatial dimensions.
-            - `domain_extent`: The extent of the domain in each spatial direction.
-            - `powerlaw_exponent`: The exponent of the power-law spectrum.
-            - `zero_mean`: Whether the field should have zero mean.
-            - `std_one`: Whether to normalize the state to have a standard
-                deviation of one. Defaults to `False`. Only works if the offset
-                is zero.
-            - `max_one`: Whether to normalize the state to have the maximum
-                absolute value of one. Defaults to `False`. Only one of
-                `std_one` and `max_one` can be `True`.
+
+        - `num_spatial_dims`: The number of spatial dimensions.
+        - `domain_extent`: The extent of the domain in each spatial direction.
+        - `powerlaw_exponent`: The exponent of the power-law spectrum.
+        - `zero_mean`: Whether the field should have zero mean.
+        - `std_one`: Whether to normalize the state to have a standard
+            deviation of one. Defaults to `False`. Only works if the offset is
+            zero.
+        - `max_one`: Whether to normalize the state to have the maximum
+            absolute value of one. Defaults to `False`. Only one of `std_one`
+            and `max_one` can be `True`.
         """
         if not zero_mean and std_one:
             raise ValueError("Cannot have `zero_mean=False` and `std_one=True`.")
@@ -64,9 +64,12 @@ class GaussianRandomField(BaseRandomICGenerator):
             self.num_spatial_dims, self.domain_extent, num_points
         )
         wavenumer_norm_grid = jnp.linalg.norm(wavenumber_grid, axis=0, keepdims=True)
+        # Further division by 2.0 in the exponent is because we want to have the
+        # **power-spectrum** follow a **power-law**. See
+        # https://github.com/Ceyron/exponax/issues/9 for more details.
         amplitude = jnp.power(wavenumer_norm_grid, -self.powerlaw_exponent / 2.0)
         amplitude = (
-            amplitude.flatten().at[0].set(0.0).reshape(wavenumer_norm_grid.shape)
+            amplitude.flatten().at[0].set(1.0).reshape(wavenumer_norm_grid.shape)
         )
 
         real_key, imag_key = jr.split(key, 2)
@@ -80,13 +83,11 @@ class GaussianRandomField(BaseRandomICGenerator):
 
         noise = noise * amplitude
 
-        noise = noise * build_scaling_array(self.num_spatial_dims, num_points)
-
-        ic = jnp.fft.irfftn(
-            noise,
-            s=spatial_shape(self.num_spatial_dims, num_points),
-            axes=space_indices(self.num_spatial_dims),
+        noise = noise * build_scaling_array(
+            self.num_spatial_dims, num_points, mode="coef_extraction"
         )
+
+        ic = ifft(noise, num_spatial_dims=self.num_spatial_dims, num_points=num_points)
 
         if self.zero_mean:
             ic = ic - jnp.mean(ic)
