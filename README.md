@@ -1,6 +1,24 @@
 <h4 align="center">Efficient Differentiable n-d PDE solvers built on top of <a href="https://github.com/google/jax" target="_blank">JAX</a> & <a href="https://github.com/patrick-kidger/equinox" target="_blank">Equinox</a>.</h4>
 
 <p align="center">
+<a href="https://pypi.org/project/exponax/">
+  <img src="https://img.shields.io/pypi/v/exponax.svg" alt="PyPI">
+</a>
+<a href="https://github.com/ceyron/exponax/actions/workflows/test.yml">
+  <img src="https://github.com/ceyron/exponax/actions/workflows/test.yml/badge.svg" alt="Tests">
+</a>
+<a href="https://fkoehler.site/exponax/">
+  <img src="https://img.shields.io/badge/docs-latest-green" alt="docs-latest">
+</a>
+<a href="https://github.com/ceyron/exponax/releases">
+  <img src="https://img.shields.io/github/v/release/ceyron/exponax?include_prereleases&label=changelog" alt="Changelog">
+</a>
+<a href="https://github.com/ceyron/exponax/blob/main/LICENSE.txt">
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
+</a>
+</p>
+
+<p align="center">
   <a href="#installation">Installation</a> •
   <a href="#documentation">Documentation</a> •
   <a href="#quickstart">Quickstart</a> •
