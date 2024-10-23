@@ -30,6 +30,8 @@ theme:
              name: Switch to light mode
     icon:
         repo: fontawesome/brands/github  # GitHub logo in top right
+    logo: "imgs/logo.png" # Logo in top left
+    favicon: "imgs/logo.png"  # Favicon in browser tab
 
 extra:
   social:
