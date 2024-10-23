@@ -1,3 +1,5 @@
+import importlib.metadata
+
 from . import _poisson as poisson
 from . import _spectral as spectral
 from . import etdrk, ic, metrics, nonlin_fun, stepper, viz
@@ -15,7 +17,7 @@ from ._utils import (
     wrap_bc,
 )
 
-__version__ = "0.1.0"
+__version__ = importlib.metadata.version("exponax")
 
 __all__ = [
     "BaseStepper",
