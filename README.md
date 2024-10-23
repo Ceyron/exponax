@@ -1,20 +1,22 @@
- ⚠️ ⚠️ ⚠️ This is a pre-release version of the package to test the PyPI workflow. Proper release **with breaking API changes** will be by end of October. ⚠️ ⚠️ ⚠️
-
-<h4 align="center">Efficient Differentiable PDE solvers built on top of <a href="https://github.com/google/jax" target="_blank">JAX</a> & <a href="https://github.com/patrick-kidger/equinox" target="_blank">Equinox</a>.</h4>
+<h4 align="center">Efficient Differentiable n-d PDE solvers built on top of <a href="https://github.com/google/jax" target="_blank">JAX</a> & <a href="https://github.com/patrick-kidger/equinox" target="_blank">Equinox</a>.</h4>
 
 <p align="center">
   <a href="#installation">Installation</a> •
+  <a href="#documentation">Documentation</a> •
   <a href="#quickstart">Quickstart</a> •
   <a href="#features">Features</a> •
-  <a href="#documentation">Documentation</a> •
   <a href="#background">Background</a> •
-  <a href="#related">Related</a> •
     <a href="#acknowledgements">Acknowledgements</a>
 </p>
 
 <p align="center">
-    <img src="docs/imgs/teaser_demo.gif">
+    <img src="https://github.com/user-attachments/assets/8371ba49-af64-4bdd-9794-c1eea853bb4f">
 </p>
+
+`Exponax` is a suite for building Fourier spectral ETDRK time-steppers for
+semi-linear PDEs in 1d, 2d, and 3d. There are many pre-built dynamics and plenty
+of helpful utilities. It is extremely efficient, is differentiable (due to being
+fully written in JAX), and embeds seamlessly into deep learning.
 
 ## Installation
 
@@ -23,6 +25,10 @@ pip install exponax
 ```
 
 Requires Python 3.10+ and JAX 0.4.13+. 👉 [JAX install guide](https://jax.readthedocs.io/en/latest/installation.html).
+
+## Documentation
+
+Documentation is available at [fkoehler.site/exponax](https://fkoehler.site/exponax/).
 
 ## Quickstart
 
@@ -48,9 +54,11 @@ plt.imshow(trajectory[:, 0, :].T, aspect='auto', cmap='RdBu', vmin=-2, vmax=2, o
 plt.xlabel("Time"); plt.ylabel("Space"); plt.show()
 ```
 
-![](docs/imgs/ks_rollout.png)
+![](https://github.com/user-attachments/assets/e4889898-9a74-4b6f-9e88-ee12706b2f6c)
 
-For a next step, check out the [simple_advection_example_1d.ipynb](examples/simple_advection_example_1d.ipynb) notebook in the `examples` folder, and check out the <a href="#documentation">Documentation</a>.
+For a next step, check out [this tutorial on 1D
+Advection](https://fkoehler.site/exponax/examples/simple_advection_example_1d/)
+that explains the basics of `Exponax`.
 
 ## Features
 
@@ -67,24 +75,20 @@ For a next step, check out the [simple_advection_example_1d.ipynb](examples/simp
         allowing to advance multiple states in time or instantiate multiple
         solvers at a time that operate efficiently in batch.
 2. **Lightweight Design** without custom types. There is no `grid` or `state`
-    object. Everything is based on `jax.numpy` arrays. Timesteppers are callable
+    object. Everything is based on JAX arrays. Timesteppers are callable
     PyTrees.
-3. More than 35 pre-built dynamics:
-    1. Linear PDEs in 1d, 2d, and 3d (advection, diffusion, dispersion, etc.)
-    2. Nonlinear PDEs in 1d, 2d, and 3d (Burgers, Kuramoto-Sivashinsky,
+3. More than 46 pre-built dynamics across 1d, 2d, and 3d:
+    1. Linear PDEs (advection, diffusion, dispersion, etc.)
+    2. Nonlinear PDEs (Burgers, Kuramoto-Sivashinsky,
         Korteweg-de Vries, Navier-Stokes, etc.)
     3. Reaction-Diffusion (Gray-Scott, Swift-Hohenberg, etc.)
-4. Collection of initial condition distributions (truncated Fourier series,
+4. Collection of **initial condition distributions** (truncated Fourier series,
    Gaussian Random Fields, etc.)
 5. **Utilities** for spectral derivatives, grid creation, autogressive rollout,
-   etc.
-6. Easily extendable to new PDEs by subclassing from the `BaseStepper` module.
-7. Normalized interface for reduced number of parameters to uniquely define any
-   dynamics.
-
-## Documentation
-
-Documentation is available at [fkoehler.site/exponax](https://fkoehler.site/exponax/).
+   interpolation, etc.
+6. Easily **extendable** to new PDEs by subclassing from the `BaseStepper` module.
+7. An alternative, reduced interface allowing to define PDE dynamics using
+   normalized or difficulty-based idenfitiers.
 
 ## Background
 
@@ -92,7 +96,7 @@ Exponax supports the efficient solution of (semi-linear) partial differential
 equations on periodic domains in arbitrary dimensions. Those are PDEs of the
 form
 
-$$ \partial u/ \partial t = Lu + N(u) $$
+$$ \partial u/ \partial t = Lu + N(u), $$
 
 where $L$ is a linear differential operator and $N$ is a nonlinear differential
 operator. The linear part can be exactly solved using a (matrix) exponential,
@@ -120,8 +124,9 @@ with a 128x128 discretization is created in less than a second on a modern GPU.
 
 [3] Montanelli, Hadrien, and Niall Bootland. "Solving periodic semilinear stiff PDEs in 1D, 2D and 3D with exponential integrators." Mathematics and Computers in Simulation 178 (2020): 307-327.
 
+## Acknowledgements
 
-## Related
+### Related & Motivation
 
 This package is greatly inspired by the [chebfun](https://www.chebfun.org/)
 library in *MATLAB*, in particular the
@@ -138,9 +143,9 @@ using them for supervised training worked for these problems, but of course
 limits the scope to purely supervised problem. Modern research ideas like
 correcting coarse solvers (see for instance the [Solver-in-the-Loop
 paper](https://arxiv.org/abs/2007.00016) or the [ML-accelerated CFD
-paper](https://arxiv.org/abs/2102.01010)) requires the coarse solvers to be
+paper](https://arxiv.org/abs/2102.01010)) require a coarse solvers to be
 [differentiable](https://physicsbaseddeeplearning.org/diffphys.html). Some ideas
-of diverted chain training also requires the fine solver to be differentiable!
+of diverted chain training also requires the fine solver to be differentiable.
 Even for applications without differentiable solvers, we still have the
 **interface problem** with legacy solvers (like the *MATLAB* ones). Hence, we
 cannot easily query them "on-the-fly" for sth like active learning tasks, nor do
@@ -154,9 +159,6 @@ This package also took much inspiration from the
 [FourierFlows.jl](https://github.com/FourierFlows/FourierFlows.jl) in the
 *Julia* ecosystem, especially for checking the implementation of the contour
 integral method of [2] and how to handle (de)aliasing.
-
-
-## Acknowledgements
 
 ### Citation
 

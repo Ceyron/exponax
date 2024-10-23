@@ -1,10 +1,17 @@
 # Getting Started
 
+`Exponax` is a suite for building Fourier spectral ETDRK time-steppers for
+semi-linear PDEs in 1d, 2d, and 3d. There are many pre-built dynamics and plenty
+of helpful utilities. It is extremely efficient, is differentiable (due to being
+fully written in JAX), and embeds seamlessly into deep learning.
+
 ## Installation
 
 ```bash
-pip install git+ssh://git@github.com/Ceyron/exponax@main
+pip install exponax
 ```
+
+Requires Python 3.10+ and JAX 0.4.13+. 👉 [JAX install guide](https://jax.readthedocs.io/en/latest/installation.html).
 
 ## Quickstart
 
@@ -30,9 +37,11 @@ plt.imshow(trajectory[:, 0, :].T, aspect='auto', cmap='RdBu', vmin=-2, vmax=2, o
 plt.xlabel("Time"); plt.ylabel("Space"); plt.show()
 ```
 
-![](imgs/ks_rollout.png)
+![](https://github.com/user-attachments/assets/e4889898-9a74-4b6f-9e88-ee12706b2f6c)
 
-For a next step, check out the [simple_advection_example_1d.ipynb](examples/simple_advection_example_1d.ipynb) notebook in the `examples` folder, and check out the <a href="#documentation">Documentation</a>.
+For a next step, check out [this tutorial on 1D
+Advection](https://fkoehler.site/exponax/examples/simple_advection_example_1d/)
+that explains the basics of `Exponax`.
 
 ## Features
 
