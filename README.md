@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-    <img src="https://github.com/user-attachments/assets/8371ba49-af64-4bdd-9794-c1eea853bb4f">
+    <img src="https://github.com/user-attachments/assets/690a2faf-8d72-42b6-bae4-3ba6f4f75e88", width=700px>
 </p>
 
 `Exponax` is a suite for building Fourier spectral ETDRK time-steppers for
