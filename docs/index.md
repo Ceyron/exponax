@@ -73,6 +73,26 @@ that explains the basics of `Exponax`.
 7. Normalized interface for reduced number of parameters to uniquely define any
    dynamics.
 
+## Citation
+
+This package was developed as part of the [APEBench paper
+(arxiv.org/abs/2411.00180)](https://arxiv.org/abs/2411.00180) (accepted at
+Neurips 2024). If you find it useful for your research, please consider citing
+it:
+
+```bibtex
+@article{koehler2024apebench,
+  title={{APEBench}: A Benchmark for Autoregressive Neural Emulators of {PDE}s},
+  author={Felix Koehler and Simon Niedermayr and R{\"}udiger Westermann and Nils Thuerey},
+  journal={Advances in Neural Information Processing Systems (NeurIPS)},
+  volume={38},
+  year={2024}
+}
+```
+
+(Feel free to also give the project a star on GitHub if you like it.)
+
+[Here](https://github.com/tum-pbs/apebench) you can find the APEBench benchmark suite.
 
 ## License
 

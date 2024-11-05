@@ -24,7 +24,8 @@
   <a href="#quickstart">Quickstart</a> •
   <a href="#features">Features</a> •
   <a href="#background">Background</a> •
-    <a href="#acknowledgements">Acknowledgements</a>
+  <a href="#related--motivation">Motivation</a> •
+  <a href="#citation">Citation</a>
 </p>
 
 <p align="center">
@@ -142,9 +143,7 @@ with a 128x128 discretization is created in less than a second on a modern GPU.
 
 [3] Montanelli, Hadrien, and Niall Bootland. "Solving periodic semilinear stiff PDEs in 1D, 2D and 3D with exponential integrators." Mathematics and Computers in Simulation 178 (2020): 307-327.
 
-## Acknowledgements
-
-### Related & Motivation
+## Related & Motivation
 
 This package is greatly inspired by the [chebfun](https://www.chebfun.org/)
 library in *MATLAB*, in particular the
@@ -178,15 +177,32 @@ This package also took much inspiration from the
 *Julia* ecosystem, especially for checking the implementation of the contour
 integral method of [2] and how to handle (de)aliasing.
 
-### Citation
+## Citation
 
-This package was developed as part of the `APEBench paper` (accepted at Neurips 2024), we will soon add the citation here.
+This package was developed as part of the [APEBench paper
+(arxiv.org/abs/2411.00180)](https://arxiv.org/abs/2411.00180) (accepted at
+Neurips 2024). If you find it useful for your research, please consider citing
+it:
 
-### Funding
+```bibtex
+@article{koehler2024apebench,
+  title={{APEBench}: A Benchmark for Autoregressive Neural Emulators of {PDE}s},
+  author={Felix Koehler and Simon Niedermayr and R{\"}udiger Westermann and Nils Thuerey},
+  journal={Advances in Neural Information Processing Systems (NeurIPS)},
+  volume={38},
+  year={2024}
+}
+```
+
+(Feel free to also give the project a star on GitHub if you like it.)
+
+[Here](https://github.com/tum-pbs/apebench) you can find the APEBench benchmark suite.
+
+## Funding
 
 The main author (Felix Koehler) is a PhD student in the group of [Prof. Thuerey at TUM](https://ge.in.tum.de/) and his research is funded by the [Munich Center for Machine Learning](https://mcml.ai/).
 
-### License
+## License
 
 MIT, see [here](https://github.com/Ceyron/exponax/blob/main/LICENSE.txt)
 
