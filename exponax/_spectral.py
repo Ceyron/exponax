@@ -720,7 +720,7 @@ def derivative(
     *,
     order: int = 1,
     indexing: str = "ij",
-) -> Union[Float[Array, "C D ... (N//2)+1"], Float[Array, "D ... (N//2)+1"]]:
+) -> Union[Float[Array, "C D ... N"], Float[Array, "D ... N"]]:
     """
     Perform the spectral derivative of a field. In higher dimensions, this
     defaults to the gradient (the collection of all partial derivatives). In 1d,
@@ -752,7 +752,7 @@ def derivative(
     **Returns:**
 
     - `field_der`: The derivative of the field, shape `(C, D, ...,
-        (N//2)+1)` or `(D, ..., (N//2)+1)`.
+        N)` or `(D, ..., N)`.
     """
     channel_shape = field.shape[0]
     spatial_shape = field.shape[1:]
