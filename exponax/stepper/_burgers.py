@@ -98,7 +98,7 @@ class Burgers(BaseStepper):
         **Notes:**
 
         - If the `diffusivity` is set too low, spurious oscillations may
-            occur because the solution becomes "too discontinous". Such
+            occur because the solution becomes "too discontinuous". Such
             simulations are not possible with Fourier pseudospectral methods.
             Sometimes increasing the number of points `N` can help.
 

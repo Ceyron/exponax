@@ -84,7 +84,7 @@ class GrayScott(BaseStepper):
 
         with `ν₁` and `ν₂` the diffusivities, `f` the feed rate, and `k` the
         kill rate. No matter the spatial dimension, this dynamics always has two
-        channels, refering to the two chemical species. In higher dimensions,
+        channels, referring to the two chemical species. In higher dimensions,
         the equations read
 
         ```

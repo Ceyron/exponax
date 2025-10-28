@@ -76,7 +76,7 @@ def fourier_aggregator(
     # Transform to Fourier space
     state_no_channel_hat = fft(state_no_channel, num_spatial_dims=num_spatial_dims)
 
-    # Remove small values that occured due to rounding errors, can become
+    # Remove small values that occurred due to rounding errors, can become
     # problematic for "normalized" norms
     state_no_channel_hat = jnp.where(
         jnp.abs(state_no_channel_hat) < 1e-5,
