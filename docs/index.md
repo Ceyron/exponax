@@ -47,7 +47,7 @@ that explains the basics of `Exponax`.
 
 
 1. **JAX** as the computational backend:
-    1. **Backend agnotistic code** - run on CPU, GPU, or TPU, in both single and
+    1. **Backend agnostic code** - run on CPU, GPU, or TPU, in both single and
         double precision.
     2. **Automatic differentiation** over the timesteppers - compute gradients
         of solutions with respect to initial conditions, parameters, etc.
@@ -67,7 +67,7 @@ that explains the basics of `Exponax`.
     3. Reaction-Diffusion (Gray-Scott, Swift-Hohenberg, etc.)
 4. Collection of initial condition distributions (truncated Fourier series,
    Gaussian Random Fields, etc.)
-5. **Utilities** for spectral derivatives, grid creation, autogressive rollout,
+5. **Utilities** for spectral derivatives, grid creation, autoregressive rollout,
    etc.
 6. Easily extendable to new PDEs by subclassing from the `BaseStepper` module.
 7. Normalized interface for reduced number of parameters to uniquely define any

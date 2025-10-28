@@ -83,7 +83,7 @@ that explains the basics of `Exponax`.
 
 
 1. **JAX** as the computational backend:
-    1. **Backend agnotistic code** - run on CPU, GPU, or TPU, in both single and
+    1. **Backend agnostic code** - run on CPU, GPU, or TPU, in both single and
         double precision.
     2. **Automatic differentiation** over the timesteppers - compute gradients
         of solutions with respect to initial conditions, parameters, etc.
@@ -103,11 +103,11 @@ that explains the basics of `Exponax`.
     3. Reaction-Diffusion (Gray-Scott, Swift-Hohenberg, etc.)
 4. Collection of **initial condition distributions** (truncated Fourier series,
    Gaussian Random Fields, etc.)
-5. **Utilities** for spectral derivatives, grid creation, autogressive rollout,
+5. **Utilities** for spectral derivatives, grid creation, autoregressive rollout,
    interpolation, etc.
 6. Easily **extendable** to new PDEs by subclassing from the `BaseStepper` module.
 7. An alternative, reduced interface allowing to define PDE dynamics using
-   normalized or difficulty-based idenfitiers.
+   normalized or difficulty-based identifiers.
 
 ## Background
 
@@ -148,7 +148,7 @@ with a 128x128 discretization is created in less than a second on a modern GPU.
 This package is greatly inspired by the [chebfun](https://www.chebfun.org/)
 library in *MATLAB*, in particular the
 [`spinX`](https://www.chebfun.org/docs/guide/guide19.html) (Stiff Pde INtegrator
-in X dimensions) module within it. These *MATLAB* utilties have been used
+in X dimensions) module within it. These *MATLAB* utilities have been used
 extensively as a data generator in early works for supervised physics-informed
 ML, e.g., the
 [DeepHiddenPhysics](https://github.com/maziarraissi/DeepHPMs/tree/7b579dbdcf5be4969ebefd32e65f709a8b20ec44/Matlab)
@@ -166,7 +166,7 @@ of diverted chain training also requires the fine solver to be differentiable.
 Even for applications without differentiable solvers, we still have the
 **interface problem** with legacy solvers (like the *MATLAB* ones). Hence, we
 cannot easily query them "on-the-fly" for sth like active learning tasks, nor do
-they run efficiently on hardward accelerators (GPUs, TPUs, etc.). Additionally,
+they run efficiently on hardware accelerators (GPUs, TPUs, etc.). Additionally,
 they were not designed with batch execution (in the sense of vectorized
 application) in mind which we get more or less for free by `jax.vmap`. With the
 reproducible randomness of `JAX` we might not even have to ever write out a
