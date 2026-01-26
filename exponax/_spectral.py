@@ -934,12 +934,7 @@ def get_spectrum(
         mask = (wavenumbers_norm[0] >= lower_limit) & (
             wavenumbers_norm[0] < upper_limit
         )
-        # return jnp.sum(p[mask])
-        return jnp.where(
-            mask,
-            p,
-            0.0,
-        ).sum()
+        return jnp.nanmean(p, where=mask)
 
     def scan_fn(_, k):
         return None, jax.vmap(power_in_bucket, in_axes=(0, None))(magnitude, k)
