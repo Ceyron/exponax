@@ -29,6 +29,7 @@ from ._base import BaseNonlinearFun
 from ._convection import ConvectionNonlinearFun
 from ._general_nonlinear import GeneralNonlinearFun
 from ._gradient_norm import GradientNormNonlinearFun
+from ._leray import Leray
 from ._polynomial import PolynomialNonlinearFun
 from ._vorticity_convection import (
     VorticityConvection2d,
@@ -45,4 +46,5 @@ __all__ = [
     "VorticityConvection2d",
     "VorticityConvection2dKolmogorov",
     "ZeroNonlinearFun",
+    "Leray",
 ]
