@@ -1,8 +1,8 @@
 import jax.numpy as jnp
 from jaxtyping import Array, Complex, Inexact
 
-from exponax.nonlin_fun import BaseNonlinearFun
-
+from .._spectral import build_scaling_array, build_wavenumbers
+from ._base import BaseNonlinearFun
 from ._leray import Leray
 
 
@@ -75,3 +75,46 @@ class ProjectedConvection3d(BaseNonlinearFun):
         convection_projected_hat = self.leray_projection(convection_hat)
 
         return convection_projected_hat
+
+
+class ProjectedConvection3dKolmogorov(ProjectedConvection3d):
+    injection: Complex[Array, "1 ... (N//2)+1"]
+
+    def __init__(
+        self,
+        num_spatial_dims: int,
+        num_points: int,
+        *,
+        injection_mode: int = 4,
+        injection_scale: float = 1.0,
+        derivative_operator: Complex[Array, " 3 ... (N//2)+1"],
+        dealiasing_fraction: float,
+    ):
+        super().__init__(
+            num_spatial_dims,
+            num_points,
+            derivative_operator=derivative_operator,
+            dealiasing_fraction=dealiasing_fraction,
+        )
+
+        wavenumbers = build_wavenumbers(num_spatial_dims, num_points)
+        injection_mask = (
+            (wavenumbers[0] == 0)
+            & (wavenumbers[1] == injection_mode)
+            & (wavenumbers[2] == 0)
+        )
+        self.injection = jnp.where(
+            injection_mask,
+            # Need to additional scale the `injection_scale` with the
+            # `injection_mode`, because we apply the forcing on the vorticity.
+            -injection_mode
+            * injection_scale
+            * build_scaling_array(num_spatial_dims, num_points, mode="coef_extraction"),
+            0.0,
+        )
+
+    def __call__(
+        self, u_hat: Complex[Array, "3 ... (N//2)+1"]
+    ) -> Complex[Array, "3 ... (N//2)+1"]:
+        neg_convection_hat = super().__call__(u_hat)
+        return neg_convection_hat + self.injection
