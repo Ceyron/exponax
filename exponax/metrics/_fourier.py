@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal
 
 import jax
 import jax.numpy as jnp
@@ -15,14 +15,14 @@ from .._spectral import (
 def fourier_aggregator(
     state_no_channel: Float[Array, "... N"],
     *,
-    num_spatial_dims: Optional[int] = None,
+    num_spatial_dims: int | None = None,
     domain_extent: float = 1.0,
-    num_points: Optional[int] = None,
+    num_points: int | None = None,
     inner_exponent: float = 2.0,
-    outer_exponent: Optional[float] = None,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
-    derivative_order: Optional[float] = None,
+    outer_exponent: float | None = None,
+    low: int | None = None,
+    high: int | None = None,
+    derivative_order: float | None = None,
 ) -> float:
     """
     Aggregate over the spatial axes of a (channel-less) state array in Fourier
@@ -142,15 +142,15 @@ def fourier_aggregator(
 
 def fourier_norm(
     state: Float[Array, "C ... N"],
-    state_ref: Optional[Float[Array, "C ... N"]] = None,
+    state_ref: Float[Array, "C ... N"] | None = None,
     *,
     mode: Literal["absolute", "normalized"] = "absolute",
     domain_extent: float = 1.0,
     inner_exponent: float = 2.0,
-    outer_exponent: Optional[float] = None,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
-    derivative_order: Optional[float] = None,
+    outer_exponent: float | None = None,
+    low: int | None = None,
+    high: int | None = None,
+    derivative_order: float | None = None,
 ) -> float:
     """
     Compute norms of states via aggregation in Fourier space.
@@ -237,12 +237,12 @@ def fourier_norm(
 
 def fourier_MAE(
     u_pred: Float[Array, "C ... N"],
-    u_ref: Optional[Float[Array, "C ... N"]] = None,
+    u_ref: Float[Array, "C ... N"] | None = None,
     *,
     domain_extent: float = 1.0,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
-    derivative_order: Optional[float] = None,
+    low: int | None = None,
+    high: int | None = None,
+    derivative_order: float | None = None,
 ) -> float:
     """
     Compute the mean absolute error in Fourier space.
@@ -299,9 +299,9 @@ def fourier_nMAE(
     u_ref: Float[Array, "C ... N"],
     *,
     domain_extent: float = 1.0,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
-    derivative_order: Optional[float] = None,
+    low: int | None = None,
+    high: int | None = None,
+    derivative_order: float | None = None,
 ) -> float:
     """
     Compute the normalized mean absolute error in Fourier space.
@@ -355,12 +355,12 @@ def fourier_nMAE(
 
 def fourier_MSE(
     u_pred: Float[Array, "C ... N"],
-    u_ref: Optional[Float[Array, "C ... N"]] = None,
+    u_ref: Float[Array, "C ... N"] | None = None,
     *,
     domain_extent: float = 1.0,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
-    derivative_order: Optional[float] = None,
+    low: int | None = None,
+    high: int | None = None,
+    derivative_order: float | None = None,
 ) -> float:
     """
     Compute the mean squared error in Fourier space.
@@ -418,9 +418,9 @@ def fourier_nMSE(
     u_ref: Float[Array, "C ... N"],
     *,
     domain_extent: float = 1.0,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
-    derivative_order: Optional[float] = None,
+    low: int | None = None,
+    high: int | None = None,
+    derivative_order: float | None = None,
 ) -> float:
     """
     Compute the normalized mean squared error in Fourier space.
@@ -473,12 +473,12 @@ def fourier_nMSE(
 
 def fourier_RMSE(
     u_pred: Float[Array, "C ... N"],
-    u_ref: Optional[Float[Array, "C ... N"]] = None,
+    u_ref: Float[Array, "C ... N"] | None = None,
     *,
     domain_extent: float = 1.0,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
-    derivative_order: Optional[float] = None,
+    low: int | None = None,
+    high: int | None = None,
+    derivative_order: float | None = None,
 ) -> float:
     """
     Compute the root mean squared error in Fourier space.
@@ -535,9 +535,9 @@ def fourier_nRMSE(
     u_ref: Float[Array, "C ... N"],
     *,
     domain_extent: float = 1.0,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
-    derivative_order: Optional[float] = None,
+    low: int | None = None,
+    high: int | None = None,
+    derivative_order: float | None = None,
 ) -> float:
     """
     Compute the normalized root mean squared error in Fourier space.

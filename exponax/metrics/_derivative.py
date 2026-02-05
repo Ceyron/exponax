@@ -1,5 +1,3 @@
-from typing import Optional
-
 from jaxtyping import Array, Float
 
 from ._fourier import (
@@ -14,11 +12,11 @@ from ._fourier import (
 
 def H1_MAE(
     u_pred: Float[Array, "C ... N"],
-    u_ref: Optional[Float[Array, "C ... N"]] = None,
+    u_ref: Float[Array, "C ... N"] | None = None,
     *,
     domain_extent: float = 1.0,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
+    low: int | None = None,
+    high: int | None = None,
 ) -> float:
     """
     Compute the mean abolute error associated with the H1 norm, i.e., the MAE
@@ -77,8 +75,8 @@ def H1_nMAE(
     u_ref: Float[Array, "C ... N"],
     *,
     domain_extent: float = 1.0,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
+    low: int | None = None,
+    high: int | None = None,
 ) -> float:
     """
     Compute the normalized mean abolute error associated with the H1 norm, i.e.,
@@ -132,11 +130,11 @@ def H1_nMAE(
 
 def H1_MSE(
     u_pred: Float[Array, "C ... N"],
-    u_ref: Optional[Float[Array, "C ... N"]] = None,
+    u_ref: Float[Array, "C ... N"] | None = None,
     *,
     domain_extent: float = 1.0,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
+    low: int | None = None,
+    high: int | None = None,
 ) -> float:
     """
     Compute the mean squared error associated with the H1 norm, i.e., the MSE
@@ -195,8 +193,8 @@ def H1_nMSE(
     u_ref: Float[Array, "C ... N"],
     *,
     domain_extent: float = 1.0,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
+    low: int | None = None,
+    high: int | None = None,
 ) -> float:
     """
     Compute the normalized mean squared error associated with the H1 norm, i.e.,
@@ -251,11 +249,11 @@ def H1_nMSE(
 
 def H1_RMSE(
     u_pred: Float[Array, "C ... N"],
-    u_ref: Optional[Float[Array, "C ... N"]] = None,
+    u_ref: Float[Array, "C ... N"] | None = None,
     *,
     domain_extent: float = 1.0,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
+    low: int | None = None,
+    high: int | None = None,
 ) -> float:
     """
     Compute the root mean squared error associated with the H1 norm, i.e., the
@@ -314,8 +312,8 @@ def H1_nRMSE(
     u_ref: Float[Array, "C ... N"],
     *,
     domain_extent: float = 1.0,
-    low: Optional[int] = None,
-    high: Optional[int] = None,
+    low: int | None = None,
+    high: int | None = None,
 ) -> float:
     """
     Compute the normalized root mean squared error associated with the H1 norm,

@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 import equinox as eqx
 from jaxtyping import Array, Bool, Complex, Float
@@ -10,14 +9,14 @@ from .._spectral import fft, ifft, low_pass_filter_mask
 class BaseNonlinearFun(eqx.Module, ABC):
     num_spatial_dims: int
     num_points: int
-    dealiasing_mask: Optional[Bool[Array, "1 ... (N//2)+1"]]
+    dealiasing_mask: Bool[Array, "1 ... (N//2)+1"] | None
 
     def __init__(
         self,
         num_spatial_dims: int,
         num_points: int,
         *,
-        dealiasing_fraction: Optional[float] = None,
+        dealiasing_fraction: float | None = None,
     ):
         """
         Base class for all nonlinear functions. This class provides the basic

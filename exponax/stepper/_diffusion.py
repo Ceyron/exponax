@@ -1,4 +1,4 @@
-from typing import TypeVar, Union
+from typing import TypeVar
 
 import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
@@ -19,11 +19,7 @@ class Diffusion(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        diffusivity: Union[
-            Float[Array, "D D"],
-            Float[Array, "D"],
-            float,
-        ] = 0.01,
+        diffusivity: Float[Array, "D D"] | Float[Array, "D"] | float = 0.01,
     ):
         """
         Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) diffusion equation

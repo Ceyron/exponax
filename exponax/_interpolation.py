@@ -1,6 +1,7 @@
 """
 Utilities to map Exponax states to different grids.
 """
+
 from typing import Literal, TypeVar
 
 import equinox as eqx
@@ -20,9 +21,9 @@ from ._spectral import (
 )
 
 C = TypeVar("C")  # Channel axis
-D = TypeVar(
-    "D"
-)  # Dimension axis - must have as many dimensions as the array has subsequent spatial axes
+# Dimension axis - must have as many dimensions as the array has subsequent
+# spatial axes
+D = TypeVar("D")
 N = TypeVar("N")  # Spatial axis
 
 
@@ -173,7 +174,7 @@ class FourierInterpolator(eqx.Module):
         )
 
         # The exponential term sums over the wavenumber dimension axis (`"D"`)
-        exp_term: Complex[Array, "... (N//2)+1"] = jnp.exp(
+        exp_term: Complex[Array, ...(N // 2) + 1] = jnp.exp(
             jnp.sum(1j * self.wavenumbers * x_bloated, axis=0)
         )
 
@@ -184,7 +185,7 @@ class FourierInterpolator(eqx.Module):
             self.state_hat_scaled * exp_term
         )
 
-        interpolated_value: Float[Array, "C"] = jnp.real(
+        interpolated_value: Float[Array, C] = jnp.real(
             jax.vmap(jnp.sum)(interpolation_operation)
         )
 
@@ -247,12 +248,9 @@ def map_between_resolutions(
         mode="norm_compensation",
     )
 
-    if new_num_points > old_num_points:
+    if (new_num_points > old_num_points) and (old_num_points % 2 == 0) and oddball_zero:
         # Upscaling
-        if old_num_points % 2 == 0 and oddball_zero:
-            old_state_hat_scaled *= oddball_filter_mask(
-                num_spatial_dims, old_num_points
-            )
+        old_state_hat_scaled *= oddball_filter_mask(num_spatial_dims, old_num_points)
 
     new_state_hat_scaled = jnp.zeros(
         (num_channels,) + wavenumber_shape(num_spatial_dims, new_num_points),
@@ -274,10 +272,9 @@ def map_between_resolutions(
         new_num_points,
         mode="norm_compensation",
     )
-    if old_num_points > new_num_points:
+    if (old_num_points > new_num_points) and (new_num_points % 2 == 0) and oddball_zero:
         # Downscaling
-        if new_num_points % 2 == 0 and oddball_zero:
-            new_state_hat *= oddball_filter_mask(num_spatial_dims, new_num_points)
+        new_state_hat *= oddball_filter_mask(num_spatial_dims, new_num_points)
 
     new_state = ifft(
         new_state_hat,

@@ -1,4 +1,4 @@
-from typing import Callable, Union
+from collections.abc import Callable
 
 import jax
 import jax.numpy as jnp
@@ -90,7 +90,7 @@ def wrap_bc(u: Float[Array, "C N"]) -> Float[Array, "C N+1"]:
 
 
 def rollout(
-    stepper_fn: Union[Callable[[PyTree], PyTree], Callable[[PyTree, PyTree], PyTree]],
+    stepper_fn: Callable[[PyTree], PyTree] | Callable[[PyTree, PyTree], PyTree],
     n: int,
     *,
     include_init: bool = False,
@@ -187,7 +187,7 @@ def rollout(
 
 
 def repeat(
-    stepper_fn: Union[Callable[[PyTree], PyTree], Callable[[PyTree, PyTree], PyTree]],
+    stepper_fn: Callable[[PyTree], PyTree] | Callable[[PyTree, PyTree], PyTree],
     n: int,
     *,
     takes_aux: bool = False,
@@ -283,7 +283,8 @@ def stack_sub_trajectories(
 
     if len(set(n_time_steps)) != 1:
         raise ValueError(
-            "All arrays in trj must have the same number of time steps in the leading axis"
+            """All arrays in trj must have the same number of time steps in the
+            leading axis"""
         )
     else:
         n_time_steps = n_time_steps[0]

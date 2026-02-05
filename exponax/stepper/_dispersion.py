@@ -1,4 +1,4 @@
-from typing import TypeVar, Union
+from typing import TypeVar
 
 import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
@@ -21,7 +21,7 @@ class Dispersion(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        dispersivity: Union[Float[Array, "D"], float] = 1.0,
+        dispersivity: Float[Array, "D"] | float = 1.0,
         advect_on_diffusion: bool = False,
     ):
         """

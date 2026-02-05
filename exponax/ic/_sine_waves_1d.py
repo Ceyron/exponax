@@ -64,7 +64,9 @@ class SineWaves1d(BaseIC):
         if x.shape[0] != 1:
             raise ValueError("SineWaves1d only works in 1d.")
         result = jnp.zeros_like(x)
-        for a, k, p in zip(self.amplitudes, self.wavenumbers, self.phases):
+        for a, k, p in zip(
+            self.amplitudes, self.wavenumbers, self.phases, strict=False
+        ):
             result += a * jnp.sin(k * (2 * jnp.pi / self.domain_extent) * x + p)
         result += self.offset
 

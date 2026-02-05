@@ -1,4 +1,4 @@
-from typing import TypeVar, Union
+from typing import TypeVar
 
 import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
@@ -20,7 +20,7 @@ class Advection(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        velocity: Union[Float[Array, "D"], float] = 1.0,
+        velocity: Float[Array, "D"] | float = 1.0,
     ):
         """
         Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) advection equation

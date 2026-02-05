@@ -24,6 +24,7 @@ found in their respective modules.
 A nonlinear function can also be used to encode a forcing term in the equation
 as done with `VorticityConvection2dKolmogorov`.
 """
+
 from ._base import BaseNonlinearFun
 from ._convection import ConvectionNonlinearFun
 from ._general_nonlinear import GeneralNonlinearFun
