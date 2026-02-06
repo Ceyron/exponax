@@ -861,6 +861,7 @@ def get_spectrum(
     state: Float[Array, "C ... N"],
     *,
     power: bool = True,
+    radial_binning: Literal["average", "sum"] = "average",
 ) -> Float[Array, "C (N//2)+1"]:
     """
     Compute the Fourier spectrum of a state, either the power spectrum or the
@@ -877,6 +878,15 @@ def get_spectrum(
         three subsequent spatial axes, **each of the same length** N.
     - `power`: Whether to compute the power spectrum or the amplitude spectrum.
         Default is `True` meaning the amplitude spectrum.
+    - `radial_binning`: How to aggregate Fourier modes within each radial
+        (spherical shell) bin. Either `"average"` (default) or `"sum"`.
+        - `"average"`: Computes the mean power/amplitude per mode in each bin.
+          This gives a spectral density that is resolution-independent and
+          removes the geometric scaling with wavenumber.
+        - `"sum"`: Computes the total power/amplitude in each bin. This is the
+          conventional approach in turbulence literature where the Kolmogorov
+          -5/3 law applies. Preserves Parseval's theorem (sum over all bins
+          equals total energy).
 
     **Returns:**
 
@@ -900,6 +910,17 @@ def get_spectrum(
         this function at `[2]`), but in the 3-bin because its distance from the
         center is `sqrt(2**2 + 2**2) = 2.8284...` which is not in the range of
         the 2-bin `[1.5, 2.5)`.
+
+    !!! note
+        **On shell surface area scaling:** In continuous formulations, the 1D
+        isotropic spectrum relates to the spectral density tensor via a shell
+        surface area factor: `E(k) = 2πk · Φ(k)` in 2D and `E(k) = 4πk² · Φ(k)`
+        in 3D. In this discrete implementation:
+        - With `radial_binning="sum"`: The geometric factor is implicit because
+          the number of discrete modes in each bin grows proportionally to the
+          shell surface area.
+        - With `radial_binning="average"`: The geometric factor is divided out,
+          yielding a per-mode density.
     """
     num_spatial_dims = state.ndim - 1
     num_points = state.shape[-1]
@@ -934,7 +955,10 @@ def get_spectrum(
         mask = (wavenumbers_norm[0] >= lower_limit) & (
             wavenumbers_norm[0] < upper_limit
         )
-        return jnp.nanmean(p, where=mask)
+        if radial_binning == "average":
+            return jnp.nanmean(p, where=mask)
+        else:  # radial_binning == "sum"
+            return jnp.nansum(p, where=mask)
 
     def scan_fn(_, k):
         return None, jax.vmap(power_in_bucket, in_axes=(0, None))(magnitude, k)
