@@ -133,6 +133,7 @@ class RepeatedStepper(eqx.Module):
         )
         if u.shape != expected_shape:
             raise ValueError(
-                f"Expected shape {expected_shape}, got {u.shape}. For batched operation use `jax.vmap` on this function."
+                f"""Expected shape {expected_shape}, got {u.shape}. For batched
+                 operation use `jax.vmap` on this function."""
             )
         return self.step(u)

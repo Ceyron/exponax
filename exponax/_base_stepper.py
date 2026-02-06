@@ -111,7 +111,9 @@ class BaseStepper(eqx.Module, ABC):
         )  # Different operator for each channel
         if linear_operator.shape not in (single_channel_shape, multi_channel_shape):
             raise ValueError(
-                f"Expected linear operator to have shape {single_channel_shape} or {multi_channel_shape}, got {linear_operator.shape}."
+                f"""Expected linear operator to have shape
+                 {single_channel_shape} or {multi_channel_shape}, got
+                 {linear_operator.shape}."""
             )
         nonlinear_fun = self._build_nonlinear_fun(derivative_operator)
 
@@ -264,6 +266,7 @@ class BaseStepper(eqx.Module, ABC):
         )
         if u.shape != expected_shape:
             raise ValueError(
-                f"Expected shape {expected_shape}, got {u.shape}. For batched operation use `jax.vmap` on this function."
+                f"""Expected shape {expected_shape}, got {u.shape}. For batched
+                 operation use `jax.vmap` on this function."""
             )
         return self.step(u)

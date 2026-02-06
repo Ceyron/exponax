@@ -122,6 +122,7 @@ class Poisson(eqx.Module):
         """
         if f.shape[1:] != spatial_shape(self.num_spatial_dims, self.num_points):
             raise ValueError(
-                f"Shape of f[1:] is {f.shape[1:]} but should be {spatial_shape(self.num_spatial_dims, self.num_points)}"
+                f"""Shape of f[1:] is {f.shape[1:]} but should be
+                 {spatial_shape(self.num_spatial_dims, self.num_points)}"""
             )
         return self.step(f)
