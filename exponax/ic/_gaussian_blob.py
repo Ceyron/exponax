@@ -43,7 +43,8 @@ class GaussianBlob(eqx.Module):
         num_spatial_dims = x.shape[0]
         if num_spatial_dims != self.position.shape[0]:
             raise ValueError(
-                f"Expected {self.position.shape[0]} spatial dimensions, but got {num_spatial_dims}."
+                f"""Expected {self.position.shape[0]} spatial dimensions, but
+                 got {num_spatial_dims}."""
             )
 
         position_expanded = jnp.reshape(

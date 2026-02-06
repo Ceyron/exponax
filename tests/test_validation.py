@@ -17,9 +17,8 @@ def test_advection_1d():
     dt = 0.1
     velocity = 0.1
 
-    analytical_solution = lambda t, x: jnp.sin(
-        4 * 2 * jnp.pi * (x - velocity * t) / domain_extent
-    )
+    def analytical_solution(t, x):
+        return jnp.sin(4 * 2 * jnp.pi * (x - velocity * t) / domain_extent)
 
     grid = ex.make_grid(num_spatial_dims, domain_extent, num_points)
     u_0 = analytical_solution(0.0, grid)
@@ -45,9 +44,10 @@ def test_advection_2d():
     dt = 0.1
     velocity = jnp.array([0.1, 0.2])
 
-    analytical_solution = lambda t, x: jnp.sin(
-        4 * 2 * jnp.pi * (x[0:1] - velocity[0] * t) / domain_extent
-    ) * jnp.sin(6 * 2 * jnp.pi * (x[1:2] - velocity[1] * t) / domain_extent)
+    def analytical_solution(t, x):
+        return jnp.sin(
+            4 * 2 * jnp.pi * (x[0:1] - velocity[0] * t) / domain_extent
+        ) * jnp.sin(6 * 2 * jnp.pi * (x[1:2] - velocity[1] * t) / domain_extent)
 
     grid = ex.make_grid(num_spatial_dims, domain_extent, num_points)
     u_0 = analytical_solution(0.0, grid)
@@ -74,13 +74,12 @@ def test_advection_3d():
     dt = 0.1
     velocity = jnp.array([0.1, 0.2, 0.3])
 
-    analytical_solution = (
-        lambda t, x: jnp.sin(
-            4 * 2 * jnp.pi * (x[0:1] - velocity[0] * t) / domain_extent
+    def analytical_solution(t, x):
+        return (
+            jnp.sin(4 * 2 * jnp.pi * (x[0:1] - velocity[0] * t) / domain_extent)
+            * jnp.sin(6 * 2 * jnp.pi * (x[1:2] - velocity[1] * t) / domain_extent)
+            * jnp.sin(8 * 2 * jnp.pi * (x[2:3] - velocity[2] * t) / domain_extent)
         )
-        * jnp.sin(6 * 2 * jnp.pi * (x[1:2] - velocity[1] * t) / domain_extent)
-        * jnp.sin(8 * 2 * jnp.pi * (x[2:3] - velocity[2] * t) / domain_extent)
-    )
 
     grid = ex.make_grid(num_spatial_dims, domain_extent, num_points)
     u_0 = analytical_solution(0.0, grid)
@@ -107,9 +106,10 @@ def test_diffusion_1d():
     dt = 0.1
     diffusivity = 0.1
 
-    analytical_solution = lambda t, x: jnp.exp(
-        -((4 * 2 * jnp.pi / domain_extent) ** 2) * diffusivity * t
-    ) * jnp.sin(4 * 2 * jnp.pi * x / domain_extent)
+    def analytical_solution(t, x):
+        return jnp.exp(
+            -((4 * 2 * jnp.pi / domain_extent) ** 2) * diffusivity * t
+        ) * jnp.sin(4 * 2 * jnp.pi * x / domain_extent)
 
     grid = ex.make_grid(num_spatial_dims, domain_extent, num_points)
     u_0 = analytical_solution(0.0, grid)

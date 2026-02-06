@@ -266,17 +266,16 @@ class KuramotoSivashinskyConservative(BaseStepper):
 
         if num_spatial_dims > 1:
             print(
-                "Warning: The KS equation in conservative format does not generalize well to higher dimensions."
+                """Warning: The KS equation in conservative format does not
+                generalize well to higher dimensions."""
             )
             print(
-                "Consider using the combustion format (`exponax.stepper.KuramotoSivashinsky`) instead."
+                """Consider using the combustion format
+                (`exponax.stepper.KuramotoSivashinsky`) instead."""
             )
 
-        if single_channel:
-            num_channels = 1
-        else:
-            # number of channels grow with the spatial dimension
-            num_channels = num_spatial_dims
+        # number of channels grow with the spatial dimension
+        num_channels = 1 if single_channel else num_spatial_dims
 
         super().__init__(
             num_spatial_dims=num_spatial_dims,

@@ -117,7 +117,9 @@ def test_fourier_equals_spatial_aggregation(num_spatial_dims, ic_gen):
         u_1, u_0, domain_extent=DOMAIN_EXTENT
     ) == pytest.approx(ex.metrics.MSE(u_1, u_0, domain_extent=DOMAIN_EXTENT))
     # # This equivalence does not hold for the MAE
-    # assert ex.metrics.fourier_MAE(u_1, u_0, domain_extent=DOMAIN_EXTENT) == pytest.approx(
+    # assert (
+    #   ex.metrics.fourier_MAE(u_1, u_0, domain_extent=DOMAIN_EXTENT)
+    #   == pytest.approx(
     #     ex.metrics.MAE(u_1, u_0, domain_extent=DOMAIN_EXTENT)
     # )
     assert ex.metrics.fourier_RMSE(
@@ -219,8 +221,10 @@ def test_sobolev_vs_manual(num_spatial_dims, metric_fn_name):
 # def analytical_L2_diff_norm(k: int, l:int):
 #     term1 = 2 * jnp.pi
 #     term2 = -jnp.sin(4 * k * jnp.pi) / (4 * k)
-#     term3 = (2 * (-(l * jnp.cos(2 * l * jnp.pi) * jnp.sin(2 * k * jnp.pi))
-#                   + k * jnp.cos(2 * k * jnp.pi) * jnp.sin(2 * l * jnp.pi))) / (k**2 - l**2)
+#     term3 = (2 * (-(
+#         l * jnp.cos(2 * l * jnp.pi) * jnp.sin(2 * k * jnp.pi)
+#         ) + k * jnp.cos(2 * k * jnp.pi) * jnp.sin(2 * l * jnp.pi))
+#     ) / (k**2 - l**2)
 #     term4 = -jnp.sin(4 * l * jnp.pi) / (4 * l)
 
 #     result = term1 + term2 + term3 + term4
