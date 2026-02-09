@@ -861,7 +861,7 @@ def get_spectrum(
     state: Float[Array, "C ... N"],
     *,
     power: bool = True,
-    radial_binning: Literal["average", "sum"] = "average",
+    radial_binning: Literal["average", "sum"] = "sum",
 ) -> Float[Array, "C (N//2)+1"]:
     """
     Compute the Fourier spectrum of a state, either the power spectrum or the
@@ -879,14 +879,14 @@ def get_spectrum(
     - `power`: Whether to compute the power spectrum or the amplitude spectrum.
         Default is `True` meaning the amplitude spectrum.
     - `radial_binning`: How to aggregate Fourier modes within each radial
-        (spherical shell) bin. Either `"average"` (default) or `"sum"`.
-        - `"average"`: Computes the mean power/amplitude per mode in each bin.
-          This gives a spectral density that is resolution-independent and
-          removes the geometric scaling with wavenumber.
+        (spherical shell) bin. Either `"sum"` (default) or `"average"`.
         - `"sum"`: Computes the total power/amplitude in each bin. This is the
           conventional approach in turbulence literature where the Kolmogorov
           -5/3 law applies. Preserves Parseval's theorem (sum over all bins
           equals total energy).
+        - `"average"`: Computes the mean power/amplitude per mode in each bin.
+          This gives a spectral density that is resolution-independent and
+          removes the geometric scaling with wavenumber.
 
     **Returns:**
 
