@@ -3,7 +3,7 @@ High-Level abstractions around the vape volume renderer.
 """
 
 import copy
-from typing import Literal, Union
+from typing import Literal
 
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
@@ -59,11 +59,9 @@ def volume_render_state_3d(
     states: Float[Array, "B N N N"],
     *,
     vlim: tuple[float, float] = (-1.0, 1.0),
-    bg_color: Union[
-        Literal["black"],
-        Literal["white"],
-        tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8],
-    ] = "white",
+    bg_color: Literal["black"]
+    | Literal["white"]
+    | tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8] = "white",
     resolution: int = 384,
     cmap: str = "RdBu_r",
     transfer_function: callable = zigzag_alpha,
@@ -99,13 +97,13 @@ def volume_render_state_3d(
         raise ValueError("state must be a four-axis array.")
     try:
         import vape4d
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             """
-                          This function requires the `vape4d` volume renderer package.
-                            Please install it via `pip install vape4d`.
-                          """
-        )
+            This function requires the `vape4d` volume renderer package. Please
+            install it via `pip install vape4d`.
+            """
+        ) from e
 
     if bg_color == "black":
         bg_color = (0, 0, 0, 255)

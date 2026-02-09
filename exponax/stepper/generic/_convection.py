@@ -109,11 +109,8 @@ class GeneralConvectionStepper(BaseStepper):
         self.dealiasing_fraction = dealiasing_fraction
         self.conservative = conservative
 
-        if single_channel:
-            num_channels = 1
-        else:
-            # number of channels grow with the spatial dimension
-            num_channels = num_spatial_dims
+        # number of channels grow with the spatial dimension
+        num_channels = 1 if single_channel else num_spatial_dims
 
         super().__init__(
             num_spatial_dims=num_spatial_dims,

@@ -1,4 +1,4 @@
-from typing import TypeVar, Union
+from typing import TypeVar
 
 import jax.numpy as jnp
 from jaxtyping import Array, Complex, Float
@@ -21,12 +21,8 @@ class AdvectionDiffusion(BaseStepper):
         num_points: int,
         dt: float,
         *,
-        velocity: Union[Float[Array, "D"], float] = 1.0,
-        diffusivity: Union[
-            Float[Array, "D D"],
-            Float[Array, "D"],
-            float,
-        ] = 0.01,
+        velocity: Float[Array, "D"] | float = 1.0,
+        diffusivity: Float[Array, "D D"] | Float[Array, "D"] | float = 0.01,
     ):
         """
         Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) advection-diffusion

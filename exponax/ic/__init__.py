@@ -8,6 +8,7 @@ arbitrary number of spatial dimensions but always only return a single channel.
 To create a multi-channel IC, e.g., for the Burgers equation, use the
 `MultiChannelIC` and `RandomMultiChannelICGenerator` classes.
 """
+
 from ._base_ic import BaseIC, BaseRandomICGenerator
 from ._clamping import ClampingICGenerator
 from ._diffused_noise import DiffusedNoise

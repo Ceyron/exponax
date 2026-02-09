@@ -1,6 +1,7 @@
 """
 This is a streamlit app.
 """
+
 import jax
 import matplotlib.pyplot as plt
 import streamlit as st

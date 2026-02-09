@@ -1,4 +1,4 @@
-from typing import Literal, TypeVar, Union
+from typing import Literal, TypeVar
 
 import jax
 import jax.numpy as jnp
@@ -116,7 +116,7 @@ def animate_state_1d_facet(
 
 
 def animate_spatio_temporal_facet(
-    trjs: Union[Float[Array, "S T C N"], Float[Array, "B S T 1 N"]],
+    trjs: Float[Array, "S T C N"] | Float[Array, "B S T 1 N"],
     *,
     facet_over_channels: bool = True,
     vlim: tuple[float, float] = (-1.0, 1.0),
@@ -186,7 +186,7 @@ def animate_spatio_temporal_facet(
 
 
 def animate_state_2d_facet(
-    trj: Union[Float[Array, "T C N N"], Float[Array, "B T 1 N N"]],
+    trj: Float[Array, "T C N N"] | Float[Array, "B T 1 N N"],
     *,
     facet_over_channels: bool = True,
     vlim: tuple[float, float] = (-1.0, 1.0),
@@ -295,7 +295,7 @@ def animate_state_2d_facet(
 
 
 def animate_state_3d_facet(
-    trj: Union[Float[Array, "T C N N N"], Float[Array, "B T 1 N N N"]],
+    trj: Float[Array, "T C N N N"] | Float[Array, "B T 1 N N N"],
     *,
     facet_over_channels: bool = True,
     vlim: tuple[float, float] = (-1.0, 1.0),
@@ -305,11 +305,9 @@ def animate_state_3d_facet(
     domain_extent: float = None,
     dt: float = None,
     include_init: bool = False,
-    bg_color: Union[
-        Literal["black"],
-        Literal["white"],
-        tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8],
-    ] = "white",
+    bg_color: Literal["black"]
+    | Literal["white"]
+    | tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8] = "white",
     resolution: int = 384,
     cmap: str = "RdBu_r",
     transfer_function: callable = zigzag_alpha,

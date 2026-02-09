@@ -1,5 +1,5 @@
 from itertools import product
-from typing import Literal, Optional, TypeVar, Union
+from typing import Literal, TypeVar
 
 import jax
 import jax.numpy as jnp
@@ -187,7 +187,8 @@ def build_gradient_inner_product_operator(
 
     if velocity.shape != (derivative_operator.shape[0],):
         raise ValueError(
-            f"Expected velocity shape to be {derivative_operator.shape[0]}, got {velocity.shape}."
+            f"""Expected velocity shape to be {derivative_operator.shape[0]},
+             got {velocity.shape}."""
         )
 
     operator = jnp.einsum(
@@ -607,7 +608,7 @@ def get_modes_slices(
 def fft(
     field: Float[Array, "C ... N"],
     *,
-    num_spatial_dims: Optional[int] = None,
+    num_spatial_dims: int | None = None,
 ) -> Complex[Array, "C ... (N//2)+1"]:
     """
     Perform a **real-valued** FFT of a field. This function is designed for
@@ -652,8 +653,8 @@ def fft(
 def ifft(
     field_hat: Complex[Array, "C ... (N//2)+1"],
     *,
-    num_spatial_dims: Optional[int] = None,
-    num_points: Optional[int] = None,
+    num_spatial_dims: int | None = None,
+    num_points: int | None = None,
 ) -> Float[Array, "C ... N"]:
     """
     Perform the inverse **real-valued** FFT of a field. This is the inverse
@@ -720,7 +721,7 @@ def derivative(
     *,
     order: int = 1,
     indexing: str = "ij",
-) -> Union[Float[Array, "C D ... N"], Float[Array, "D ... N"]]:
+) -> Float[Array, "C D ... N"] | Float[Array, "D ... N"]:
     """
     Perform the spectral derivative of a field. In higher dimensions, this
     defaults to the gradient (the collection of all partial derivatives). In 1d,
@@ -818,7 +819,8 @@ def make_incompressible(
     num_spatial_dims = len(spatial_shape)
     if channel_shape != num_spatial_dims:
         raise ValueError(
-            f"Expected the number of channels to be {num_spatial_dims}, got {channel_shape}."
+            f"""Expected the number of channels to be {num_spatial_dims}, got
+             {channel_shape}."""
         )
     num_points = spatial_shape[0]
 
@@ -957,10 +959,11 @@ def get_spectrum(
 def get_fourier_coefficients(
     state: Float[Array, "C ... N"],
     *,
-    scaling_compensation_mode: Optional[
-        Literal["norm_compensation", "reconstruction", "coef_extraction"]
-    ] = "coef_extraction",
-    round: Optional[int] = 5,
+    scaling_compensation_mode: Literal[
+        "norm_compensation", "reconstruction", "coef_extraction"
+    ]
+    | None = "coef_extraction",
+    round: int | None = 5,
     indexing: str = "ij",
 ) -> Complex[Array, "C ... (N//2)+1"]:
     """

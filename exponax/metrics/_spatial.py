@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal
 
 import jax
 import jax.numpy as jnp
@@ -8,11 +8,11 @@ from jaxtyping import Array, Float
 def spatial_aggregator(
     state_no_channel: Float[Array, "... N"],
     *,
-    num_spatial_dims: Optional[int] = None,
+    num_spatial_dims: int | None = None,
     domain_extent: float = 1.0,
-    num_points: Optional[int] = None,
+    num_points: int | None = None,
     inner_exponent: float = 2.0,
-    outer_exponent: Optional[float] = None,
+    outer_exponent: float | None = None,
 ) -> float:
     """
     Aggregate over the spatial axes of a (channel-less) state tensor to get a
@@ -85,12 +85,12 @@ def spatial_aggregator(
 
 def spatial_norm(
     state: Float[Array, "C ... N"],
-    state_ref: Optional[Float[Array, "C ... N"]] = None,
+    state_ref: Float[Array, "C ... N"] | None = None,
     *,
     mode: Literal["absolute", "normalized", "symmetric"] = "absolute",
     domain_extent: float = 1.0,
     inner_exponent: float = 2.0,
-    outer_exponent: Optional[float] = None,
+    outer_exponent: float | None = None,
 ) -> float:
     """
     Compute the conistent counterpart of the `Lᴾ` functional norm.
@@ -197,7 +197,7 @@ def spatial_norm(
 
 def MAE(
     u_pred: Float[Array, "C ... N"],
-    u_ref: Optional[Float[Array, "C ... N"]] = None,
+    u_ref: Float[Array, "C ... N"] | None = None,
     *,
     domain_extent: float = 1.0,
 ) -> float:
@@ -296,7 +296,11 @@ def sMAE(
     """
     Compute the symmetric mean absolute error (sMAE) between two states.
 
-        ∑_(channels) [2 ∑_(space) (L/N)ᴰ |uₕ - uₕʳ| / (∑_(space) (L/N)ᴰ |uₕ| + ∑_(space) (L/N)ᴰ |uₕʳ|)]
+        ∑_(channels) [
+            2 ∑_(space) (L/N)ᴰ |uₕ - uₕʳ|
+            /
+            (∑_(space) (L/N)ᴰ |uₕ| + ∑_(space) (L/N)ᴰ |uₕʳ|)
+        ]
 
     Given the correct `domain_extent`, this is consistent to the following
     functional norm:
@@ -338,7 +342,7 @@ def sMAE(
 
 def MSE(
     u_pred: Float[Array, "C ... N"],
-    u_ref: Optional[Float[Array, "C ... N"]] = None,
+    u_ref: Float[Array, "C ... N"] | None = None,
     *,
     domain_extent: float = 1.0,
 ) -> float:
@@ -437,7 +441,11 @@ def sMSE(
     """
     Compute the symmetric mean squared error (sMSE) between two states.
 
-        ∑_(channels) [2 ∑_(space) (L/N)ᴰ |uₕ - uₕʳ|² / (∑_(space) (L/N)ᴰ |uₕ|² + ∑_(space) (L/N)ᴰ |uₕʳ|²)]
+        ∑_(channels) [
+            2 ∑_(space) (L/N)ᴰ |uₕ - uₕʳ|²
+            /
+            (∑_(space) (L/N)ᴰ |uₕ|² + ∑_(space) (L/N)ᴰ |uₕʳ|²)
+        ]
 
     Given the correct `domain_extent`, this is consistent to the following
     functional norm:
@@ -479,7 +487,7 @@ def sMSE(
 
 def RMSE(
     u_pred: Float[Array, "C ... N"],
-    u_ref: Optional[Float[Array, "C ... N"]] = None,
+    u_ref: Float[Array, "C ... N"] | None = None,
     *,
     domain_extent: float = 1.0,
 ) -> float:

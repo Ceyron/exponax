@@ -1,4 +1,4 @@
-from typing import Literal, TypeVar, Union
+from typing import Literal, TypeVar
 
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
@@ -92,7 +92,7 @@ def plot_state_1d_facet(
 
 
 def plot_spatio_temporal_facet(
-    trjs: Union[Float[Array, "T C N"], Float[Array, "B T 1 N"]],
+    trjs: Float[Array, "T C N"] | Float[Array, "B T 1 N"],
     *,
     facet_over_channels: bool = True,
     vlim: tuple[float, float] = (-1.0, 1.0),
@@ -190,7 +190,7 @@ def plot_spatio_temporal_facet(
 
 
 def plot_state_2d_facet(
-    states: Union[Float[Array, "C N N"], Float[Array, "B 1 N N"]],
+    states: Float[Array, "C N N"] | Float[Array, "B 1 N N"],
     *,
     facet_over_channels: bool = True,
     vlim: tuple[float, float] = (-1.0, 1.0),
@@ -275,7 +275,7 @@ def plot_state_2d_facet(
 
 
 def plot_state_3d_facet(
-    states: Union[Float[Array, "C N N N"], Float[Array, "B 1 N N N"]],
+    states: Float[Array, "C N N N"] | Float[Array, "B 1 N N N"],
     *,
     facet_over_channels: bool = True,
     vlim: tuple[float, float] = (-1.0, 1.0),
@@ -283,11 +283,9 @@ def plot_state_3d_facet(
     figsize: tuple[float, float] = (10, 10),
     titles: list[str] = None,
     domain_extent: float = None,
-    bg_color: Union[
-        Literal["black"],
-        Literal["white"],
-        tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8],
-    ] = "white",
+    bg_color: Literal["black"]
+    | Literal["white"]
+    | tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8] = "white",
     resolution: int = 384,
     cmap: str = "RdBu_r",
     transfer_function: callable = zigzag_alpha,
@@ -378,7 +376,7 @@ def plot_state_3d_facet(
 
 
 def plot_spatio_temporal_2d_facet(
-    trjs: Union[Float[Array, "T C N N"], Float[Array, "B T 1 N N"]],
+    trjs: Float[Array, "T C N N"] | Float[Array, "B T 1 N N"],
     *,
     facet_over_channels: bool = True,
     vlim: tuple[float, float] = (-1.0, 1.0),
@@ -388,11 +386,9 @@ def plot_spatio_temporal_2d_facet(
     domain_extent: float = None,
     dt: float = None,
     include_init: bool = False,
-    bg_color: Union[
-        Literal["black"],
-        Literal["white"],
-        tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8],
-    ] = "white",
+    bg_color: Literal["black"]
+    | Literal["white"]
+    | tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8] = "white",
     resolution: int = 384,
     cmap: str = "RdBu_r",
     transfer_function: callable = zigzag_alpha,

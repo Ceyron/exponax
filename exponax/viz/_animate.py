@@ -1,4 +1,4 @@
-from typing import Literal, TypeVar, Union
+from typing import Literal, TypeVar
 
 import jax
 import jax.numpy as jnp
@@ -256,11 +256,9 @@ def animate_state_3d(
     domain_extent: float = None,
     dt: float = None,
     include_init: bool = False,
-    bg_color: Union[
-        Literal["black"],
-        Literal["white"],
-        tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8],
-    ] = "white",
+    bg_color: Literal["black"]
+    | Literal["white"]
+    | tuple[jnp.int8, jnp.int8, jnp.int8, jnp.int8] = "white",
     resolution: int = 384,
     cmap: str = "RdBu_r",
     transfer_function: callable = zigzag_alpha,

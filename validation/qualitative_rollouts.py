@@ -14,7 +14,8 @@ import exponax as ex  # noqa: E402
 
 ic_key = jax.random.PRNGKey(0)
 
-HAS_VAPE = True  # Set to False if you are on a non-GPU machine to not produce the 3D animations
+# Set to False if you are on a non-GPU machine to not produce the 3D animations
+HAS_VAPE = True
 
 CONFIGURATIONS_1D = [
     # Linear

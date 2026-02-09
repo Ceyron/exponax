@@ -76,6 +76,7 @@ class RandomMultiChannelICGenerator(eqx.Module):
             for (ic_gen, k) in zip(
                 self.ic_generators,
                 jax.random.split(key, len(self.ic_generators)),
+                strict=False,
             )
         ]
         return MultiChannelIC(ic_funs)
@@ -88,6 +89,7 @@ class RandomMultiChannelICGenerator(eqx.Module):
             for (ic_gen, k) in zip(
                 self.ic_generators,
                 jax.random.split(key, len(self.ic_generators)),
+                strict=False,
             )
         ]
         return jnp.concatenate(u_list, axis=0)

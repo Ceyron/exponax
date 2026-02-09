@@ -18,7 +18,9 @@ class Discontinuity(eqx.Module):
 
     def __call__(self, x: Array) -> Array:
         mask = jnp.ones_like(x, dtype=bool)
-        for i, (lb, ub) in enumerate(zip(self.lower_limits, self.upper_limits)):
+        for i, (lb, ub) in enumerate(
+            zip(self.lower_limits, self.upper_limits, strict=False)
+        ):
             mask = mask & (x[i : i + 1] > lb) & (x[i : i + 1] < ub)
 
         return jnp.where(mask, self.value, 0.0)
@@ -136,7 +138,7 @@ class RandomDiscontinuities(BaseRandomICGenerator):
         """
         lower_limits = []
         upper_limits = []
-        for i in range(self.num_spatial_dims):
+        for _ in range(self.num_spatial_dims):
             key_1, key_2, key = jr.split(key, 3)
             lim_1 = jr.uniform(key_1, (), minval=0.0, maxval=self.domain_extent)
             lim_2 = jr.uniform(key_2, (), minval=0.0, maxval=self.domain_extent)

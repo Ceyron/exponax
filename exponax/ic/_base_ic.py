@@ -41,7 +41,8 @@ class BaseRandomICGenerator(eqx.Module):
             degree of freedom locations.
         """
         raise NotImplementedError(
-            "This random ic generator cannot represent its initial condition as a function. Directly evaluate it."
+            """This random ic generator cannot represent its initial condition
+            as a function. Directly evaluate it."""
         )
 
     def __call__(

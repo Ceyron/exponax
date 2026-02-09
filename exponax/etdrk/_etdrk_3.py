@@ -32,19 +32,95 @@ class ETDRK3(BaseETDRK):
         (2002)](https://doi.org/10.1006/jcph.2002.6995):
 
         $$
-            \begin{aligned}
-                \hat{u}_h^* &= \exp(\hat{\mathcal{L}}_h \Delta t / 2) \odot \hat{u}_h^{[t]} + \frac{\exp(\hat{\mathcal{L}}_h \Delta t/2) - 1}{\hat{\mathcal{L}}_h} \odot \hat{\mathcal{N}}_h(\hat{u}_h^{[t]}).
-                \\
-                \hat{u}_h^{**} &= \exp(\hat{\mathcal{L}}_h \Delta t / 2) \odot \hat{u}_h^{[t]} + \frac{\exp(\hat{\mathcal{L}}_h \Delta t) - 1}{\hat{\mathcal{L}}_h} \odot \left( 2 \hat{\mathcal{N}}_h(\hat{u}_h^*) - \hat{\mathcal{N}}_h(\hat{u}_h^{[t]}) \right).
-                \\
-                \hat{u}_h^{[t+1]} &= \exp(\hat{\mathcal{L}}_h \Delta t) \odot \hat{u}_h^{[t]}
-                \\
-                &+ \frac{-4 - \exp(\hat{\mathcal{L}}_h \Delta t) + \exp(\hat{\mathcal{L}}_h \Delta) \left( 4 - 3 \hat{\mathcal{L}}_h \Delta t + \left(\hat{\mathcal{L}}_h \Delta t\right)^2 \right)}{\hat{\mathcal{L}}_h^3 (\Delta t)^2} \odot \hat{\mathcal{N}}_h(\hat{u}_h^{[t]}).
-                \\
-                &+ 4 \frac{2 + \hat{\mathcal{L}}_h \Delta t + \exp(\hat{\mathcal{L}}_h \Delta t) \left( -2 + \hat{\mathcal{L}}_h \Delta t \right)}{\hat{\mathcal{L}}_h^3 (\Delta t)^2} \odot \hat{\mathcal{N}}_h(\hat{u}_h^*)
-                \\
-                &+ \frac{-4 - 3 \hat{\mathcal{L}}_h \Delta t - \left( \hat{\mathcal{L}}_h \Delta t \right)^2 + \exp(\hat{\mathcal{L}}_h \Delta t) \left( 4 - \hat{\mathcal{L}}_h \Delta t \right)}{\hat{\mathcal{L}}_h^3 (\Delta t)^2} \odot \hat{\mathcal{N}}_h(\hat{u}_h^{**})
-            \end{aligned}
+        \begin{aligned}
+            \hat{u}_h^*
+            &=
+            \exp(\hat{\mathcal{L}}_h \Delta t / 2)
+            \odot
+            \hat{u}_h^{[t]}
+            +
+            \frac{
+                \exp(\hat{\mathcal{L}}_h \Delta t/2) - 1
+            }{
+                \hat{\mathcal{L}}_h
+            }
+            \odot
+            \hat{\mathcal{N}}_h(\hat{u}_h^{[t]}).
+            \\
+            \hat{u}_h^{**}
+            &=
+            \exp(\hat{\mathcal{L}}_h \Delta t / 2)
+            \odot
+            \hat{u}_h^{[t]}
+            +
+            \frac{
+                \exp(\hat{\mathcal{L}}_h \Delta t) - 1
+            }{
+                \hat{\mathcal{L}}_h
+            }
+            \odot
+            \left(
+                2 \hat{\mathcal{N}}_h(\hat{u}_h^*)
+                -
+                \hat{\mathcal{N}}_h(\hat{u}_h^{[t]})
+            \right).
+            \\
+            \hat{u}_h^{[t+1]}
+            &=
+            \exp(\hat{\mathcal{L}}_h \Delta t)
+            \odot
+            \hat{u}_h^{[t]}
+            \\
+            &+
+            \frac{
+                -4 - \exp(\hat{\mathcal{L}}_h \Delta t)
+                +
+                \exp(\hat{\mathcal{L}}_h \Delta)
+                \left(
+                    4 - 3 \hat{\mathcal{L}}_h \Delta t
+                    +
+                    \left(
+                        \hat{\mathcal{L}}_h \Delta t
+                    \right)^2
+                \right)
+            }{
+                \hat{\mathcal{L}}_h^3 (\Delta t)^2
+            }
+            \odot
+            \hat{\mathcal{N}}_h(\hat{u}_h^{[t]}).
+            \\
+            &+
+            4 \frac{
+                2 + \hat{\mathcal{L}}_h \Delta t
+                +
+                \exp(\hat{\mathcal{L}}_h \Delta t)
+                \left(
+                    -2 + \hat{\mathcal{L}}_h \Delta t
+                \right)
+            }{
+                \hat{\mathcal{L}}_h^3 (\Delta t)^2
+            }
+            \odot
+            \hat{\mathcal{N}}_h(\hat{u}_h^*)
+            \\
+            &+
+            \frac{
+                -4 - 3 \hat{\mathcal{L}}_h \Delta t
+                -
+                \left(
+                    \hat{\mathcal{L}}_h \Delta t
+                \right)^2
+                +
+                \exp(\hat{\mathcal{L}}_h \Delta t)
+                \left(
+                    4 - \hat{\mathcal{L}}_h \Delta t
+                \right)
+            }{
+                \hat{\mathcal{L}}_h^3 (\Delta t)^2
+            }
+            \odot
+            \hat{\mathcal{N}}_h(\hat{u}_h^{**})
+        \end{aligned}
         $$
 
         where $\hat{\mathcal{N}}_h$ is the Fourier pseudo-spectral treatment of
