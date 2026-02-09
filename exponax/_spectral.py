@@ -921,6 +921,14 @@ def get_spectrum(
           shell surface area.
         - With `radial_binning="average"`: The geometric factor is divided out,
           yielding a per-mode density.
+
+    !!! note
+        **On the radial bin range:** In D > 1 dimensions, the radial bins only
+        extend up to `N/2` (the 1D Nyquist frequency), not to `sqrt(D) * N/2`
+        (the corner of the wavenumber cube). Modes with `|k| > N/2` that exist
+        in the corners of the Cartesian wavenumber grid are not included. The
+        spectrum thus covers the **Nyquist sphere** inscribed in the wavenumber
+        cube.
     """
     num_spatial_dims = state.ndim - 1
     num_points = state.shape[-1]
