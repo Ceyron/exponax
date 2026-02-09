@@ -11,6 +11,16 @@ keywords = ["jax", "sciml", "deep-learning", "pde", "etdrk"]
 urls = {repository = "https://github.com/Ceyron/exponax" }
 dependencies = ["jax>=0.4.13", "jaxtyping>=0.2.20", "typing_extensions>=4.5.0", "equinox>=0.11.3", "matplotlib>=3.8.1"]
 
+[project.optional-dependencies]
+docs = [
+    "mkdocs==1.6.1",
+    "mkdocs-material==9.7.1",
+    "mkdocstrings==1.0.3",
+    "mkdocstrings-python==2.0.1",
+    "mkdocs-jupyter==0.25.1",
+    "griffe==1.15.0",
+]
+
 [tool.ruff]
 line-length = 88
 target-version = "py310"
