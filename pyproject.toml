@@ -17,7 +17,7 @@ docs = [
     "mkdocs-material==9.7.1",
     "mkdocstrings==1.0.3",
     "mkdocstrings-python==2.0.1",
-    "mkdocs-jupyter==0.25.1",
+    "mknotebooks==0.8.0",
     "griffe==1.15.0",
     "black==26.1.0",  # Needed for API autoformat
 ]

@@ -67,7 +67,7 @@ extra_javascript:
 plugins:
     - search  # requires re-enabling
     - autorefs  # Cross-links to headings
-    - mkdocs-jupyter  # Jupyter notebooks
+    - mknotebooks  # Jupyter notebooks
     - mkdocstrings:
         handlers:
             python:
