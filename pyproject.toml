@@ -19,6 +19,7 @@ docs = [
     "mkdocstrings-python==2.0.1",
     "mkdocs-jupyter==0.25.1",
     "griffe==1.15.0",
+    "black==26.1.0",  # Needed for API autoformat
 ]
 
 [tool.ruff]
