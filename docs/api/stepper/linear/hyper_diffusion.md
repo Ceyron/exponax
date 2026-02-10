@@ -12,6 +12,8 @@ or with spatial mixing:
 
 $$ \frac{\partial u}{\partial t} = - \zeta (\nabla \cdot \nabla)(\nabla \cdot \nabla) u $$
 
+In all cases $\zeta > 0$ for stability.
+
 ::: exponax.stepper.HyperDiffusion
     options:
         members:
