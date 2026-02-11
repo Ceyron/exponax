@@ -944,6 +944,19 @@ def get_spectrum(
         + 1)` that exist in the corners of the Cartesian wavenumber grid are not
         included. The spectrum thus covers the **Nyquist sphere** inscribed in
         the wavenumber cube.
+
+    !!! note
+        **Parseval's identity:** With `power=True` and `radial_binning="sum"`,
+        the spectrum satisfies `jnp.sum(spectrum) == 0.5 * jnp.mean(u**2)` (per
+        channel). In 1D this holds exactly; in higher dimensions it holds for
+        signals whose energy is contained within the Nyquist sphere (see note
+        above on radial bin range). Note that this is a **sum** in Fourier
+        space equaling a **mean** in physical space — the reverse of the
+        textbook form `(1/N^D) Σ|û|² = Σ|u|²`. The inversion happens because the
+        coefficients are divided by scaling arrays of order N^D; since power is
+        quadratic, this scales as N^(2D), which cancels the N^D factor from the
+        sum over Fourier modes, leaving a single N^D factor in the denominator
+        on the right-hand side, which is the mean in physical space.
     """
     num_spatial_dims = state.ndim - 1
     num_points = state.shape[-1]
