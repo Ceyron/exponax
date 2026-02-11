@@ -1,4 +1,4 @@
-# Gradient NormA
+# Gradient Norm
 
 ::: exponax.stepper.generic.NormalizedGradientNormStepper  
     options:

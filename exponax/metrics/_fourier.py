@@ -369,7 +369,7 @@ def fourier_MSE(
 
     The channel axis is summed **after** the aggregation.
 
-    Under default settings with correctly specific `domain_extent`, this
+    Under default settings with correctly specified `domain_extent`, this
     function (up to rounding errors) produces the identical result as
     [`exponax.metrics.MSE`][] which is a consequence of Parseval's theorem.
     However, it additionally allows filtering specific frequency ranges and to
@@ -430,7 +430,7 @@ def fourier_nMSE(
 
     The channel axis is summed **after** the aggregation.
 
-    Under default settings with correctly specific `domain_extent`, this
+    Under default settings with correctly specified `domain_extent`, this
     function (up to rounding errors) produces the identical result as
     [`exponax.metrics.nMSE`][] which is a consequence of Parseval's theorem.
     However, it additionally allows filtering specific frequency ranges and to
@@ -487,7 +487,7 @@ def fourier_RMSE(
 
     The channel axis is summed **after** the aggregation.
 
-    Under default settings with correctly specific `domain_extent`, this
+    Under default settings with correctly specified `domain_extent`, this
     function (up to rounding errors) produces the identical result as
     [`exponax.metrics.RMSE`][] which is a consequence of Parseval's theorem.
     However, it additionally allows filtering specific frequency ranges and to
@@ -547,7 +547,7 @@ def fourier_nRMSE(
 
     The channel axis is summed **after** the aggregation.
 
-    Under default settings with correctly specific `domain_extent`, this
+    Under default settings with correctly specified `domain_extent`, this
     function (up to rounding errors) produces the identical result as
     [`exponax.metrics.nRMSE`][] which is a consequence of Parseval's theorem.
     However, it additionally allows filtering specific frequency ranges and to

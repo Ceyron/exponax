@@ -96,7 +96,7 @@ it:
 
 ## License
 
-MIT, see [here](https://github.com/Ceyron/apebench/blob/main/LICENSE.txt)
+MIT, see [here](https://github.com/ceyron/exponax/blob/main/LICENSE.txt)
 
 ---
 

@@ -642,7 +642,7 @@ def fft(
         (this function) does not apply any normalization to the result, only the
         [`exponax.ifft`][] function applies normalization. To extract the
         amplitude of the coefficients divide by
-        `expoanx.spectral.build_scaling_array`.
+        `exponax.spectral.build_scaling_array`.
     """
     if num_spatial_dims is None:
         num_spatial_dims = field.ndim - 1

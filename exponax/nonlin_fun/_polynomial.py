@@ -16,7 +16,7 @@ class PolynomialNonlinearFun(BaseNonlinearFun):
     ):
         """
         Performs a pseudo-spectral evaluation of an (unmixed) polynomial
-        nonlineariy, e.g., as they are found in reaction-diffusion systems
+        nonlinearity, e.g., as they are found in reaction-diffusion systems
         (e.g., FisherKPP). In state space, this reads
 
         ```
@@ -24,7 +24,7 @@ class PolynomialNonlinearFun(BaseNonlinearFun):
         ```
 
         with `cₖ` the coefficient of the `k`-th order term. Note that there is
-        no channe mixing. For example, `u₀² u₁` cannot be represented.
+        no channel mixing. For example, `u₀² u₁` cannot be represented.
 
         This format works in any number of dimensions.
 

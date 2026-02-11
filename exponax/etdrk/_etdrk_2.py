@@ -24,7 +24,7 @@ class ETDRK2(BaseETDRK):
         Solve a semi-linear PDE using Exponential Time Differencing Runge-Kutta
         with a **second order approximation**.
 
-        Adopted from Eq. (22) of [Cox and Matthews
+        Adapted from Eq. (22) of [Cox and Matthews
         (2002)](https://doi.org/10.1006/jcph.2002.6995):
 
         $$

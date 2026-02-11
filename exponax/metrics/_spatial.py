@@ -93,7 +93,7 @@ def spatial_norm(
     outer_exponent: float | None = None,
 ) -> float:
     """
-    Compute the conistent counterpart of the `Lᴾ` functional norm.
+    Compute the consistent counterpart of the `Lᴾ` functional norm.
 
     See [`exponax.metrics.spatial_aggregator`][] for more details. This function
     sums over the channel axis **after aggregation**. If you need more low-level
