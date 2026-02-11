@@ -65,7 +65,7 @@ class FourierInterpolator(eqx.Module):
             easily exceed available resources. In such cases, either consider
             evaluating the query locations in smaller batches or resort to local
             basis interpolants like linear or cubic splines (see
-            `scipy.interpolate` or its JAX anologons).
+            `scipy.interpolate` or its JAX analogues).
 
         **Arguments:**
 

@@ -48,7 +48,7 @@ class KortewegDeVries(BaseStepper):
         In 1d, the Korteweg-de Vries equation is given by
 
         ```
-            uₜ + b₁ 1/2 (u²)ₓ + a₃ uₓₓₓ = ν uₓₓ - μ uₓₓₓₓ
+            uₜ + b₁ 1/2 (u²)ₓ + a₃ uₓₓₓ = ν uₓₓ - ζ uₓₓₓₓ
         ```
 
         with `b₁` the convection coefficient, `a₃` the dispersion coefficient
@@ -58,7 +58,7 @@ class KortewegDeVries(BaseStepper):
         dimensions, the equation reads (using vector format for the channels)
 
         ```
-            uₜ + b₁ 1/2 ∇ ⋅ (u ⊗ u) + a₃ 1 ⋅ (∇⊙∇⊙(∇u)) = ν Δu - μ ((∇⊙∇) ⋅ (∇⊙∇)) u
+            uₜ + b₁ 1/2 ∇ ⋅ (u ⊗ u) + a₃ 1 ⋅ (∇⊙∇⊙(∇u)) = ν Δu - ζ ((∇⊙∇) ⋅ (∇⊙∇)) u
         ```
 
         or
@@ -178,7 +178,7 @@ class KortewegDeVries(BaseStepper):
         if self.advect_over_diffuse:
             dispersion_operator = (
                 -build_gradient_inner_product_operator(
-                    derivative_operator, self.advect_over_diffuse_dispersivity, order=1
+                    derivative_operator, dispersion_velocity, order=1
                 )
                 * laplace_operator
             )

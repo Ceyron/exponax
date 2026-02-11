@@ -28,10 +28,10 @@ class HyperDiffusion(BaseStepper):
         In 1d, the hyper-diffusion equation is given by
 
         ```
-            uₜ = - μ uₓₓₓₓ
+            uₜ = - ζ uₓₓₓₓ
         ```
 
-        with `μ ∈ ℝ` being the hyper-diffusivity.
+        with `ζ ∈ ℝ` being the hyper-diffusivity.
 
         Note the minus sign because by default, a fourth-order derivative
         dampens with a negative coefficient. To match the concept of
@@ -40,13 +40,13 @@ class HyperDiffusion(BaseStepper):
         In higher dimensions, the hyper-diffusion equation can be written as
 
         ```
-            uₜ = − μ ((∇⊙∇) ⋅ (∇⊙∇)) u
+            uₜ = - ζ ((∇⊙∇) ⋅ (∇⊙∇)) u
         ```
 
         or
 
         ```
-            uₜ = - μ Δ(Δu)
+            uₜ = - ζ Δ(Δu)
         ```
 
         The latter introduces spatial mixing.
@@ -62,7 +62,7 @@ class HyperDiffusion(BaseStepper):
             in each dimension is the same. Hence, the total number of degrees of
             freedom is `Nᵈ`.
         - `dt`: The timestep size `Δt` between two consecutive states.
-        - `hyper_diffusivity` (keyword-only): The hyper-diffusivity `ν`.
+        - `hyper_diffusivity` (keyword-only): The hyper-diffusivity `ζ`.
             This stepper only supports scalar (=isotropic) hyper-diffusivity.
             Default: 0.0001.
         - `diffuse_on_diffuse` (keyword-only): If `True`, the second form
@@ -75,7 +75,7 @@ class HyperDiffusion(BaseStepper):
         - The stepper is unconditionally stable, no matter the choice of
             any argument because the equation is solved analytically in Fourier
             space.
-        - Ultimately, only the factor `μ Δt / L⁴` affects the characteristic
+        - Ultimately, only the factor `ζ Δt / L⁴` affects the characteristic
             of the dynamics. See also
             [`exponax.stepper.generic.NormalizedLinearStepper`][] with
             `normalized_coefficients = [0, 0, 0, 0, alpha_4]` with `alpha_4 = -
