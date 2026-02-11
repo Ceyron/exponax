@@ -104,6 +104,7 @@ nav:
         - Advanced:
             - 1D Burgers Emulator Training: 'examples/learning_burgers_autoregressive_neural_operator.ipynb'
             - More on Metrics: 'examples/on_metrics_advanced.ipynb'
+            - ETDRK from the Ground Up: 'examples/edtrk_from_the_ground_up.ipynb'
         - Additional:
             - Nice Features: 'examples/additional_features.ipynb'
             - Performance Hints: 'examples/performance_hints.ipynb'
