@@ -877,7 +877,7 @@ def get_spectrum(
         `Exponax` convention with a leading channel axis and then one, two, or
         three subsequent spatial axes, **each of the same length** N.
     - `power`: Whether to compute the power spectrum or the amplitude spectrum.
-        Default is `True` meaning the amplitude spectrum.
+        Default is `True` meaning the power spectrum.
     - `radial_binning`: How to aggregate Fourier modes within each radial
         (spherical shell) bin. Either `"sum"` (default) or `"average"`.
         - `"sum"`: Computes the total power/amplitude in each bin. This is the
@@ -894,14 +894,30 @@ def get_spectrum(
 
     !!! tip
         The spectrum is usually best presented with a logarithmic y-axis, either
-        as `plt.semiology` or `plt.loglog`. Sometimes it can be helpful to set
+        as `plt.semilogy` or `plt.loglog`. Sometimes it can be helpful to set
         the spectrum below a threshold to zero to better visualize the relevant
-        parts of the spectrum. This can be done with `jnp.maximum(spectrum,
-        1e-10)` for example.
+        parts of the spectrum (fast Fourier transformations include rounding
+        errors that, especially, can aggregate when radially binning in higher
+        dimensions). This can be done with `jnp.maximum(spectrum, 1e-10)` for
+        example. Recommended lower thresholds are `1e-10` and `1e-5` for the
+        power spectrum and amplitude spectrum, respectively, both in single
+        precision. (Reason: `1e-5` is slightly higher than the precision
+        limit for single precision, and `1e-10` is its square (since in the
+        power spectrum is the amplitude spectrum squared).)
 
     !!! info
         If it is applied to a vorticity field with `power=True` (default), it
         produces the enstrophy spectrum.
+
+    !!! info
+        Multi-Channel Fields: For example, when computing the power spectrum of
+        a velocity field in 2D or 3D, natively, this function will compute the
+        power spectrum of each velocity component separately, returning an array
+        of shape `(D, (N//2)+1)` where `D` is the number of spatial dimensions.
+        Typically, one is interested in the total kinetic energy which would be
+        the vector norm of the velocity field squared. This can be computed by
+        summing the power spectrum across the channel axis, i.e.,
+        `jnp.sum(spectrum, axis=0)`.
 
     !!! note
         The binning in higher dimensions can sometimes be counterintuitive. For
@@ -915,20 +931,19 @@ def get_spectrum(
         **On shell surface area scaling:** In continuous formulations, the 1D
         isotropic spectrum relates to the spectral density tensor via a shell
         surface area factor: `E(k) = 2πk · Φ(k)` in 2D and `E(k) = 4πk² · Φ(k)`
-        in 3D. In this discrete implementation:
-        - With `radial_binning="sum"`: The geometric factor is implicit because
-          the number of discrete modes in each bin grows proportionally to the
-          shell surface area.
-        - With `radial_binning="average"`: The geometric factor is divided out,
-          yielding a per-mode density.
+        in 3D. In this discrete implementation: (a) with `radial_binning="sum"`:
+        The geometric factor is implicit because the number of discrete modes in
+        each bin grows proportionally to the shell surface area. (b) with
+        `radial_binning="average"`: The geometric factor is divided out,
+        yielding a per-mode density.
 
     !!! note
         **On the radial bin range:** In D > 1 dimensions, the radial bins only
-        extend up to `N/2` (the 1D Nyquist frequency), not to `sqrt(D) * N/2`
-        (the corner of the wavenumber cube). Modes with `|k| > N/2` that exist
-        in the corners of the Cartesian wavenumber grid are not included. The
-        spectrum thus covers the **Nyquist sphere** inscribed in the wavenumber
-        cube.
+        extend up to `N//2 + 1` (the 1D Nyquist frequency), not to `sqrt(D) *
+        (N//2 + 1)` (the corner of the wavenumber cube). Modes with `|k| > (N//2
+        + 1)` that exist in the corners of the Cartesian wavenumber grid are not
+        included. The spectrum thus covers the **Nyquist sphere** inscribed in
+        the wavenumber cube.
     """
     num_spatial_dims = state.ndim - 1
     num_points = state.shape[-1]
