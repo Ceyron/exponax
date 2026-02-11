@@ -310,6 +310,53 @@ def test_binning_average_vs_sum_2d():
     assert jnp.allclose(actual_counts, expected_surface, rtol=0.2)
 
 
+def test_binning_average_vs_sum_3d():
+    """Verify that sum = mode_count * average for each radial bin in 3D.
+
+    The mode count per bin should approximately scale as 2*pi*k² (half of the
+    full 4*pi*k² shell surface area because the rfft grid only stores
+    k_last >= 0).
+    """
+    N = 16
+
+    # Compute the exact mode count per radial bin from the wavenumber mesh
+    wavenumbers_mesh = ex._spectral.build_wavenumbers(3, N)
+    wavenumbers_norm = jnp.linalg.norm(wavenumbers_mesh, axis=0)
+    wavenumbers_1d = jnp.arange(N // 2 + 1, dtype=float)
+
+    mode_count = jnp.zeros(N // 2 + 1)
+    for i, k in enumerate(wavenumbers_1d):
+        bin_mask = (wavenumbers_norm >= k - 0.5) & (wavenumbers_norm < k + 0.5)
+        mode_count = mode_count.at[i].set(jnp.sum(bin_mask))
+
+    # Use a low-pass filtered random field so all bins are populated
+    key = jax.random.PRNGKey(10)
+    u_hat = jax.random.normal(
+        key, shape=(1, N, N, N // 2 + 1)
+    ) + 1j * jax.random.normal(jax.random.PRNGKey(11), shape=(1, N, N, N // 2 + 1))
+    mask = ex._spectral.low_pass_filter_mask(3, N, cutoff=N // 2, axis_separate=False)
+    u_hat = u_hat * mask
+    u = ex.ifft(u_hat, num_spatial_dims=3, num_points=N)
+
+    spec_sum = ex.get_spectrum(u, power=True, radial_binning="sum")
+    spec_avg = ex.get_spectrum(u, power=True, radial_binning="average")
+
+    # For every bin with modes, verify sum == mode_count * average
+    for k in range(N // 2 + 1):
+        if mode_count[k] > 0 and float(spec_avg[0, k]) > 1e-10:
+            ratio = float(spec_sum[0, k] / spec_avg[0, k])
+            assert ratio == pytest.approx(float(mode_count[k]), rel=1e-3), (
+                f"Bin {k}: ratio={ratio}, expected mode_count={int(mode_count[k])}"
+            )
+
+    # Sanity check: at large k the mode count should approach 2*pi*k²
+    # (half of the full 4*pi*k² because the rfft grid only stores k_last >= 0)
+    large_k = jnp.arange(3, N // 4)
+    expected_surface = 2 * jnp.pi * large_k**2
+    actual_counts = mode_count[3 : N // 4]
+    assert jnp.allclose(actual_counts, expected_surface, rtol=0.25)
+
+
 # ---------------------------------------------------------------------------
 # rfft compensation: spectrum should be the same regardless of which spatial
 # axis carries the mode (the rfft axis vs. the full-fft axes)
