@@ -40,13 +40,13 @@ class KuramotoSivashinsky(BaseStepper):
         ```
 
         with `b₂` the gradient-norm coefficient, `ψ₁` the second-order scale and
-        `ψ₂` the fourth-order. If the latter two terms were on the right-hand
+        `ψ₂` the fourth-order scale. If the latter two terms were on the right-hand
         side, they could be interpreted as diffusivity and hyper-diffusivity,
         respectively. Here, the second-order term acts destabilizing (increases
         the energy of the system) and the fourth-order term acts stabilizing
         (decreases the energy of the system). A common configuration is `b₂ = ψ₁
         = ψ₂ = 1` and the dynamics are only adapted using the `domain_extent`.
-        For this, we espect the KS equation to experience spatio-temporal chaos
+        For this, we expect the KS equation to experience spatio-temporal chaos
         roughly once `L > 60`.
 
         In this combustion (=non-conservative) format, the number of channels
@@ -210,7 +210,7 @@ class KuramotoSivashinskyConservative(BaseStepper):
         the energy of the system) and the fourth-order term acts stabilizing
         (decreases the energy of the system). A common configuration is `b₁ = ψ₁
         = ψ₂ = 1` and the dynamics are only adapted using the `domain_extent`.
-        For this, we espect the KS equation to experience spatio-temporal chaos
+        For this, we expect the KS equation to experience spatio-temporal chaos
         roughly once `L > 60`.
 
         !!! info

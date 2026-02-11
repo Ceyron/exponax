@@ -206,7 +206,7 @@ class NormalizedLinearStepper(GeneralLinearStepper):
 
         Take care of the signs!
 
-        In the defaulf configuration of this timestepper, the PDE is an
+        In the default configuration of this timestepper, the PDE is an
         advection-diffusion equation with normalized advection of 0.5 and
         normalized diffusion of 0.01.
 

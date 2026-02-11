@@ -228,8 +228,8 @@ def MAE(
         If not specified, the MAE is computed against zero, i.e., the norm of
         `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`. Must be
-        provide to get the correctly consistent norm. If this metric is used an
-        optimization objective, it can often be ignored since it only
+        provided to get the correctly consistent norm. If this metric is used as
+        an optimization objective, it can often be ignored since it only
         contributes a multiplicative factor.
     """
     return spatial_norm(
@@ -273,8 +273,8 @@ def nMAE(
         axes.
     - `u_ref`: The reference state array. Must have the same shape as `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`. Must be
-        provide to get the correctly consistent norm. If this metric is used an
-        optimization objective, it can often be ignored since it only
+        provided to get the correctly consistent norm. If this metric is used as
+        an optimization objective, it can often be ignored since it only
         contributes a multiplicative factor.
     """
     return spatial_norm(
@@ -326,8 +326,8 @@ def sMAE(
         axes.
     - `u_ref`: The reference state array. Must have the same shape as `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`. Must be
-        provide to get the correctly consistent norm. If this metric is used an
-        optimization objective, it can often be ignored since it only
+        provided to get the correctly consistent norm. If this metric is used as
+        an optimization objective, it can often be ignored since it only
         contributes a multiplicative factor.
     """
     return spatial_norm(
@@ -373,8 +373,8 @@ def MSE(
         If not specified, the MSE is computed against zero, i.e., the norm of
         `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`. Must be
-        provide to get the correctly consistent norm. If this metric is used an
-        optimization objective, it can often be ignored since it only
+        provided to get the correctly consistent norm. If this metric is used as
+        an optimization objective, it can often be ignored since it only
         contributes a multiplicative factor.
     """
     return spatial_norm(
@@ -418,8 +418,8 @@ def nMSE(
         axes.
     - `u_ref`: The reference state array. Must have the same shape as `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`. Must be
-        provide to get the correctly consistent norm. If this metric is used an
-        optimization objective, it can often be ignored since it only
+        provided to get the correctly consistent norm. If this metric is used as
+        an optimization objective, it can often be ignored since it only
         contributes a multiplicative factor.
     """
     return spatial_norm(
@@ -471,8 +471,8 @@ def sMSE(
         axes.
     - `u_ref`: The reference state array. Must have the same shape as `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`. Must be
-        provide to get the correctly consistent norm. If this metric is used an
-        optimization objective, it can often be ignored since it only
+        provided to get the correctly consistent norm. If this metric is used as
+        an optimization objective, it can often be ignored since it only
         contributes a multiplicative factor.
     """
     return spatial_norm(
@@ -520,9 +520,9 @@ def RMSE(
         If not specified, the RMSE is computed against zero, i.e., the norm of
         `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`. Must be
-        provide to get the correctly consistent norm. If this metric is used an
-        optimization objective, it can often be ignored since it only
-        contributes a multiplicative factor
+        provided to get the correctly consistent norm. If this metric is used as
+        an optimization objective, it can often be ignored since it only
+        contributes a multiplicative factor.
     """
     return spatial_norm(
         u_pred,
@@ -570,9 +570,9 @@ def nRMSE(
         axes.
     - `u_ref`: The reference state array. Must have the same shape as `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`. Must be
-        provide to get the correctly consistent norm. If this metric is used an
-        optimization objective, it can often be ignored since it only
-        contributes a multiplicative factor
+        provided to get the correctly consistent norm. If this metric is used as
+        an optimization objective, it can often be ignored since it only
+        contributes a multiplicative factor.
     """
     return spatial_norm(
         u_pred,

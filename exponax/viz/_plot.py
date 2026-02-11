@@ -354,7 +354,7 @@ def plot_spatio_temporal_2d(
 ):
     """
     Plot a trajectory of a 2d state as a spatio-temporal plot visualized by a
-    volume render (space in in plain parallel to screen, and time in the
+    volume render (space in the plane parallel to screen, and time in the
     direction into the screen).
 
     Requires the input to be a real array with four axes: a leading time axis, a

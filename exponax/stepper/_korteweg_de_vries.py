@@ -134,7 +134,7 @@ class KortewegDeVries(BaseStepper):
 
         **Good Values:**
 
-        - There is an anlytical solution to the (inviscid, `ν = 0`) KdV of
+        - There is an analytical solution to the (inviscid, `ν = 0`) KdV of
             `u(t, x) = - 1/2 c^2 sech^2(c/2 (x - ct - a))` with the hyperbolic
             secant `sech` and arbitrarily selected speed `c` and shift `a`.
         - For a nice simulation with an initial condition that breaks into

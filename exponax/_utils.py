@@ -263,7 +263,7 @@ def stack_sub_trajectories(
     together. Useful for rollout training neural operators with temporal mixing.
 
     !!! warning
-        This function can produce very large arrays, especially if `sub_le >>
+        This function can produce very large arrays, especially if `sub_len >>
         1`.
 
     **Arguments:**

@@ -65,7 +65,7 @@ class GeneralPolynomialStepper(BaseStepper):
 
         Note that the effect of polynomial_scale[1] is similar to the effect of
         coefficients[0] with the difference that in ETDRK integration the latter
-        is treated anlytically and should be preferred.
+        is treated analytically and should be preferred.
 
         **Arguments:**
 
@@ -85,7 +85,7 @@ class GeneralPolynomialStepper(BaseStepper):
             Fisher-KPP equation.
         - `polynomial_coefficients`: The list of scales `pₖ` corresponding to the
             polynomial contributions. The length of this tuple represents the
-            highest occuring polynomial. The default value `(0.0, 0.0, 10.0)` in
+            highest occuring polynomial. The default value `(0.0, 0.0, -10.0)` in
             combination with the default `linear_coefficients` corresponds to the
             Fisher-KPP equation.
         - `order`: The order of the Exponential Time Differencing Runge
