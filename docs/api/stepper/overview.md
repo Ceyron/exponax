@@ -105,7 +105,7 @@ There are **three interfaces** for each generic stepper family:
 | [Convection](generic/physical/general_convection.md) | $\frac{b}{2} \nabla \cdot (\mathbf{u} \otimes \mathbf{u})$ | $d$ (or 1) | 1,2,3 | Burgers, KdV, KS (conservative) |
 | [Gradient Norm](generic/physical/general_gradient_norm.md) | $\frac{b}{2} \lVert \nabla u \rVert_2^2$ | 1 | 1,2,3 | KS (combustion) |
 | [Polynomial](generic/physical/general_polynomial.md) | $\sum_i c_i u^i$ | 1 | 1,2,3 | Fisher-KPP, Allen-Cahn, Swift-Hohenberg |
-| [Nonlinear](generic/physical/general_nonlinear.md) | $b_0 u^2 + \frac{b_1}{2}(\vec{1} \cdot \nabla) u^2 + \frac{b_2}{2} \lVert \nabla u \rVert_2^2$ | varies | 1,2,3 | Combines quadratic, convection, and gradient norm |
+| [Nonlinear](generic/physical/general_nonlinear.md) | $b_0 u^2 + \frac{b_1}{2}(\vec{1} \cdot \nabla) u^2 + \frac{b_2}{2} \lVert \nabla u \rVert_2^2$ | 1 | 1,2,3 | Combines quadratic, single-channel convection, and gradient norm |
 | [Vorticity Convection](generic/physical/general_vorticity_convection.md) | $b \left(\begin{bmatrix}1 \\ -1\end{bmatrix} \odot \nabla(\Delta^{-1} u)\right) \cdot \nabla u$ | 1 | 2 | Navier-Stokes, Kolmogorov Flow |
 
 All generic steppers (except vorticity convection) combine their respective
