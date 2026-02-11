@@ -956,13 +956,19 @@ def get_spectrum(
     )
 
     if power:
+        # The "reconstruction" scaling doubles intermediate rfft-axis modes
+        # to account for the missing conjugate.  This is correct for the
+        # amplitude (linear in |c|), but squaring would turn that 2x into 4x.
+        # Mixing one "reconstruction"-scaled and one "norm_compensation"-scaled
+        # factor gives: |û|² / (recon * norm).  This equals |c|² for DC and
+        # Nyquist (where recon == norm) and |c|²/2 for intermediate modes
+        # (where the conjugate pair together contribute half each), so that
+        # sum(spectrum) == 0.5 * mean(u²).
         magnitude_norm_compensated = state_hat_abs / build_scaling_array(
             num_spatial_dims,
             num_points,
             mode="norm_compensation",
         )
-
-        # Compute Power
         quantity = 0.5 * magnitude * magnitude_norm_compensated
     else:
         quantity = magnitude
