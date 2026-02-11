@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="docs/imgs/logo.svg" alt="exponax logo" width="300">
+</p>
 <h4 align="center">Efficient Differentiable n-d PDE solvers built on top of <a href="https://github.com/google/jax" target="_blank">JAX</a> & <a href="https://github.com/patrick-kidger/equinox" target="_blank">Equinox</a>.</h4>
 
 <p align="center">
