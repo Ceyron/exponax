@@ -108,7 +108,7 @@ class KuramotoSivashinsky(BaseStepper):
             chaotic attractor is independent of the initial condition.
         - However, since the KS develops a certain spectrum based on the
             domain length, make sure to use enough discretization point to
-            capture the highes occuring mode. For a domain extent of 60, this
+            capture the highest occuring mode. For a domain extent of 60, this
             requires at least roughly 100 `num_points` in single precision
             floats.
         - For domain lengths smaller than the threshold to enter chaos, the

@@ -40,7 +40,7 @@ class Diffusion(BaseStepper):
             uₜ = ν Δu
         ```
 
-        More generally speaking, there can be anistropic diffusivity given by a
+        More generally speaking, there can be anisotropic diffusivity given by a
         `A ∈ ℝᵈ ˣ ᵈ` sandwiched between the gradient and divergence operators.
 
         ```
@@ -81,7 +81,7 @@ class Diffusion(BaseStepper):
             `normalized_coefficients = [0, 0, alpha_2]` with `alpha_2 =
             diffusivity * dt / domain_extent**2`.
         """
-        # ToDo: more sophisticated checks here
+        # TODO: more sophisticated checks here
         if isinstance(diffusivity, float):
             diffusivity = jnp.diag(jnp.ones(num_spatial_dims)) * diffusivity
         elif len(diffusivity.shape) == 1:

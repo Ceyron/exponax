@@ -59,7 +59,7 @@ class GeneralPolynomialStepper(BaseStepper):
         exponax.stepper.reaction.FisherKPP(
             num_spatial_dims=num_spatial_dims, domain_extent=domain_extent,
             num_points=num_points, dt=dt, diffusivity=0.01, reactivity=-10.0,
-            #TODO: Check this
+            # TODO: Check this
         )
         ```
 

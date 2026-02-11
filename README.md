@@ -96,7 +96,7 @@ that explains the basics of `Exponax`.
 2. **Lightweight Design** without custom types. There is no `grid` or `state`
     object. Everything is based on JAX arrays. Timesteppers are callable
     PyTrees.
-3. More than 46 pre-built dynamics across 1d, 2d, and 3d:
+3. More than 46 pre-built dynamics:
     1. Linear PDEs (advection, diffusion, dispersion, etc.)
     2. Nonlinear PDEs (Burgers, Kuramoto-Sivashinsky,
         Korteweg-de Vries, Navier-Stokes, etc.)
@@ -165,7 +165,7 @@ paper](https://arxiv.org/abs/2102.01010)) require a coarse solvers to be
 of diverted chain training also requires the fine solver to be differentiable.
 Even for applications without differentiable solvers, we still have the
 **interface problem** with legacy solvers (like the *MATLAB* ones). Hence, we
-cannot easily query them "on-the-fly" for sth like active learning tasks, nor do
+cannot easily query them "on-the-fly" for something like active learning tasks, nor do
 they run efficiently on hardware accelerators (GPUs, TPUs, etc.). Additionally,
 they were not designed with batch execution (in the sense of vectorized
 application) in mind which we get more or less for free by `jax.vmap`. With the

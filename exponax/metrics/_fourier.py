@@ -57,7 +57,7 @@ def fourier_aggregator(
     - `outer_exponent`: The exponent `q` the aggregated magnitudes are raised
         to. If not specified, it is set to `1/p`.
     - `low`: The lower cutoff (inclusive) frequency for filtering. If not
-        specified, it is set to `0`, meaning start it starts (including) the
+        specified, it is set to `0`, meaning it starts (including) the
         mean/zero mode.
     - `high`: The upper cutoff (inclusive) frequency for filtering. If not
         specified, it is set to `N//2 + 1`, meaning it ends (including) at the
@@ -188,7 +188,7 @@ def fourier_norm(
     - `outer_exponent`: The exponent `q` the aggregated magnitudes are raised
         to. If not specified, it is set to `1/p`.
     - `low`: The lower cutoff (inclusive) frequency for filtering. If not
-        specified, it is set to `0`, meaning start it starts (including) the
+        specified, it is set to `0`, meaning it starts (including) the
         mean/zero mode.
     - `high`: The upper cutoff (inclusive) frequency for filtering. If not
         specified, it is set to `N//2 + 1`, meaning it ends (including) at the
@@ -273,7 +273,7 @@ def fourier_MAE(
         norm of `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
     - `low`: The lower cutoff (inclusive) frequency for filtering. If not
-        specified, it is set to `0`, meaning start it starts (including) the
+        specified, it is set to `0`, meaning it starts (including) the
         mean/zero mode.
     - `high`: The upper cutoff (inclusive) frequency for filtering. If not
         specified, it is set to `N//2 + 1`, meaning it ends (including) at the
@@ -332,7 +332,7 @@ def fourier_nMAE(
         `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
     - `low`: The lower cutoff (inclusive) frequency for filtering. If not
-        specified, it is set to `0`, meaning start it starts (including) the
+        specified, it is set to `0`, meaning it starts (including) the
         mean/zero mode.
     - `high`: The upper cutoff (inclusive) frequency for filtering. If not
         specified, it is set to `N//2 + 1`, meaning it ends (including) at the
@@ -392,7 +392,7 @@ def fourier_MSE(
         norm of `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
     - `low`: The lower cutoff (inclusive) frequency for filtering. If not
-        specified, it is set to `0`, meaning start it starts (including) the
+        specified, it is set to `0`, meaning it starts (including) the
         mean/zero mode.
     - `high`: The upper cutoff (inclusive) frequency for filtering. If not
         specified, it is set to `N//2 + 1`, meaning it ends (including) at the
@@ -450,7 +450,7 @@ def fourier_nMSE(
     - `u_ref`: The reference state array. Must have the same shape as `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
     - `low`: The lower cutoff (inclusive) frequency for filtering. If not
-        specified, it is set to `0`, meaning start it starts (including) the
+        specified, it is set to `0`, meaning it starts (including) the
         mean/zero mode.
     - `high`: The upper cutoff (inclusive) frequency for filtering. If not
         specified, it is set to `N//2 + 1`, meaning it ends (including) at the
@@ -509,7 +509,7 @@ def fourier_RMSE(
         `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
     - `low`: The lower cutoff (inclusive) frequency for filtering. If not
-        specified, it is set to `0`, meaning start it starts (including) the
+        specified, it is set to `0`, meaning it starts (including) the
         mean/zero mode.
     - `high`: The upper cutoff (inclusive) frequency for filtering. If not
         specified, it is set to `N//2 + 1`, meaning it ends (including) at the
@@ -567,7 +567,7 @@ def fourier_nRMSE(
     - `u_ref`: The reference state array. Must have the same shape as `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
     - `low`: The lower cutoff (inclusive) frequency for filtering. If not
-        specified, it is set to `0`, meaning start it starts (including) the
+        specified, it is set to `0`, meaning it starts (including) the
         mean/zero mode.
     - `high`: The upper cutoff (inclusive) frequency for filtering. If not
         specified, it is set to `N//2 + 1`, meaning it ends (including) at the

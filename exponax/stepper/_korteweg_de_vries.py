@@ -75,7 +75,7 @@ class KortewegDeVries(BaseStepper):
         displaced but having an unchanged shape and propagation speed. If either
         the `diffusivity` or the `hyper_diffusivity` is non-zero (by default,
         the latter is active), the solution will decay over time with the
-        produced small-scall features decaying the fastest.
+        produced small-scale features decaying the fastest.
 
         **Arguments:**
 
