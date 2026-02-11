@@ -28,6 +28,50 @@ initial condition. This might be different for **(N)onlinear** problems, which
 can produce higher modes and can become unresolved. This can lead to instability
 in the simulation, which might require stronger diffusion or substepping.
 
+## How the Equations Relate
+
+The following diagram shows how the concrete PDEs in Exponax are composed from
+building blocks. Diffusion is the central ingredient that appears in almost
+every equation. Each arrow indicates what term is added (or changed) to obtain
+a more complex equation.
+
+```mermaid
+graph TD
+    Adv["Advection<br/><small>c ∂ₓu</small>"]
+    Diff["Diffusion<br/><small>ν ∂ₓₓu</small>"]
+    Disp["Dispersion<br/><small>ξ ∂ₓₓₓu</small>"]
+    Hyp["Hyper-Diffusion<br/><small>−μ ∂ₓₓₓₓu</small>"]
+
+    Adv -->|"+ Diffusion"| AD["Advection-<br/>Diffusion"]
+
+    Diff -->|"+ Convection"| B["Burgers"]
+    B -->|"+ Dispersion<br/>+ Hyper-Diff."| KdV["Korteweg-<br/>de Vries"]
+
+    KSC["KS<br/>Conservative"]
+    KS["KS<br/>Combustion"]
+    B -..->|"flip Diff. &<br/>Hyper-Diff. signs"| KSC
+    KSC -..->|"Convection →<br/>Gradient Norm"| KS
+
+    Diff -->|"+ Vort. Conv.<br/>(2D only)"| NS["Navier-Stokes"]
+    NS -->|"+ Drag<br/>+ Forcing"| KF["Kolmogorov<br/>Flow"]
+
+    Diff -->|"+ u(1−u)"| Fisher["Fisher-KPP"]
+    Diff -->|"+ c₁u + c₃u³"| AC["Allen-Cahn"]
+    Diff -->|"+ Δ(c₃u³ + c₁u)"| CH["Cahn-Hilliard"]
+    Diff -->|"+ (k+Δ)²u + g(u)"| SH["Swift-<br/>Hohenberg"]
+    Diff -->|"+ 2-species rxn"| GS["Gray-Scott"]
+
+    classDef linear fill:#D4F2B6,stroke:#6a9c3a,color:#2e5a00
+    classDef nonlinear fill:#F2D4D4,stroke:#c47070,color:#6b1a1a
+    classDef reaction fill:#F1F2E1,stroke:#a0a170,color:#4a4b20
+    classDef vorticity fill:#f3e5f5,stroke:#7b1fa2,color:#4a148c
+
+    class Adv,Diff,Disp,Hyp,AD linear
+    class B,KdV,KSC,KS nonlinear
+    class NS,KF vorticity
+    class Fisher,AC,CH,SH,GS reaction
+```
+
 ## Concrete Steppers
 
 The following table provides an overview of all concrete PDE steppers available
@@ -90,6 +134,50 @@ separate rows below. In 1D, the isotropic and anisotropic forms are identical.
 
 Beyond the concrete steppers, Exponax provides **generic steppers** that allow
 flexibly defining a wide range of dynamics by providing arbitrary coefficients.
+Each generic stepper family generalizes a group of concrete steppers by replacing
+specific coefficients with arbitrary ones.
+
+```mermaid
+graph LR
+    subgraph GL["<b>GeneralLinearStepper</b>"]
+        direction LR
+        A1["Advection"]
+        A2["Diffusion"]
+        A3["Adv.-Diff."]
+        A4["Dispersion"]
+        A5["Hyper-Diff."]
+    end
+
+    subgraph GC["<b>GeneralConvectionStepper</b>"]
+        direction LR
+        B1["Burgers"]
+        B2["KdV"]
+        B3["KS Cons."]
+    end
+
+    subgraph GGN["<b>GeneralGradientNormStepper</b>"]
+        C1["KS Combustion"]
+    end
+
+    subgraph GP["<b>GeneralPolynomialStepper</b>"]
+        direction LR
+        D1["Fisher-KPP"]
+        D2["Allen-Cahn"]
+        D3["Swift-Hohenberg"]
+    end
+
+    subgraph GVC["<b>GeneralVorticityConvectionStepper</b><br/>(2D only)"]
+        direction LR
+        E1["Navier-Stokes"]
+        E2["Kolmogorov Flow"]
+    end
+
+    GN["<b>GeneralNonlinearStepper</b><br/><small>encompasses single-channel, isotropic<br/>versions of Linear, Convection,<br/>and Gradient Norm families</small>"]
+
+    GN -.-> GL
+    GN -.-> GC
+    GN -.-> GGN
+```
 
 There are **three interfaces** for each generic stepper family:
 
