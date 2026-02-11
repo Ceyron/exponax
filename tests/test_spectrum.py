@@ -245,3 +245,169 @@ def test_parseval_3d_random():
     spectrum = ex.get_spectrum(u, power=True, radial_binning="sum")
     energy = 0.5 * jnp.mean(u**2)
     assert float(jnp.sum(spectrum)) == pytest.approx(float(energy), rel=1e-3)
+
+
+# ---------------------------------------------------------------------------
+# Radial binning: "average" vs "sum"
+# ---------------------------------------------------------------------------
+
+
+def test_binning_average_vs_sum_1d():
+    """In 1D there is no radial binning, so average and sum should agree."""
+    N = 64
+    grid = ex.make_grid(1, 2 * jnp.pi, N)
+    u = 3.0 * jnp.sin(grid) + 2.0 * jnp.cos(5 * grid)
+
+    spec_sum = ex.get_spectrum(u, power=True, radial_binning="sum")
+    spec_avg = ex.get_spectrum(u, power=True, radial_binning="average")
+    assert jnp.allclose(spec_sum, spec_avg)
+
+
+def test_binning_average_vs_sum_2d():
+    """Verify that sum = mode_count * average for each radial bin in 2D.
+
+    The mode count per bin is computed directly from the wavenumber mesh and
+    should approximately scale as 2*pi*k (shell circumference) for large k.
+    """
+    N = 32
+
+    # Compute the exact mode count per radial bin from the wavenumber mesh
+    wavenumbers_mesh = ex._spectral.build_wavenumbers(2, N)
+    wavenumbers_norm = jnp.linalg.norm(wavenumbers_mesh, axis=0)
+    wavenumbers_1d = jnp.arange(N // 2 + 1, dtype=float)
+
+    mode_count = jnp.zeros(N // 2 + 1)
+    for i, k in enumerate(wavenumbers_1d):
+        mask = (wavenumbers_norm >= k - 0.5) & (wavenumbers_norm < k + 0.5)
+        mode_count = mode_count.at[i].set(jnp.sum(mask))
+
+    # Use a low-pass filtered random field so all bins within the Nyquist
+    # sphere are populated
+    key = jax.random.PRNGKey(0)
+    u_hat = jax.random.normal(key, shape=(1, N, N // 2 + 1)) + 1j * jax.random.normal(
+        jax.random.PRNGKey(1), shape=(1, N, N // 2 + 1)
+    )
+    mask = ex._spectral.low_pass_filter_mask(2, N, cutoff=N // 2, axis_separate=False)
+    u_hat = u_hat * mask
+    u = ex.ifft(u_hat, num_spatial_dims=2, num_points=N)
+
+    spec_sum = ex.get_spectrum(u, power=True, radial_binning="sum")
+    spec_avg = ex.get_spectrum(u, power=True, radial_binning="average")
+
+    # For every bin with modes, verify sum == mode_count * average
+    for k in range(N // 2 + 1):
+        if mode_count[k] > 0 and float(spec_avg[0, k]) > 1e-10:
+            ratio = float(spec_sum[0, k] / spec_avg[0, k])
+            assert ratio == pytest.approx(float(mode_count[k]), rel=1e-4), (
+                f"Bin {k}: ratio={ratio}, expected mode_count={int(mode_count[k])}"
+            )
+
+    # Sanity check: at large k the mode count should approach pi*k
+    # (half of the full 2*pi*k because the rfft grid only stores k_last >= 0)
+    large_k = jnp.arange(5, N // 4)
+    expected_surface = jnp.pi * large_k
+    actual_counts = mode_count[5 : N // 4]
+    assert jnp.allclose(actual_counts, expected_surface, rtol=0.2)
+
+
+# ---------------------------------------------------------------------------
+# rfft compensation: spectrum should be the same regardless of which spatial
+# axis carries the mode (the rfft axis vs. the full-fft axes)
+# ---------------------------------------------------------------------------
+
+
+def test_rfft_axis_symmetry_2d():
+    """A cosine along axis 0 (full fft) and axis 1 (rfft) with the same
+    wavenumber should produce the same spectrum."""
+    N = 32
+    grid = ex.make_grid(2, 2 * jnp.pi, N)
+
+    u_axis0 = 4.0 * jnp.cos(3 * grid[0:1])
+    u_axis1 = 4.0 * jnp.cos(3 * grid[1:2])
+
+    spec0 = ex.get_spectrum(u_axis0, power=True)
+    spec1 = ex.get_spectrum(u_axis1, power=True)
+    assert jnp.allclose(spec0, spec1, atol=1e-5)
+
+
+def test_rfft_axis_symmetry_3d():
+    """Same test in 3D: a cosine along each of the three axes should give
+    identical spectra."""
+    N = 16
+    grid = ex.make_grid(3, 2 * jnp.pi, N)
+
+    spectra = []
+    for axis in range(3):
+        u = 4.0 * jnp.cos(3 * grid[axis : axis + 1])
+        spectra.append(ex.get_spectrum(u, power=True))
+
+    assert jnp.allclose(spectra[0], spectra[1], atol=1e-4)
+    assert jnp.allclose(spectra[0], spectra[2], atol=1e-4)
+
+
+# ---------------------------------------------------------------------------
+# Multi-channel
+# ---------------------------------------------------------------------------
+
+
+def test_multi_channel():
+    """Each channel should get its own independent spectrum."""
+    N = 64
+    grid = ex.make_grid(1, 2 * jnp.pi, N)
+
+    # Channel 0: amplitude 3 at wavenumber 2
+    # Channel 1: amplitude 5 at wavenumber 7
+    u = jnp.concatenate([3.0 * jnp.cos(2 * grid), 5.0 * jnp.sin(7 * grid)], axis=0)
+    assert u.shape == (2, N)
+
+    spectrum = ex.get_spectrum(u, power=False)
+    assert spectrum.shape == (2, N // 2 + 1)
+    assert spectrum[0, 2] == pytest.approx(3.0)
+    assert spectrum[1, 7] == pytest.approx(5.0)
+    # Cross-check: channel 0 should have nothing at wavenumber 7 and vice versa
+    assert spectrum[0, 7] == pytest.approx(0.0, abs=1e-5)
+    assert spectrum[1, 2] == pytest.approx(0.0, abs=1e-5)
+
+
+def test_multi_channel_2d():
+    """Multi-channel in 2D."""
+    N = 32
+    grid = ex.make_grid(2, 2 * jnp.pi, N)
+
+    u = jnp.concatenate(
+        [3.0 * jnp.cos(2 * grid[0:1]), 5.0 * jnp.sin(4 * grid[1:2])], axis=0
+    )
+    assert u.shape == (2, N, N)
+
+    spectrum = ex.get_spectrum(u, power=False)
+    assert spectrum.shape == (2, N // 2 + 1)
+    assert spectrum[0, 2] == pytest.approx(3.0, abs=1e-4)
+    assert spectrum[1, 4] == pytest.approx(5.0, abs=1e-4)
+
+
+# ---------------------------------------------------------------------------
+# Edge cases
+# ---------------------------------------------------------------------------
+
+
+def test_zero_field():
+    """Spectrum of a zero field should be all zeros."""
+    for ndim in [1, 2, 3]:
+        N = 16
+        shape = (1,) + (N,) * ndim
+        u = jnp.zeros(shape)
+        spectrum = ex.get_spectrum(u, power=True)
+        assert jnp.allclose(spectrum, 0.0)
+        spectrum = ex.get_spectrum(u, power=False)
+        assert jnp.allclose(spectrum, 0.0)
+
+
+def test_output_shape():
+    """Verify spectrum output shape is (C, N//2+1) regardless of spatial dims."""
+    for ndim in [1, 2, 3]:
+        N = 16
+        C = 3
+        shape = (C,) + (N,) * ndim
+        u = jnp.ones(shape)
+        spectrum = ex.get_spectrum(u, power=True)
+        assert spectrum.shape == (C, N // 2 + 1)
