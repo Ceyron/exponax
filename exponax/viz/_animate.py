@@ -44,8 +44,8 @@ def animate_state_1d(
     - `dt`: The time step between each frame. Default is `None`. If provided,
         a title will be displayed with the current time. If not provided, just
         the frames are counted.
-    - `include_init`: Whether to the state starts at an initial condition (t=0)
-        or at the first frame in the trajectory. This affects is the the time
+    - `include_init`: Whether the state starts at an initial condition (t=0)
+        or at the first frame in the trajectory. This affects whether the time
         range is [0, (T-1)dt] or [dt, Tdt]. Default is `False`.
     - `**kwargs`: Additional keyword arguments to pass to the plotting function.
 
@@ -124,8 +124,8 @@ def animate_spatio_temporal(
     - `dt`: The time step between each frame. Default is `None`. If provided,
         a title will be displayed with the current time. If not provided, just
         the frames are counted.
-    - `include_init`: Whether to the state starts at an initial condition (t=0)
-        or at the first frame in the trajectory. This affects is the the time
+    - `include_init`: Whether the state starts at an initial condition (t=0)
+        or at the first frame in the trajectory. This affects whether the time
         range is [0, (T-1)dt] or [dt, Tdt]. Default is `False`.
     - `**kwargs`: Additional keyword arguments to pass to the plotting function.
 
@@ -200,8 +200,8 @@ def animate_state_2d(
     - `dt`: The time step between each frame. Default is `None`. If provided,
         a title will be displayed with the current time. If not provided, just
         the frames are counted.
-    - `include_init`: Whether to the state starts at an initial condition (t=0)
-        or at the first frame in the trajectory. This affects is the the time
+    - `include_init`: Whether the state starts at an initial condition (t=0)
+        or at the first frame in the trajectory. This affects whether the time
         range is [0, (T-1)dt] or [dt, Tdt]. Default is `False`.
     - `**kwargs`: Additional keyword arguments to pass to the plotting function.
 
@@ -286,8 +286,8 @@ def animate_state_3d(
     - `dt`: The time step between each frame. Default is `None`. If provided,
         a title will be displayed with the current time. If not provided, just
         the frames are counted.
-    - `include_init`: Whether to the state starts at an initial condition (t=0)
-        or at the first frame in the trajectory. This affects is the the time
+    - `include_init`: Whether the state starts at an initial condition (t=0)
+        or at the first frame in the trajectory. This affects whether the time
         range is [0, (T-1)dt] or [dt, Tdt]. Default is `False`.
     - `bg_color`: The background color. Either `"black"`, `"white"`, or a tuple
         of RGBA values. Default is `"white"`.

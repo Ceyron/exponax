@@ -54,7 +54,7 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
         The generalization to higher dimensions includes mixed terms and is not
         that straightforward to write down.
 
-        Offsets are drawn accoriding to a uniform distribution in the range
+        Offsets are drawn according to a uniform distribution in the range
         `offset_range`. Amplitudes are drawn according to a uniform distribution
         in the range `amplitude_range`. Angles (=angular offsets) are drawn
         according to a uniform distribution in the range `angle_range`.

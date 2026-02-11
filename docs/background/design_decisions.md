@@ -60,7 +60,7 @@ Both the linear and the non-linear operator are real-valued.
 ### Most pre-defined steppers have isotropic linear operators (C)
 
 * Eases the interface
-* One can implement its own custom time stepper. `Exponax` supports anistropy
+* One can implement its own custom time stepper. `Exponax` supports anisotropy
   (=spatial mixing) but does **not** support channel mixing in the linear
   operator. However, channel mixing in the non-linear operator is fine!
 
@@ -93,7 +93,7 @@ the [Equinox](https://github.com/patrick-kidger/equinox) philosophy.
 
 ### There are no custom grid or state classes (C)
 
-* Lean design that only focuses on JAX Arrays and PyTrees allows for tigher
+* Lean design that only focuses on JAX Arrays and PyTrees allows for tighter
   integration with other libraries in the JAX ecosystem.
 
 ### There is no `jax.jit` being used in the package (C)

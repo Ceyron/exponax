@@ -37,7 +37,7 @@ class NavierStokesVorticity(BaseStepper):
         with `u` the vorticity. On the right-hand side the first term is a drag
         with coefficient `λ` and the second term is a diffusion with coefficient
         `ν`. The operation on the left-hand-side `([1, -1]ᵀ ⊙ ∇(Δ⁻¹u)) ⋅ ∇u` is
-        the "vorticity" convection which is scale by `b`. It consists of the
+        the "vorticity" convection which is scaled by `b`. It consists of the
         solution to the Poisson problem via the inverse Laplacian `Δ⁻¹` and the
         gradient `∇` of the streamfunction. The term `[1, -1]ᵀ ⊙` negates the
         second component of the gradient.
@@ -87,7 +87,7 @@ class NavierStokesVorticity(BaseStepper):
 
         **Notes:**
 
-        - The Reynolds number is measure of whether the problem is dominated
+        - The Reynolds number is a measure of whether the problem is dominated
             by diffusive or convective effects. The higher the Reynolds number,
             the stronger the effect of the convective. Since this term is the
             nonlinear one, the higher the Reynolds number, the worse the ETDRK

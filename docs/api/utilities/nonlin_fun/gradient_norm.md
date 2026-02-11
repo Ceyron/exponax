@@ -1,4 +1,4 @@
-# Gradien Norm Nonlinear Functions
+# Gradient Norm Nonlinear Functions
 
 ::: exponax.nonlin_fun.GradientNormNonlinearFun
     options:

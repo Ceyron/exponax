@@ -1,4 +1,4 @@
-:::exponax.BaseStepper
+::: exponax.BaseStepper
     options:
         members:
             - __init__

@@ -61,7 +61,7 @@ considered isotropic and with the convection in single-channel).
 
 Hence, almost every (isotropic) dynamic can be expressed with the general
 steppers. The specific steppers are provided for convenience and easier
-accessiblity for new users. Additinally, some of them also support anisotropic
+accessibility for new users. Additionally, some of them also support anisotropic
 modes for the linear terms.
 """
 

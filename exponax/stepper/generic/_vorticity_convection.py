@@ -76,7 +76,7 @@ class GeneralVorticityConvectionStepper(BaseStepper):
             2, 3, 4}. The option `0` only solves the linear part of the
             equation. Hence, only use this for linear PDEs. For nonlinear PDEs,
             a higher order method tends to be more stable and accurate. `2` is
-            often a good compromis in single-precision. Use `4` together with
+            often a good compromise in single-precision. Use `4` together with
             double precision (`jax.config.update("jax_enable_x64", True)`) for
             highest accuracy.
         - `num_circle_points`: How many points to use in the complex contour

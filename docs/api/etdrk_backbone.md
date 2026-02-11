@@ -1,6 +1,6 @@
 # ETDRK Backbone
 
-Core clases that implement the Exponential Time Differencing Runge-Kutta (ETDRK)
+Core classes that implement the Exponential Time Differencing Runge-Kutta (ETDRK)
 method for solving semi-linear PDEs in form of timesteppers. Require supplying
 the time step size $\Delta t$, the linear operator in Fourier space $\hat{\mathcal{L}}_h$, and the non-linear operator in Fourier space $\hat{\mathcal{N}}_h$.
 

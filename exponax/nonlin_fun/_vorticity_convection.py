@@ -115,7 +115,7 @@ class VorticityConvection2dKolmogorov(VorticityConvection2d):
     ):
         """
         Performs a pseudo-spectral evaluation of the nonlinear vorticity
-        convection together with a Kolmorogov-like injection term, e.g., found
+        convection together with a Kolmogorov-like injection term, e.g., found
         in the 2d Navier-Stokes equations in streamfunction-vorticity
         formulation used for simulating a Kolmogorov flow.
 

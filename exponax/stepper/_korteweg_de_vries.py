@@ -48,7 +48,7 @@ class KortewegDeVries(BaseStepper):
         In 1d, the Korteweg-de Vries equation is given by
 
         ```
-            uₜ + b₁ 1/2 (u²)ₓ + a₃ uₓₓₓ = ν uₓₓ - μ uₓₓₓₓ
+            uₜ + b₁ 1/2 (u²)ₓ + a₃ uₓₓₓ = ν uₓₓ - ζ uₓₓₓₓ
         ```
 
         with `b₁` the convection coefficient, `a₃` the dispersion coefficient
@@ -58,7 +58,7 @@ class KortewegDeVries(BaseStepper):
         dimensions, the equation reads (using vector format for the channels)
 
         ```
-            uₜ + b₁ 1/2 ∇ ⋅ (u ⊗ u) + a₃ 1 ⋅ (∇⊙∇⊙(∇u)) = ν Δu - μ ((∇⊙∇) ⋅ (∇⊙∇)) u
+            uₜ + b₁ 1/2 ∇ ⋅ (u ⊗ u) + a₃ 1 ⋅ (∇⊙∇⊙(∇u)) = ν Δu - ζ ((∇⊙∇) ⋅ (∇⊙∇)) u
         ```
 
         or
@@ -75,7 +75,7 @@ class KortewegDeVries(BaseStepper):
         displaced but having an unchanged shape and propagation speed. If either
         the `diffusivity` or the `hyper_diffusivity` is non-zero (by default,
         the latter is active), the solution will decay over time with the
-        produced small-scall features decaying the fastest.
+        produced small-scale features decaying the fastest.
 
         **Arguments:**
 
@@ -134,7 +134,7 @@ class KortewegDeVries(BaseStepper):
 
         **Good Values:**
 
-        - There is an anlytical solution to the (inviscid, `ν = 0`) KdV of
+        - There is an analytical solution to the (inviscid, `ν = 0`) KdV of
             `u(t, x) = - 1/2 c^2 sech^2(c/2 (x - ct - a))` with the hyperbolic
             secant `sech` and arbitrarily selected speed `c` and shift `a`.
         - For a nice simulation with an initial condition that breaks into
@@ -178,7 +178,7 @@ class KortewegDeVries(BaseStepper):
         if self.advect_over_diffuse:
             dispersion_operator = (
                 -build_gradient_inner_product_operator(
-                    derivative_operator, self.advect_over_diffuse_dispersivity, order=1
+                    derivative_operator, dispersion_velocity, order=1
                 )
                 * laplace_operator
             )

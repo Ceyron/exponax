@@ -43,7 +43,7 @@ class GeneralNonlinearFun(BaseNonlinearFun):
             In contrast to the individual nonlinear functions
             `exponax.nonlin_fun.ConvectionNonlinearFun` and
             `exponax.nonlin_fun.GradientNormNonlinearFun`, there is no minus.
-            Hence, to have a "propoper" convection term, consider supplying a
+            Hence, to have a "proper" convection term, consider supplying a
             negative scale for the convection term, etc.
 
         **Arguments**:

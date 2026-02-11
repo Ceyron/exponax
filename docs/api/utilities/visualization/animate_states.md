@@ -1,6 +1,6 @@
 # Animate States
 
-Visualizes trajectories of states in 1d, 2d, or 3d via an animation of their respective [plot_states]()
+Visualizes trajectories of states in 1d, 2d, or 3d via an animation of their respective plot functions.
 
 ::: exponax.viz.animate_state_1d
 

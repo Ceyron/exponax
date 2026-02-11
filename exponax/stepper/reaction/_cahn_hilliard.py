@@ -67,7 +67,7 @@ class CahnHilliard(BaseStepper):
         is related to the Allen-Cahn equation. In 1d, it reads
 
         ```
-            uₜ = ν ∂ₓₓ (c₃ u³ + c₁ u − γ uₓₓ)
+            uₜ = ν ∂ₓₓ (c₃ u³ + c₁ u - γ uₓₓ)
         ```
 
         with `ν` the diffusivity, `c₁` the first order coefficient, `c₃` the

@@ -1,3 +1,4 @@
+import warnings
 from typing import TypeVar
 
 import jax.numpy as jnp
@@ -50,7 +51,7 @@ class GeneralLinearStepper(BaseStepper):
         collection of second derivatives (=Laplace operator), etc.
 
         The interface to this general stepper is the list of coefficients
-        containing the `a_j`. Its length determines the highes occuring order of
+        containing the `a_j`. Its length determines the highest occuring order of
         derivative. Note that this list starts at zero. If only one specific
         linear term is wanted, have all prior coefficients set to zero.
 
@@ -97,14 +98,14 @@ class GeneralLinearStepper(BaseStepper):
                 effect continues for higher orders with the dependency on
                 the wavenumber becoming continuously stronger.
         - Take care of the signs of coefficients. In contrast to the
-            indivial linear steppers ([`exponax.stepper.Advection`][],
+            individual linear steppers ([`exponax.stepper.Advection`][],
             [`exponax.stepper.Diffusion`][], etc.), the signs are not
             automatically taken care of to produce meaningful coefficients.
             For the general linear stepper all linear derivatives are on the
             right-hand side of the equation. This has the following effect
             based on the order of derivative (this a consequence of squaring
             the imaginary unit returning -1):
-            - Zeroth-Order: A negative coeffcient is a drag and removes
+            - Zeroth-Order: A negative coefficient is a drag and removes
                 energy from the system. A positive coefficient adds energy
                 to the system.
             - First-Order: A negative coefficient rotates the solution
@@ -205,7 +206,7 @@ class NormalizedLinearStepper(GeneralLinearStepper):
 
         Take care of the signs!
 
-        In the defaulf configuration of this timestepper, the PDE is an
+        In the default configuration of this timestepper, the PDE is an
         advection-diffusion equation with normalized advection of 0.5 and
         normalized diffusion of 0.01.
 
@@ -292,7 +293,7 @@ class DifficultyLinearStepper(NormalizedLinearStepper):
         )
 
 
-class DiffultyLinearStepperSimple(DifficultyLinearStepper):
+class DifficultyLinearStepperSimple(DifficultyLinearStepper):
     def __init__(
         self,
         num_spatial_dims: int = 1,
@@ -325,3 +326,14 @@ class DiffultyLinearStepperSimple(DifficultyLinearStepper):
             num_spatial_dims=num_spatial_dims,
             num_points=num_points,
         )
+
+
+def DiffultyLinearStepperSimple(*args, **kwargs):
+    """Deprecated: Use `DifficultyLinearStepperSimple` instead."""
+    warnings.warn(
+        "`DiffultyLinearStepperSimple` is deprecated due to a typo. "
+        "Use `DifficultyLinearStepperSimple` instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return DifficultyLinearStepperSimple(*args, **kwargs)

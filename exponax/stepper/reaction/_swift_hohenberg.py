@@ -50,7 +50,7 @@ class SwiftHohenberg(BaseStepper):
         with `cᵢ` the polynomial coefficients.
 
         The state only has one channel, no matter the spatial dimension. The
-        higher dimensional generarlization reads
+        higher dimensional generalization reads
 
         ```
             uₜ = r u - (k + Δ)² u + g(u)

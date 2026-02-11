@@ -72,7 +72,8 @@ class GrayScott(BaseStepper):
         """
         Timestepper for the d-dimensional (`d ∈ {1, 2, 3}`) Gray-Scott reaction
         diffusion equation on periodic boundary conditions. This
-        reaction-diffusion models the interaction of two chemical species u & v.
+        reaction-diffusion equation models the interaction of two chemical
+        species u & v.
 
         In 1d, the Gray-Scott equation is given by
 

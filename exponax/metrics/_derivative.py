@@ -19,7 +19,7 @@ def H1_MAE(
     high: int | None = None,
 ) -> float:
     """
-    Compute the mean abolute error associated with the H1 norm, i.e., the MAE
+    Compute the mean absolute error associated with the H1 norm, i.e., the MAE
     across state and all its first derivatives.
 
     This is **not** consistent with the H1 norm because it uses a Fourier-based
@@ -45,7 +45,7 @@ def H1_MAE(
         norm of `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
     - `low`: The lower cutoff (inclusive) frequency for filtering. If not
-        specified, it is set to `0`, meaning start it starts (including) the
+        specified, it is set to `0`, meaning it starts (including) the
         mean/zero mode.
     - `high`: The upper cutoff (inclusive) frequency for filtering. If not
         specified, it is set to `N//2 + 1`, meaning it ends (including) at the
@@ -79,7 +79,7 @@ def H1_nMAE(
     high: int | None = None,
 ) -> float:
     """
-    Compute the normalized mean abolute error associated with the H1 norm, i.e.,
+    Compute the normalized mean absolute error associated with the H1 norm, i.e.,
     the nMAE across state and all its first derivatives.
 
     This is **not** consistent with the H1 norm because it uses a Fourier-based
@@ -103,7 +103,7 @@ def H1_nMAE(
         `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
     - `low`: The lower cutoff (inclusive) frequency for filtering. If not
-        specified, it is set to `0`, meaning start it starts (including) the
+        specified, it is set to `0`, meaning it starts (including) the
         mean/zero mode.
     - `high`: The upper cutoff (inclusive) frequency for filtering. If not
         specified, it is set to `N//2 + 1`, meaning it ends (including) at the
@@ -163,7 +163,7 @@ def H1_MSE(
         norm of `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
     - `low`: The lower cutoff (inclusive) frequency for filtering. If not
-        specified, it is set to `0`, meaning start it starts (including) the
+        specified, it is set to `0`, meaning it starts (including) the
         mean/zero mode.
     - `high`: The upper cutoff (inclusive) frequency for filtering. If not
         specified, it is set to `N//2 + 1`, meaning it ends (including) at the
@@ -222,7 +222,7 @@ def H1_nMSE(
         `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
     - `low`: The lower cutoff (inclusive) frequency for filtering. If not
-        specified, it is set to `0`, meaning start it starts (including) the
+        specified, it is set to `0`, meaning it starts (including) the
         mean/zero mode.
     - `high`: The upper cutoff (inclusive) frequency for filtering. If not
         specified, it is set to `N//2 + 1`, meaning it ends (including) at the
@@ -282,7 +282,7 @@ def H1_RMSE(
         norm of `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
     - `low`: The lower cutoff (inclusive) frequency for filtering. If not
-        specified, it is set to `0`, meaning start it starts (including) the
+        specified, it is set to `0`, meaning it starts (including) the
         mean/zero mode.
     - `high`: The upper cutoff (inclusive) frequency for filtering. If not
         specified, it is set to `N//2 + 1`, meaning it ends (including) at the
@@ -341,7 +341,7 @@ def H1_nRMSE(
         `u_pred`.
     - `domain_extent`: The extent `L` of the domain `Ω = (0, L)ᴰ`.
     - `low`: The lower cutoff (inclusive) frequency for filtering. If not
-        specified, it is set to `0`, meaning start it starts (including) the
+        specified, it is set to `0`, meaning it starts (including) the
         mean/zero mode.
     - `high`: The upper cutoff (inclusive) frequency for filtering. If not
         specified, it is set to `N//2 + 1`, meaning it ends (including) at the

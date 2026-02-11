@@ -1,4 +1,4 @@
-# Cahn-Hilliad
+# Cahn-Hilliard
 
 ::: exponax.stepper.reaction.CahnHilliard
     options:

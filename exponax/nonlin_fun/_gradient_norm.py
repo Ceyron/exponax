@@ -92,7 +92,7 @@ class GradientNormNonlinearFun(BaseNonlinearFun):
         u_gradient_norm_squared = jnp.sum(u_gradient**2, axis=1)
 
         if self.zero_mode_fix:
-            # Maybe there is more efficient way
+            # Maybe there is a more efficient way
             u_gradient_norm_squared = jax.vmap(self.zero_fix)(u_gradient_norm_squared)
 
         u_gradient_norm_squared_hat = 0.5 * self.fft(u_gradient_norm_squared)
