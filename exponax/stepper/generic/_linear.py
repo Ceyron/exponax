@@ -1,3 +1,4 @@
+import warnings
 from typing import TypeVar
 
 import jax.numpy as jnp
@@ -292,7 +293,7 @@ class DifficultyLinearStepper(NormalizedLinearStepper):
         )
 
 
-class DiffultyLinearStepperSimple(DifficultyLinearStepper):
+class DifficultyLinearStepperSimple(DifficultyLinearStepper):
     def __init__(
         self,
         num_spatial_dims: int = 1,
@@ -325,3 +326,14 @@ class DiffultyLinearStepperSimple(DifficultyLinearStepper):
             num_spatial_dims=num_spatial_dims,
             num_points=num_points,
         )
+
+
+def DiffultyLinearStepperSimple(*args, **kwargs):
+    """Deprecated: Use `DifficultyLinearStepperSimple` instead."""
+    warnings.warn(
+        "`DiffultyLinearStepperSimple` is deprecated due to a typo. "
+        "Use `DifficultyLinearStepperSimple` instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return DifficultyLinearStepperSimple(*args, **kwargs)
