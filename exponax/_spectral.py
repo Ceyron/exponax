@@ -948,21 +948,28 @@ def get_spectrum(
     num_spatial_dims = state.ndim - 1
     num_points = state.shape[-1]
 
-    state_hat = fft(state, num_spatial_dims=num_spatial_dims)
-    state_hat_scaled = state_hat / build_scaling_array(
+    state_hat_abs = jnp.abs(fft(state, num_spatial_dims=num_spatial_dims))
+    magnitude = state_hat_abs / build_scaling_array(
         num_spatial_dims,
         num_points,
-        mode="reconstruction",  # because of rfft
+        mode="reconstruction",
     )
 
     if power:
-        magnitude = 0.5 * jnp.abs(state_hat_scaled) ** 2
+        magnitude_norm_compensated = state_hat_abs / build_scaling_array(
+            num_spatial_dims,
+            num_points,
+            mode="norm_compensation",
+        )
+
+        # Compute Power
+        quantity = 0.5 * magnitude * magnitude_norm_compensated
     else:
-        magnitude = jnp.abs(state_hat_scaled)
+        quantity = magnitude
 
     if num_spatial_dims == 1:
         # 1D does not need any binning and can be returned directly
-        return magnitude
+        return quantity
 
     wavenumbers_mesh = build_wavenumbers(num_spatial_dims, num_points)
     wavenumbers_1d = build_wavenumbers(1, num_points)
@@ -984,7 +991,7 @@ def get_spectrum(
             return jnp.nansum(p, where=mask)
 
     def scan_fn(_, k):
-        return None, jax.vmap(power_in_bucket, in_axes=(0, None))(magnitude, k)
+        return None, jax.vmap(power_in_bucket, in_axes=(0, None))(quantity, k)
 
     _, spectrum = jax.lax.scan(scan_fn, None, wavenumbers_1d[0, :])
 
