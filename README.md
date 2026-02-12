@@ -197,12 +197,14 @@ This package is greatly inspired by the
 [`spinX`](https://www.chebfun.org/docs/guide/guide19.html) module of the
 [ChebFun](https://www.chebfun.org/) package in *MATLAB*. `spinX` served as a
 reliable data generator for early works in physics-based deep learning, e.g.,
-[DeepHiddenPhysics](https://github.com/maziarraissi/DeepHPMs) and [Fourier
-Neural Operators](https://github.com/neuraloperator/neuraloperator). However,
-due to the two-language barrier, dynamically calling *MATLAB* solvers from
-Python-based deep learning workflows is hard to impossible. This also excludes
-the option to differentiate through them — ruling out differentiable-physics
-approaches like solver-in-the-loop correction or diverted-chain training.
+[DeepHiddenPhysics](https://github.com/maziarraissi/DeepHPMs/tree/7b579dbdcf5be4969ebefd32e65f709a8b20ec44/Matlab)
+and [Fourier Neural
+Operators](https://github.com/neuraloperator/neuraloperator/tree/af93f781d5e013f8ba5c52baa547f2ada304ffb0/data_generation).
+However, due to the two-language barrier, dynamically calling *MATLAB* solvers
+from Python-based deep learning workflows is hard to impossible. This also
+excludes the option to differentiate through them — ruling out
+differentiable-physics approaches like solver-in-the-loop correction or
+diverted-chain training.
 
 We view `Exponax` as a spiritual successor of `spinX`. JAX, as the
 computational backend, elevates the power of this solver type with automatic
