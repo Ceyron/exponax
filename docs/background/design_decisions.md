@@ -112,8 +112,8 @@ Both the linear and the non-linear operator are real-valued.
 
 * Eases the interface. See the [stepper overview](../api/stepper/overview.md)
   for the full list of available steppers. Some steppers like
-  [Advection](../api/stepper/advection.md) and
-  [Diffusion](../api/stepper/diffusion.md) allow for anisotropy in higher
+  [Advection](../api/stepper/linear/advection.md) and
+  [Diffusion](../api/stepper/linear/diffusion.md) allow for anisotropy in higher
   dimensions.
 * You can implement your own custom time stepper. `Exponax` supports anisotropy
   (=spatial mixing) but does **not** support channel mixing in the linear
