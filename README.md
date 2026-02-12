@@ -97,32 +97,32 @@ that explains the basics of `Exponax`.
 
 | Equation | Stepper | Dimensions |
 |----------|---------|------------|
-| Advection: $u_t + c \cdot \nabla u = 0$ | `Advection` | 1D, 2D, 3D |
-| Diffusion: $u_t = \nu \Delta u$ | `Diffusion` | 1D, 2D, 3D |
-| Advection-Diffusion: $u_t + c \cdot \nabla u = \nu \Delta u$ | `AdvectionDiffusion` | 1D, 2D, 3D |
-| Dispersion: $u_t = \xi \nabla^3 u$ | `Dispersion` | 1D, 2D, 3D |
-| Hyper-Diffusion: $u_t = -\zeta \Delta^2 u$ | `HyperDiffusion` | 1D, 2D, 3D |
+| Advection: $u_t + c \cdot \nabla u = 0$ | [`Advection`](https://fkoehler.site/exponax/api/stepper/linear/advection/) | 1D, 2D, 3D |
+| Diffusion: $u_t = \nu \Delta u$ | [`Diffusion`](https://fkoehler.site/exponax/api/stepper/linear/diffusion/) | 1D, 2D, 3D |
+| Advection-Diffusion: $u_t + c \cdot \nabla u = \nu \Delta u$ | [`AdvectionDiffusion`](https://fkoehler.site/exponax/api/stepper/linear/advection_diffusion/) | 1D, 2D, 3D |
+| Dispersion: $u_t = \xi \nabla^3 u$ | [`Dispersion`](https://fkoehler.site/exponax/api/stepper/linear/dispersion/) | 1D, 2D, 3D |
+| Hyper-Diffusion: $u_t = -\zeta \Delta^2 u$ | [`HyperDiffusion`](https://fkoehler.site/exponax/api/stepper/linear/hyper_diffusion/) | 1D, 2D, 3D |
 
 ### Nonlinear
 
 | Equation | Stepper | Dimensions |
 |----------|---------|------------|
-| Burgers: $u_t + \frac{1}{2} \nabla \cdot (u \otimes u) = \nu \Delta u$ | `Burgers` | 1D, 2D, 3D |
-| Korteweg-de Vries: $u_t + \frac{1}{2} \nabla \cdot (u \otimes u) - \nabla^3 u = \mu \Delta u$ | `KortewegDeVries` | 1D, 2D, 3D |
-| Kuramoto-Sivashinsky: $u_t + \frac{1}{2} \|\nabla u\|^2 + \Delta u + \Delta^2 u = 0$ | `KuramotoSivashinsky` | 1D, 2D, 3D |
-| KS (conservative): $u_t + \frac{1}{2} \nabla \cdot (u \otimes u) + \Delta u + \Delta^2 u = 0$ | `KuramotoSivashinskyConservative` | 1D, 2D, 3D |
-| Navier-Stokes (vorticity): $\omega_t + (u \cdot \nabla)\omega = \nu \Delta \omega$ | `NavierStokesVorticity` | 2D |
-| Kolmogorov Flow (vorticity): $\omega_t + (u \cdot \nabla)\omega = \nu \Delta \omega + f$ | `KolmogorovFlowVorticity` | 2D |
+| Burgers: $u_t + \frac{1}{2} \nabla \cdot (u \otimes u) = \nu \Delta u$ | [`Burgers`](https://fkoehler.site/exponax/api/stepper/nonlinear/burgers/) | 1D, 2D, 3D |
+| Korteweg-de Vries: $u_t + \frac{1}{2} \nabla \cdot (u \otimes u) - \nabla^3 u = \mu \Delta u$ | [`KortewegDeVries`](https://fkoehler.site/exponax/api/stepper/nonlinear/kdv/) | 1D, 2D, 3D |
+| Kuramoto-Sivashinsky: $u_t + \frac{1}{2} \|\nabla u\|^2 + \Delta u + \Delta^2 u = 0$ | [`KuramotoSivashinsky`](https://fkoehler.site/exponax/api/stepper/nonlinear/ks/) | 1D, 2D, 3D |
+| KS (conservative): $u_t + \frac{1}{2} \nabla \cdot (u \otimes u) + \Delta u + \Delta^2 u = 0$ | [`KuramotoSivashinskyConservative`](https://fkoehler.site/exponax/api/stepper/nonlinear/ks_cons/) | 1D, 2D, 3D |
+| Navier-Stokes (vorticity): $\omega_t + (u \cdot \nabla)\omega = \nu \Delta \omega$ | [`NavierStokesVorticity`](https://fkoehler.site/exponax/api/stepper/nonlinear/navier_stokes/) | 2D |
+| Kolmogorov Flow (vorticity): $\omega_t + (u \cdot \nabla)\omega = \nu \Delta \omega + f$ | [`KolmogorovFlowVorticity`](https://fkoehler.site/exponax/api/stepper/nonlinear/navier_stokes/) | 2D |
 
 ### Reaction-Diffusion
 
 | Equation | Stepper | Dimensions |
 |----------|---------|------------|
-| Fisher-KPP: $u_t = \nu \Delta u + r\, u(1 - u)$ | `reaction.FisherKPP` | 1D, 2D, 3D |
-| Allen-Cahn: $u_t = \nu \Delta u + c_1 u + c_3 u^3$ | `reaction.AllenCahn` | 1D, 2D, 3D |
-| Cahn-Hilliard: $u_t = \nu \Delta(u^3 + c_1 u - \gamma \Delta u)$ | `reaction.CahnHilliard` | 1D, 2D, 3D |
-| Gray-Scott: $u_t = \nu_1 \Delta u + f(1-u) - uv^2, \quad v_t = \nu_2 \Delta v - (f+k)v + uv^2$ | `reaction.GrayScott` | 1D, 2D, 3D |
-| Swift-Hohenberg: $u_t = ru - (k + \Delta)^2 u + g(u)$ | `reaction.SwiftHohenberg` | 1D, 2D, 3D |
+| Fisher-KPP: $u_t = \nu \Delta u + r\, u(1 - u)$ | [`reaction.FisherKPP`](https://fkoehler.site/exponax/api/stepper/reaction/fisher_kpp/) | 1D, 2D, 3D |
+| Allen-Cahn: $u_t = \nu \Delta u + c_1 u + c_3 u^3$ | [`reaction.AllenCahn`](https://fkoehler.site/exponax/api/stepper/reaction/allen_cahn/) | 1D, 2D, 3D |
+| Cahn-Hilliard: $u_t = \nu \Delta(u^3 + c_1 u - \gamma \Delta u)$ | [`reaction.CahnHilliard`](https://fkoehler.site/exponax/api/stepper/reaction/cahn_hilliard/) | 1D, 2D, 3D |
+| Gray-Scott: $u_t = \nu_1 \Delta u + f(1-u) - uv^2, \quad v_t = \nu_2 \Delta v - (f+k)v + uv^2$ | [`reaction.GrayScott`](https://fkoehler.site/exponax/api/stepper/reaction/gray_scott/) | 1D, 2D, 3D |
+| Swift-Hohenberg: $u_t = ru - (k + \Delta)^2 u + g(u)$ | [`reaction.SwiftHohenberg`](https://fkoehler.site/exponax/api/stepper/reaction/swift_hohenberg/) | 1D, 2D, 3D |
 
 <details>
 <summary><strong>Generic stepper families</strong> (for advanced / custom dynamics)</summary>
@@ -132,12 +132,12 @@ three flavors: physical coefficients, normalized, and difficulty-based.
 
 | Family | Nonlinearity | Generalizes |
 |--------|-------------|-------------|
-| `GeneralLinearStepper` | None | Advection, Diffusion, Dispersion, etc. |
-| `GeneralConvectionStepper` | Quadratic convection | Burgers, KdV, KS Conservative |
-| `GeneralGradientNormStepper` | Gradient norm | Kuramoto-Sivashinsky |
-| `GeneralVorticityConvectionStepper` | Vorticity convection (2D only) | Navier-Stokes, Kolmogorov Flow |
-| `GeneralPolynomialStepper` | Arbitrary polynomial | Fisher-KPP, Allen-Cahn, etc. |
-| `GeneralNonlinearStepper` | Convection + gradient norm + polynomial | Most of the above |
+| [`GeneralLinearStepper`](https://fkoehler.site/exponax/api/stepper/generic/physical/general_linear/) | None | Advection, Diffusion, Dispersion, etc. |
+| [`GeneralConvectionStepper`](https://fkoehler.site/exponax/api/stepper/generic/physical/general_convection/) | Quadratic convection | Burgers, KdV, KS Conservative |
+| [`GeneralGradientNormStepper`](https://fkoehler.site/exponax/api/stepper/generic/physical/general_gradient_norm/) | Gradient norm | Kuramoto-Sivashinsky |
+| [`GeneralVorticityConvectionStepper`](https://fkoehler.site/exponax/api/stepper/generic/physical/general_vorticity_convection/) | Vorticity convection (2D only) | Navier-Stokes, Kolmogorov Flow |
+| [`GeneralPolynomialStepper`](https://fkoehler.site/exponax/api/stepper/generic/physical/general_polynomial/) | Arbitrary polynomial | Fisher-KPP, Allen-Cahn, etc. |
+| [`GeneralNonlinearStepper`](https://fkoehler.site/exponax/api/stepper/generic/physical/general_nonlinear/) | Convection + gradient norm + polynomial | Most of the above |
 
 See the [normalized & difficulty interface docs](https://fkoehler.site/exponax/api/utilities/normalized_and_difficulty/) for details.
 
