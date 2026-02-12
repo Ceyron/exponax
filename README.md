@@ -10,6 +10,9 @@
 <a href="https://github.com/ceyron/exponax/actions/workflows/test.yml">
   <img src="https://github.com/ceyron/exponax/actions/workflows/test.yml/badge.svg" alt="Tests">
 </a>
+<a href="https://codecov.io/gh/Ceyron/exponax">
+  <img src="https://codecov.io/gh/Ceyron/exponax/branch/main/graph/badge.svg" alt="codecov">
+</a>
 <a href="https://fkoehler.site/exponax/">
   <img src="https://img.shields.io/badge/docs-latest-green" alt="docs-latest">
 </a>
