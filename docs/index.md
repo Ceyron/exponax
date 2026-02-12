@@ -1,5 +1,9 @@
 # Getting Started
 
+<p align="center">
+  <img src="imgs/logo.svg" alt="exponax logo" width="50%">
+</p>
+
 `Exponax` is a suite for building Fourier spectral ETDRK time-steppers for
 semi-linear PDEs in 1d, 2d, and 3d. There are many pre-built dynamics and plenty
 of helpful utilities. It is extremely efficient, is differentiable (due to being
