@@ -1,7 +1,7 @@
 # Getting Started
 
 <p align="center">
-  <img src="imgs/logo.svg" alt="exponax logo" width="50%">
+  <img src="imgs/logo.svg" alt="exponax logo" width="300">
 </p>
 
 `Exponax` is a suite for building Fourier spectral ETDRK time-steppers for
