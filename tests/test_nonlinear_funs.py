@@ -7,7 +7,9 @@ from exponax.nonlin_fun import (
     ConvectionNonlinearFun,
     GradientNormNonlinearFun,
     PolynomialNonlinearFun,
+    VorticityConvection2d,
 )
+from exponax.nonlin_fun._general_nonlinear import GeneralNonlinearFun
 
 
 def test_convection_single_channel():
@@ -177,3 +179,190 @@ def test_dealiasing_removes_high_modes():
     assert dealiased[0, cutoff + 1 :] == pytest.approx(
         jnp.zeros(num_points // 2 + 1 - cutoff - 1), abs=1e-10
     )
+
+
+# ===========================================================================
+# Validation error path tests
+# ===========================================================================
+
+
+class TestConvectionValidation:
+    def test_multi_channel_conservative_channel_mismatch(self):
+        """Multi-channel conservative convection requires channels == spatial dims."""
+        N = 32
+        deriv_op = build_derivative_operator(2, 1.0, N)
+        conv = ConvectionNonlinearFun(
+            num_spatial_dims=2,
+            num_points=N,
+            derivative_operator=deriv_op,
+            dealiasing_fraction=2 / 3,
+            scale=1.0,
+            single_channel=False,
+            conservative=True,
+        )
+        # Give 3-channel input (but spatial dims is 2)
+        u_hat = jnp.zeros((3, N, N // 2 + 1), dtype=jnp.complex64)
+        with pytest.raises(ValueError, match="channels"):
+            conv(u_hat)
+
+    def test_multi_channel_nonconservative_channel_mismatch(self):
+        """
+        Multi-channel non-conservative convection requires channels ==
+        spatial dims.
+        """
+        N = 32
+        deriv_op = build_derivative_operator(2, 1.0, N)
+        conv = ConvectionNonlinearFun(
+            num_spatial_dims=2,
+            num_points=N,
+            derivative_operator=deriv_op,
+            dealiasing_fraction=2 / 3,
+            scale=1.0,
+            single_channel=False,
+            conservative=False,
+        )
+        u_hat = jnp.zeros((3, N, N // 2 + 1), dtype=jnp.complex64)
+        with pytest.raises(ValueError, match="channels"):
+            conv(u_hat)
+
+
+class TestVorticityConvectionValidation:
+    def test_non_2d_raises(self):
+        """VorticityConvection2d only supports 2D."""
+        N = 16
+        deriv_op_1d = build_derivative_operator(1, 1.0, N)
+        with pytest.raises(ValueError, match="2"):
+            VorticityConvection2d(
+                num_spatial_dims=1,
+                num_points=N,
+                derivative_operator=deriv_op_1d,
+                dealiasing_fraction=2 / 3,
+            )
+
+
+class TestGeneralNonlinearFunValidation:
+    def test_scale_list_wrong_length(self):
+        """GeneralNonlinearFun requires exactly 3 scales."""
+        N = 32
+        deriv_op = build_derivative_operator(1, 1.0, N)
+        with pytest.raises(ValueError, match="3"):
+            GeneralNonlinearFun(
+                num_spatial_dims=1,
+                num_points=N,
+                derivative_operator=deriv_op,
+                dealiasing_fraction=2 / 3,
+                scale_list=(1.0, 2.0),  # only 2
+            )
+
+
+# ===========================================================================
+# Multi-channel convection tests
+# ===========================================================================
+
+
+class TestMultiChannelConvection:
+    def test_2d_conservative(self):
+        """Multi-channel conservative convection in 2D should produce finite results."""
+        N = 32
+        D = 2
+        deriv_op = build_derivative_operator(D, 1.0, N)
+        conv = ConvectionNonlinearFun(
+            num_spatial_dims=D,
+            num_points=N,
+            derivative_operator=deriv_op,
+            dealiasing_fraction=2 / 3,
+            scale=1.0,
+            single_channel=False,
+            conservative=True,
+        )
+        # 2-channel input matching 2 spatial dims
+        grid = ex.make_grid(D, 1.0, N)
+        u = jnp.concatenate(
+            [
+                jnp.sin(2 * jnp.pi * grid[0:1]),
+                jnp.cos(2 * jnp.pi * grid[1:2]),
+            ],
+            axis=0,
+        )
+        u_hat = fft(u, num_spatial_dims=D)
+        result_hat = conv(u_hat)
+        result = ifft(result_hat, num_spatial_dims=D, num_points=N)
+        assert result.shape == u.shape
+        assert jnp.all(jnp.isfinite(result))
+
+    def test_2d_nonconservative(self):
+        """Multi-channel non-conservative convection in 2D."""
+        N = 32
+        D = 2
+        deriv_op = build_derivative_operator(D, 1.0, N)
+        conv = ConvectionNonlinearFun(
+            num_spatial_dims=D,
+            num_points=N,
+            derivative_operator=deriv_op,
+            dealiasing_fraction=2 / 3,
+            scale=1.0,
+            single_channel=False,
+            conservative=False,
+        )
+        grid = ex.make_grid(D, 1.0, N)
+        u = jnp.concatenate(
+            [
+                jnp.sin(2 * jnp.pi * grid[0:1]),
+                jnp.cos(2 * jnp.pi * grid[1:2]),
+            ],
+            axis=0,
+        )
+        u_hat = fft(u, num_spatial_dims=D)
+        result_hat = conv(u_hat)
+        result = ifft(result_hat, num_spatial_dims=D, num_points=N)
+        assert result.shape == u.shape
+        assert jnp.all(jnp.isfinite(result))
+
+
+# ===========================================================================
+# Gradient norm additional tests
+# ===========================================================================
+
+
+class TestGradientNormAdditional:
+    def test_2d(self):
+        """GradientNormNonlinearFun should work in 2D."""
+        N = 32
+        D = 2
+        deriv_op = build_derivative_operator(D, 1.0, N)
+        grad_norm = GradientNormNonlinearFun(
+            num_spatial_dims=D,
+            num_points=N,
+            derivative_operator=deriv_op,
+            dealiasing_fraction=2 / 3,
+            zero_mode_fix=True,
+            scale=1.0,
+        )
+        grid = ex.make_grid(D, 1.0, N)
+        u = jnp.sin(2 * jnp.pi * grid[0:1]) * jnp.cos(2 * jnp.pi * grid[1:2])
+        u_hat = fft(u, num_spatial_dims=D)
+        result_hat = grad_norm(u_hat)
+        result = ifft(result_hat, num_spatial_dims=D, num_points=N)
+        assert result.shape == u.shape
+        assert jnp.all(jnp.isfinite(result))
+        # DC mode should be near zero due to zero_mode_fix
+        assert float(jnp.abs(result_hat[0, 0, 0])) == pytest.approx(0.0, abs=1e-2)
+
+    def test_without_zero_mode_fix(self):
+        """Without zero_mode_fix, DC mode may be nonzero."""
+        N = 64
+        deriv_op = build_derivative_operator(1, 3.0, N)
+        grad_norm = GradientNormNonlinearFun(
+            num_spatial_dims=1,
+            num_points=N,
+            derivative_operator=deriv_op,
+            dealiasing_fraction=2 / 3,
+            zero_mode_fix=False,
+            scale=1.0,
+        )
+        grid = ex.make_grid(1, 3.0, N)
+        u = jnp.sin(2 * jnp.pi * grid / 3.0) + 0.5
+        u_hat = fft(u, num_spatial_dims=1)
+        result_hat = grad_norm(u_hat)
+        # Without fix, DC mode should be nonzero (gradient norm squared is positive)
+        assert float(jnp.abs(result_hat[0, 0])) > 1e-6

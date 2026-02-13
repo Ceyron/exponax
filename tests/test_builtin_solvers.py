@@ -553,6 +553,243 @@ class TestKolmogorovFlowVorticity:
         assert jnp.all(jnp.isfinite(u))
 
 
+# ===========================================================================
+# Difficulty-based stepper tests
+# ===========================================================================
+
+
+class TestDifficultySteppers:
+    """Test the Difficulty*Stepper constructors that convert difficulty values
+    into normalized coefficients."""
+
+    def test_difficulty_linear_stepper(self):
+        stepper = ex.stepper.generic.DifficultyLinearStepper(
+            num_spatial_dims=1,
+            num_points=48,
+            linear_difficulties=(0.0, -2.0, 0.01),
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(1, cutoff=5)(
+            48, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_difficulty_convection_stepper(self):
+        stepper = ex.stepper.generic.DifficultyConvectionStepper(
+            num_spatial_dims=1,
+            num_points=48,
+            linear_difficulties=(0.0, 0.0, 0.1),
+            convection_difficulty=5.0,
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(1, cutoff=5)(
+            48, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_difficulty_gradient_norm_stepper(self):
+        stepper = ex.stepper.generic.DifficultyGradientNormStepper(
+            num_spatial_dims=1,
+            num_points=48,
+            linear_difficulties=(0.0, 0.0, 0.1),
+            gradient_norm_difficulty=0.5,
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(1, cutoff=5)(
+            48, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_difficulty_polynomial_stepper(self):
+        stepper = ex.stepper.generic.DifficultyPolynomialStepper(
+            num_spatial_dims=1,
+            num_points=48,
+            linear_difficulties=(0.0, 0.0, 0.1),
+            polynomial_difficulties=(0.0, 0.0, -0.01),
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(1, cutoff=5)(
+            48, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_difficulty_nonlinear_stepper(self):
+        stepper = ex.stepper.generic.DifficultyNonlinearStepper(
+            num_spatial_dims=1,
+            num_points=48,
+            linear_difficulties=(0.0, 0.0, 0.1),
+            nonlinear_difficulties=(0.01, -0.05, 0.001),
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(1, cutoff=5)(
+            48, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))
+
+    @pytest.mark.parametrize("D", [1, 2, 3])
+    def test_difficulty_linear_multi_dim(self, D):
+        stepper = ex.stepper.generic.DifficultyLinearStepper(
+            num_spatial_dims=D,
+            num_points=16,
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(D, cutoff=3)(
+            16, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))
+
+
+# ===========================================================================
+# GeneralVorticityConvectionStepper tests
+# ===========================================================================
+
+
+class TestGeneralVorticityConvectionStepper:
+    def test_non_2d_raises(self):
+        with pytest.raises(ValueError, match="2"):
+            ex.stepper.generic.GeneralVorticityConvectionStepper(1, 1.0, 32, 0.01)
+
+    def test_no_injection_branch(self):
+        """With injection_scale=0.0, should use VorticityConvection2d."""
+        stepper = ex.stepper.generic.GeneralVorticityConvectionStepper(
+            2,
+            1.0,
+            32,
+            0.01,
+            injection_scale=0.0,
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(2, cutoff=5)(
+            32, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == (1, 32, 32)
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_with_injection_branch(self):
+        """With injection_scale>0, should use VorticityConvection2dKolmogorov."""
+        stepper = ex.stepper.generic.GeneralVorticityConvectionStepper(
+            2,
+            1.0,
+            32,
+            0.01,
+            injection_scale=1.0,
+            injection_mode=4,
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(2, cutoff=5)(
+            32, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == (1, 32, 32)
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_injection_vs_no_injection_differ(self):
+        """Injected stepper should produce different output than non-injected."""
+        u_0 = 0.01 * ex.ic.RandomTruncatedFourierSeries(2, cutoff=3)(
+            32, key=jax.random.PRNGKey(0)
+        )
+        stepper_no_inj = ex.stepper.generic.GeneralVorticityConvectionStepper(
+            2,
+            1.0,
+            32,
+            0.01,
+            injection_scale=0.0,
+        )
+        stepper_inj = ex.stepper.generic.GeneralVorticityConvectionStepper(
+            2,
+            1.0,
+            32,
+            0.01,
+            injection_scale=1.0,
+            injection_mode=4,
+        )
+        u_no_inj = stepper_no_inj(u_0)
+        u_inj = stepper_inj(u_0)
+        assert not jnp.allclose(u_no_inj, u_inj)
+
+    def test_matches_navier_stokes(self):
+        """
+        With matching parameters, should give same result as
+        NavierStokesVorticity.
+        """
+        L, N, dt, nu = 1.0, 32, 0.01, 0.01
+        u_0 = ex.ic.RandomTruncatedFourierSeries(2, cutoff=5)(
+            N, key=jax.random.PRNGKey(0)
+        )
+        ns = ex.stepper.NavierStokesVorticity(2, L, N, dt, diffusivity=nu)
+        gen = ex.stepper.generic.GeneralVorticityConvectionStepper(
+            2,
+            L,
+            N,
+            dt,
+            linear_coefficients=(0.0, 0.0, nu),
+        )
+        assert ns(u_0) == pytest.approx(gen(u_0), abs=1e-5)
+
+
+# ===========================================================================
+# GeneralNonlinearStepper validation
+# ===========================================================================
+
+
+class TestGeneralNonlinearStepperValidation:
+    def test_wrong_number_of_nonlinear_coefficients(self):
+        """nonlinear_coefficients must have exactly 3 elements."""
+        with pytest.raises(ValueError, match="3"):
+            ex.stepper.generic.GeneralNonlinearStepper(
+                1,
+                1.0,
+                32,
+                0.01,
+                nonlinear_coefficients=(0.0, -1.0),  # only 2
+            )
+        with pytest.raises(ValueError, match="3"):
+            ex.stepper.generic.GeneralNonlinearStepper(
+                1,
+                1.0,
+                32,
+                0.01,
+                nonlinear_coefficients=(0.0, -1.0, 0.5, 0.1),  # 4
+            )
+
+
+# ===========================================================================
+# ETDRK order equivalence for linear problems
+# ===========================================================================
+
+
+class TestETDRKOrderConvergence:
+    """Higher ETDRK orders should produce consistent results for smooth problems."""
+
+    def test_orders_agree_on_burgers(self):
+        """ETDRK orders 1-4 should agree on a smooth Burgers problem."""
+        L, N, dt = 2 * jnp.pi, 64, 0.01
+        u_0 = ex.ic.RandomTruncatedFourierSeries(1, cutoff=5)(
+            N, key=jax.random.PRNGKey(0)
+        )
+        results = {}
+        for order in [1, 2, 3, 4]:
+            stepper = ex.stepper.Burgers(
+                1,
+                L,
+                N,
+                dt,
+                diffusivity=0.1,
+                convection_scale=1.0,
+                order=order,
+            )
+            results[order] = stepper(u_0)
+
+        # Orders 2-4 should closely agree (order 1 may differ slightly more)
+        for order in [3, 4]:
+            assert results[order] == pytest.approx(results[2], abs=5e-4)
+
+
 # # ===========================================================================
 # # BelousovZhabotinsky tests (imported directly since not in public API)
 # # ===========================================================================
@@ -623,3 +860,103 @@ class TestKolmogorovFlowVorticity:
 #         u_1 = stepper(u_0)
 #         assert u_1.shape == (3, 32, 32)
 #         assert jnp.all(jnp.isfinite(u_1))
+
+
+# ===========================================================================
+# Gray-Scott reaction-diffusion tests
+# ===========================================================================
+
+
+class TestGrayScott:
+    def test_instantiate_and_step(self):
+        """GrayScott should instantiate and step without error."""
+        stepper = ex.stepper.reaction.GrayScott(1, 1.0, 64, 0.5)
+        key = jax.random.PRNGKey(0)
+        # 2 channels in [0, 1]
+        u_0 = jax.random.uniform(key, (2, 64), minval=0.0, maxval=0.5)
+        u_1 = stepper(u_0)
+        assert u_1.shape == (2, 64)
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_2d(self):
+        """GrayScott should work in 2D."""
+        stepper = ex.stepper.reaction.GrayScott(2, 1.0, 32, 0.5)
+        key = jax.random.PRNGKey(0)
+        u_0 = jax.random.uniform(key, (2, 32, 32), minval=0.0, maxval=0.5)
+        u_1 = stepper(u_0)
+        assert u_1.shape == (2, 32, 32)
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_nonlinear_fun_wrong_channels(self):
+        """GrayScott nonlinear fun requires exactly 2 channels."""
+        from exponax.stepper.reaction._gray_scott import GrayScottNonlinearFun
+
+        nonlin = GrayScottNonlinearFun(
+            num_spatial_dims=1,
+            num_points=32,
+            dealiasing_fraction=0.5,
+            feed_rate=0.04,
+            kill_rate=0.06,
+        )
+        bad_input = jnp.zeros((3, 17), dtype=jnp.complex64)
+        with pytest.raises(ValueError, match="2"):
+            nonlin(bad_input)
+
+
+# ===========================================================================
+# Cahn-Hilliard reaction-diffusion tests
+# ===========================================================================
+
+
+class TestCahnHilliard:
+    def test_instantiate_and_step(self):
+        """CahnHilliard should instantiate and step without error."""
+        stepper = ex.stepper.reaction.CahnHilliard(1, 1.0, 64, 0.001)
+        key = jax.random.PRNGKey(0)
+        u_0 = 0.1 * jax.random.normal(key, (1, 64))
+        u_1 = stepper(u_0)
+        assert u_1.shape == (1, 64)
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_nonlinear_fun_computes_cubic_laplace(self):
+        """Cahn-Hilliard nonlinear fun should apply u³ then Laplacian."""
+        from exponax._spectral import build_derivative_operator, fft, ifft
+        from exponax.stepper.reaction._cahn_hilliard import CahnHilliardNonlinearFun
+
+        N = 32
+        deriv_op = build_derivative_operator(1, 2 * jnp.pi, N)
+        nonlin = CahnHilliardNonlinearFun(
+            num_spatial_dims=1,
+            num_points=N,
+            derivative_operator=deriv_op,
+            scale=1.0,
+            dealiasing_fraction=0.5,
+        )
+        # Constant field u=c → u³=c³ is constant → Laplacian(c³)=0
+        c = 0.5
+        u = jnp.ones((1, N)) * c
+        u_hat = fft(u, num_spatial_dims=1)
+        result_hat = nonlin(u_hat)
+        result = ifft(result_hat, num_spatial_dims=1, num_points=N)
+        assert result == pytest.approx(jnp.zeros_like(result), abs=1e-5)
+
+
+# ===========================================================================
+# BaseStepper input validation
+# ===========================================================================
+
+
+class TestBaseStepperValidation:
+    def test_wrong_input_shape_raises(self):
+        """Calling a stepper with wrong input shape should raise ValueError."""
+        stepper = ex.stepper.Diffusion(1, 1.0, 32, 0.01)
+        wrong_shape = jnp.zeros((1, 64))  # Expected (1, 32)
+        with pytest.raises(ValueError, match="Expected shape"):
+            stepper(wrong_shape)
+
+    def test_wrong_channels_raises(self):
+        """Calling a stepper with wrong number of channels should raise."""
+        stepper = ex.stepper.Diffusion(1, 1.0, 32, 0.01)
+        wrong_channels = jnp.zeros((2, 32))  # Diffusion expects 1 channel
+        with pytest.raises(ValueError, match="Expected shape"):
+            stepper(wrong_channels)

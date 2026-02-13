@@ -380,3 +380,81 @@ class TestMultiChannelICGenIcFun:
         # Channels should differ because keys are split
         assert not jnp.allclose(ic[0], ic[1])
         assert not jnp.allclose(ic[1], ic[2])
+
+
+# ===========================================================================
+# Discontinuities IC tests
+# ===========================================================================
+
+
+class TestDiscontinuities:
+    def test_zero_mean_false_std_one_raises(self):
+        """Cannot have zero_mean=False and std_one=True."""
+        from exponax.ic._discontinuities import Discontinuities, Discontinuity
+
+        disc = Discontinuity(lower_limits=(0.2,), upper_limits=(0.8,), value=1.0)
+        with pytest.raises(ValueError, match="zero_mean=False"):
+            Discontinuities((disc,), zero_mean=False, std_one=True)
+
+    def test_std_one_and_max_one_raises(self):
+        """Cannot have both std_one and max_one."""
+        from exponax.ic._discontinuities import Discontinuities, Discontinuity
+
+        disc = Discontinuity(lower_limits=(0.2,), upper_limits=(0.8,), value=1.0)
+        with pytest.raises(ValueError, match="std_one=True"):
+            Discontinuities((disc,), std_one=True, max_one=True)
+
+    def test_zero_mean_normalization(self):
+        """With zero_mean=True, output should have approximately zero mean."""
+        from exponax.ic._discontinuities import Discontinuities, Discontinuity
+
+        disc = Discontinuity(lower_limits=(0.2,), upper_limits=(0.8,), value=1.0)
+        ic_gen = Discontinuities((disc,), zero_mean=True)
+        grid = ex.make_grid(1, 1.0, 64)
+        ic = ic_gen(grid)
+        assert float(jnp.abs(jnp.mean(ic))) < 0.01
+
+    def test_std_one_normalization(self):
+        """With std_one=True, output should have unit standard deviation."""
+        from exponax.ic._discontinuities import Discontinuities, Discontinuity
+
+        disc = Discontinuity(lower_limits=(0.2,), upper_limits=(0.8,), value=2.0)
+        ic_gen = Discontinuities((disc,), zero_mean=True, std_one=True)
+        grid = ex.make_grid(1, 1.0, 64)
+        ic = ic_gen(grid)
+        assert float(jnp.std(ic)) == pytest.approx(1.0, abs=0.01)
+
+    def test_max_one_normalization(self):
+        """With max_one=True, max absolute value should be 1.0."""
+        from exponax.ic._discontinuities import Discontinuities, Discontinuity
+
+        disc = Discontinuity(lower_limits=(0.2,), upper_limits=(0.8,), value=3.0)
+        ic_gen = Discontinuities((disc,), zero_mean=True, max_one=True)
+        grid = ex.make_grid(1, 1.0, 64)
+        ic = ic_gen(grid)
+        assert float(jnp.max(jnp.abs(ic))) == pytest.approx(1.0, abs=0.01)
+
+
+class TestRandomDiscontinuities:
+    def test_zero_mean_false_std_one_raises(self):
+        """Cannot have zero_mean=False and std_one=True."""
+        from exponax.ic._discontinuities import RandomDiscontinuities
+
+        with pytest.raises(ValueError, match="zero_mean=False"):
+            RandomDiscontinuities(1, zero_mean=False, std_one=True)
+
+    def test_std_one_and_max_one_raises(self):
+        """Cannot have both std_one and max_one."""
+        from exponax.ic._discontinuities import RandomDiscontinuities
+
+        with pytest.raises(ValueError, match="std_one=True"):
+            RandomDiscontinuities(1, std_one=True, max_one=True)
+
+    def test_generates_valid_ic(self):
+        """RandomDiscontinuities should produce finite ICs."""
+        from exponax.ic._discontinuities import RandomDiscontinuities
+
+        gen = RandomDiscontinuities(1, num_discontinuities=3)
+        ic = gen(32, key=jax.random.PRNGKey(0))
+        assert ic.shape == (1, 32)
+        assert jnp.all(jnp.isfinite(ic))
