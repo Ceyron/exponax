@@ -249,3 +249,174 @@ def test_analytical_solution_1d(wavenumber_k: int, wavenumber_l: int):
     )
     assert ex.metrics.nMSE(u_1, u_0) == pytest.approx(2.0)
     assert ex.metrics.nMSE(u_1, u_0, domain_extent=DOMAIN_EXTENT) == pytest.approx(2.0)
+
+
+# ===========================================================================
+# Correlation tests
+# ===========================================================================
+
+
+class TestCorrelation:
+    def test_identical_fields(self):
+        """Correlation of a field with itself should be 1.0."""
+        u = jax.random.normal(jax.random.PRNGKey(0), (1, 64))
+        assert float(ex.metrics.correlation(u, u)) == pytest.approx(1.0, abs=1e-5)
+
+    def test_negative_field(self):
+        """Correlation of a field with its negation should be -1.0."""
+        u = jax.random.normal(jax.random.PRNGKey(0), (1, 64))
+        assert float(ex.metrics.correlation(u, -u)) == pytest.approx(-1.0, abs=1e-5)
+
+    def test_orthogonal_fields_1d(self):
+        """Correlation of orthogonal sine waves should be ~0."""
+        grid = ex.make_grid(1, 2 * jnp.pi, 128)
+        u = jnp.sin(grid)
+        v = jnp.cos(grid)
+        assert float(ex.metrics.correlation(u, v)) == pytest.approx(0.0, abs=1e-4)
+
+    def test_multi_channel(self):
+        """Correlation should average over channels."""
+        u = jax.random.normal(jax.random.PRNGKey(0), (3, 64))
+        corr = float(ex.metrics.correlation(u, u))
+        assert corr == pytest.approx(1.0, abs=1e-5)
+
+    def test_2d(self):
+        """Correlation should work in 2D."""
+        u = jax.random.normal(jax.random.PRNGKey(0), (1, 32, 32))
+        assert float(ex.metrics.correlation(u, u)) == pytest.approx(1.0, abs=1e-5)
+
+
+# ===========================================================================
+# mean_metric tests
+# ===========================================================================
+
+
+class TestMeanMetric:
+    def test_basic(self):
+        """mean_metric should average the metric over the batch axis."""
+        u_pred = jax.random.normal(jax.random.PRNGKey(0), (5, 1, 64))
+        u_ref = jax.random.normal(jax.random.PRNGKey(1), (5, 1, 64))
+        result = ex.metrics.mean_metric(ex.metrics.MSE, u_pred, u_ref)
+        # Manually compute
+        manual = jnp.mean(jax.vmap(ex.metrics.MSE)(u_pred, u_ref))
+        assert float(result) == pytest.approx(float(manual), abs=1e-6)
+
+    def test_with_kwargs(self):
+        """mean_metric should pass kwargs through."""
+        u_pred = jax.random.normal(jax.random.PRNGKey(0), (5, 1, 64))
+        u_ref = jax.random.normal(jax.random.PRNGKey(1), (5, 1, 64))
+        result = ex.metrics.mean_metric(
+            ex.metrics.MSE, u_pred, u_ref, domain_extent=2.0
+        )
+        manual = jnp.mean(
+            jax.vmap(lambda p, r: ex.metrics.MSE(p, r, domain_extent=2.0))(
+                u_pred, u_ref
+            )
+        )
+        assert float(result) == pytest.approx(float(manual), abs=1e-6)
+
+    def test_scalar_output(self):
+        """mean_metric result should be a scalar."""
+        u_pred = jax.random.normal(jax.random.PRNGKey(0), (3, 1, 32))
+        u_ref = jax.random.normal(jax.random.PRNGKey(1), (3, 1, 32))
+        result = ex.metrics.mean_metric(ex.metrics.RMSE, u_pred, u_ref)
+        assert result.ndim == 0
+
+
+# ===========================================================================
+# MAE / nMAE / sMAE tests
+# ===========================================================================
+
+
+class TestMAEFamily:
+    def test_mae_constant_fields(self):
+        """MAE of constant fields with difference=2 on unit domain."""
+        u_pred = 4.0 * jnp.ones((1, 64))
+        u_ref = 2.0 * jnp.ones((1, 64))
+        # MAE = sum (L/N)^D |u-v| = 1/64 * 64 * 2 = 2.0
+        assert float(ex.metrics.MAE(u_pred, u_ref)) == pytest.approx(2.0, abs=1e-5)
+
+    def test_mae_without_ref(self):
+        """MAE without reference = norm of the state."""
+        u = 3.0 * jnp.ones((1, 64))
+        assert float(ex.metrics.MAE(u)) == pytest.approx(3.0, abs=1e-5)
+
+    def test_nmae_constant_fields(self):
+        """nMAE = |u-v|/|v| = 2/2 = 1.0 for constant fields."""
+        u_pred = 4.0 * jnp.ones((1, 64))
+        u_ref = 2.0 * jnp.ones((1, 64))
+        assert float(ex.metrics.nMAE(u_pred, u_ref)) == pytest.approx(1.0, abs=1e-5)
+
+    def test_smae_constant_fields(self):
+        """sMAE = 2|u-v|/(|u|+|v|) = 2*2/(4+2) = 2/3."""
+        u_pred = 4.0 * jnp.ones((1, 64))
+        u_ref = 2.0 * jnp.ones((1, 64))
+        assert float(ex.metrics.sMAE(u_pred, u_ref)) == pytest.approx(
+            2.0 / 3.0, abs=1e-5
+        )
+
+    def test_smae_symmetry(self):
+        """sMAE should be symmetric."""
+        u = jax.random.normal(jax.random.PRNGKey(0), (1, 64))
+        v = jax.random.normal(jax.random.PRNGKey(1), (1, 64))
+        assert float(ex.metrics.sMAE(u, v)) == pytest.approx(
+            float(ex.metrics.sMAE(v, u)), abs=1e-6
+        )
+
+    def test_mae_domain_extent_scaling(self):
+        """MAE should scale with domain_extent^D."""
+        u_pred = 4.0 * jnp.ones((1, 64))
+        u_ref = 2.0 * jnp.ones((1, 64))
+        L = 5.0
+        mae_L1 = float(ex.metrics.MAE(u_pred, u_ref, domain_extent=1.0))
+        mae_L5 = float(ex.metrics.MAE(u_pred, u_ref, domain_extent=L))
+        assert mae_L5 == pytest.approx(L * mae_L1, abs=1e-5)
+
+
+# ===========================================================================
+# spatial_norm validation tests
+# ===========================================================================
+
+
+class TestSpatialNormValidation:
+    def test_normalized_without_ref_raises(self):
+        u = jax.random.normal(jax.random.PRNGKey(0), (1, 64))
+        with pytest.raises(ValueError, match="normalized.*requires"):
+            ex.metrics.spatial_norm(u, mode="normalized")
+
+    def test_symmetric_without_ref_raises(self):
+        u = jax.random.normal(jax.random.PRNGKey(0), (1, 64))
+        with pytest.raises(ValueError, match="symmetric.*requires"):
+            ex.metrics.spatial_norm(u, mode="symmetric")
+
+    def test_outer_exponent_auto(self):
+        """When outer_exponent is None, it should be set to 1/inner_exponent."""
+        u = jnp.ones((1, 64))
+        # For inner=2, outer should auto-set to 0.5
+        # spatial_aggregator with p=2, q=0.5 on all-ones: ((1/64)*64*1)^0.5 = 1.0
+        result = float(ex.metrics.spatial_norm(u, inner_exponent=2.0))
+        assert result == pytest.approx(1.0, abs=1e-5)
+
+
+# ===========================================================================
+# Fourier metric edge cases
+# ===========================================================================
+
+
+class TestFourierMetricEdgeCases:
+    def test_fourier_norm_normalized_without_ref_raises(self):
+        """fourier_norm with mode='normalized' requires state_ref."""
+        u = jnp.ones((1, 64))
+        with pytest.raises(ValueError, match="normalized"):
+            ex.metrics.fourier_norm(u, mode="normalized")
+
+    def test_fourier_norm_auto_outer_exponent(self):
+        """fourier_norm with default outer_exponent should use 1/inner."""
+        N = 64
+        grid = ex.make_grid(1, 2 * jnp.pi, N)
+        u = jnp.sin(grid)
+        # With inner_exponent=2 and outer_exponent=None (auto → 0.5),
+        # result should be finite and positive
+        result = float(ex.metrics.fourier_norm(u, inner_exponent=2.0))
+        assert result > 0
+        assert jnp.isfinite(result)
