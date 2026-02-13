@@ -797,7 +797,7 @@ def make_incompressible(
     With the divergence of the velocity field as the right-hand side, solve the
     Poisson equation for pressure `p`
 
-        Δp = - ∇ ⋅ v⃗
+        Δp = ∇ ⋅ v⃗
 
     and then correct the velocity field to be incompressible
 
@@ -842,11 +842,11 @@ def make_incompressible(
         1.0 / laplace_operator,
     )
 
-    pseudo_pressure = -inv_laplace_operator * divergence
+    pseudo_pressure = inv_laplace_operator * divergence
 
-    pseudo_pressure_garadient = derivative_operator * pseudo_pressure
+    pseudo_pressure_gradient = derivative_operator * pseudo_pressure
 
-    incompressible_field_hat = incompressible_field_hat - pseudo_pressure_garadient
+    incompressible_field_hat = incompressible_field_hat - pseudo_pressure_gradient
 
     incompressible_field = ifft(
         incompressible_field_hat,
