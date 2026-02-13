@@ -87,7 +87,7 @@ it with `jax.grad`, `jax.vmap`, and `jax.jit`:
 
 ```python
 # Jacobian of the stepper function
-grad_fn = jax.jacfwd(ks_stepper)(u_0)
+jacobian = jax.jacfwd(ks_stepper)(u_0)
 ```
 
 For a next step, check out [this tutorial on 1D
