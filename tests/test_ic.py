@@ -458,3 +458,47 @@ class TestRandomDiscontinuities:
         ic = gen(32, key=jax.random.PRNGKey(0))
         assert ic.shape == (1, 32)
         assert jnp.all(jnp.isfinite(ic))
+
+
+# ===========================================================================
+# GaussianRandomField validation tests
+# ===========================================================================
+
+
+class TestGaussianRandomField:
+    def test_zero_mean_false_std_one_raises(self):
+        with pytest.raises(ValueError, match="zero_mean=False"):
+            ex.ic.GaussianRandomField(1, zero_mean=False, std_one=True)
+
+    def test_std_one_and_max_one_raises(self):
+        with pytest.raises(ValueError, match="std_one=True"):
+            ex.ic.GaussianRandomField(1, std_one=True, max_one=True)
+
+    def test_std_one_normalization(self):
+        """With std_one=True, output should have unit standard deviation."""
+        gen = ex.ic.GaussianRandomField(1, zero_mean=True, std_one=True)
+        ic = gen(64, key=jax.random.PRNGKey(0))
+        assert float(jnp.std(ic)) == pytest.approx(1.0, abs=0.01)
+
+    def test_max_one_normalization(self):
+        """With max_one=True, max absolute value should be 1.0."""
+        gen = ex.ic.GaussianRandomField(1, max_one=True)
+        ic = gen(64, key=jax.random.PRNGKey(0))
+        assert float(jnp.max(jnp.abs(ic))) == pytest.approx(1.0, abs=0.01)
+
+
+# ===========================================================================
+# ScaledICGenerator gen_ic_fun test
+# ===========================================================================
+
+
+class TestScaledICGeneratorGenIcFun:
+    def test_gen_ic_fun(self):
+        """ScaledICGenerator.gen_ic_fun should return a ScaledIC."""
+        base = ex.ic.RandomSineWaves1d(1, max_one=True)
+        scaled = ex.ic.ScaledICGenerator(base, scale=2.0)
+        ic_fun = scaled.gen_ic_fun(key=jax.random.PRNGKey(0))
+        grid = ex.make_grid(1, 1.0, 32)
+        result = ic_fun(grid)
+        assert result.shape == (1, 32)
+        assert jnp.all(jnp.isfinite(result))

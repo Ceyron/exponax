@@ -495,3 +495,17 @@ class TestMakeIncompressibleValidation:
         field = jnp.zeros((3, 16, 16))
         with pytest.raises(ValueError, match="channels"):
             make_incompressible(field)
+
+
+# ===========================================================================
+# Poisson solver validation
+# ===========================================================================
+
+
+class TestPoissonValidation:
+    def test_wrong_shape_raises(self):
+        """Poisson solver should reject input with wrong spatial shape."""
+        poisson = ex.poisson.Poisson(1, 2 * jnp.pi, 64)
+        wrong_rhs = jnp.ones((1, 32))  # Expected (1, 64)
+        with pytest.raises(ValueError, match="Shape"):
+            poisson(wrong_rhs)

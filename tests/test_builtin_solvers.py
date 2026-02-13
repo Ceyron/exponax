@@ -960,3 +960,216 @@ class TestBaseStepperValidation:
         wrong_channels = jnp.zeros((2, 32))  # Diffusion expects 1 channel
         with pytest.raises(ValueError, match="Expected shape"):
             stepper(wrong_channels)
+
+
+# ===========================================================================
+# Analytical correctness tests
+# ===========================================================================
+
+
+class TestAdvectionAnalytical:
+    def test_sine_wave_translation(self):
+        """Advection of sin(kx) should give sin(k(x - ct)) after time dt."""
+        L, N, c, dt = 2 * jnp.pi, 64, 1.5, 0.1
+        k = 3
+        stepper = ex.stepper.Advection(1, L, N, dt, velocity=c)
+        grid = ex.make_grid(1, L, N)
+        u_0 = jnp.sin(k * 2 * jnp.pi * grid / L)
+        u_1 = stepper(u_0)
+        expected = jnp.sin(k * 2 * jnp.pi * (grid - c * dt) / L)
+        assert u_1 == pytest.approx(expected, abs=1e-5)
+
+    def test_energy_conservation(self):
+        """Advection should exactly preserve the L2 norm."""
+        L, N, c, dt = 5.0, 64, 2.0, 0.05
+        stepper = ex.stepper.Advection(1, L, N, dt, velocity=c)
+        u = ex.ic.RandomTruncatedFourierSeries(1, cutoff=10)(
+            N, key=jax.random.PRNGKey(0)
+        )
+        energy_before = float(jnp.sum(u**2))
+        for _ in range(20):
+            u = stepper(u)
+        energy_after = float(jnp.sum(u**2))
+        assert energy_after == pytest.approx(energy_before, rel=1e-5)
+
+    def test_2d_advection(self):
+        """2D advection should translate in both directions."""
+        L, N, dt = 2 * jnp.pi, 32, 0.1
+        c = jnp.array([1.0, 2.0])
+        stepper = ex.stepper.Advection(2, L, N, dt, velocity=c)
+        grid = ex.make_grid(2, L, N)
+        u_0 = jnp.sin(2 * jnp.pi * grid[0:1] / L) * jnp.cos(2 * jnp.pi * grid[1:2] / L)
+        u_1 = stepper(u_0)
+        expected = jnp.sin(2 * jnp.pi * (grid[0:1] - c[0] * dt) / L) * jnp.cos(
+            2 * jnp.pi * (grid[1:2] - c[1] * dt) / L
+        )
+        assert u_1 == pytest.approx(expected, abs=1e-4)
+
+
+class TestDiffusionAnalytical:
+    def test_mode_decay_rate(self):
+        """Each Fourier mode should decay as exp(-ν*(2πk/L)²*dt)."""
+        L, N, nu, dt = 2 * jnp.pi, 64, 0.1, 0.05
+        k = 3
+        stepper = ex.stepper.Diffusion(1, L, N, dt, diffusivity=nu)
+        grid = ex.make_grid(1, L, N)
+        u_0 = jnp.sin(k * 2 * jnp.pi * grid / L)
+        u_1 = stepper(u_0)
+        decay_factor = jnp.exp(-nu * (k * 2 * jnp.pi / L) ** 2 * dt)
+        expected = decay_factor * u_0
+        assert u_1 == pytest.approx(expected, abs=1e-5)
+
+    def test_higher_modes_decay_faster(self):
+        """Higher wavenumbers should decay faster under diffusion."""
+        L, N, nu, dt = 2 * jnp.pi, 64, 0.05, 0.1
+        stepper = ex.stepper.Diffusion(1, L, N, dt, diffusivity=nu)
+        grid = ex.make_grid(1, L, N)
+
+        u_low = jnp.sin(1 * 2 * jnp.pi * grid / L)
+        u_high = jnp.sin(5 * 2 * jnp.pi * grid / L)
+
+        u_low_1 = stepper(u_low)
+        u_high_1 = stepper(u_high)
+
+        # Ratio of amplitudes after diffusion
+        ratio_low = float(jnp.max(jnp.abs(u_low_1))) / float(jnp.max(jnp.abs(u_low)))
+        ratio_high = float(jnp.max(jnp.abs(u_high_1))) / float(jnp.max(jnp.abs(u_high)))
+        assert ratio_high < ratio_low  # Higher mode decays more
+
+    def test_energy_monotone_decrease(self):
+        """Diffusion should monotonically decrease energy."""
+        L, N, nu, dt = 3.0, 64, 0.01, 0.01
+        stepper = ex.stepper.Diffusion(1, L, N, dt, diffusivity=nu)
+        u = ex.ic.RandomTruncatedFourierSeries(1, cutoff=10)(
+            N, key=jax.random.PRNGKey(0)
+        )
+        prev_energy = float(jnp.sum(u**2))
+        for _ in range(50):
+            u = stepper(u)
+            energy = float(jnp.sum(u**2))
+            assert energy <= prev_energy + 1e-6
+            prev_energy = energy
+
+
+class TestAdvectionDiffusionAnalytical:
+    def test_combines_advection_and_diffusion(self):
+        """Should both translate AND decay a sine wave."""
+        L, N, c, nu, dt = 2 * jnp.pi, 64, 1.0, 0.05, 0.1
+        k = 2
+        stepper = ex.stepper.AdvectionDiffusion(1, L, N, dt, velocity=c, diffusivity=nu)
+        grid = ex.make_grid(1, L, N)
+        u_0 = jnp.sin(k * 2 * jnp.pi * grid / L)
+        u_1 = stepper(u_0)
+        # Analytical: translate by c*dt AND decay by exp(-ν*k²*(2π/L)²*dt)
+        decay = jnp.exp(-nu * (k * 2 * jnp.pi / L) ** 2 * dt)
+        expected = decay * jnp.sin(k * 2 * jnp.pi * (grid - c * dt) / L)
+        assert u_1 == pytest.approx(expected, abs=1e-5)
+
+    def test_vector_diffusivity(self):
+        """AdvectionDiffusion should accept vector diffusivity."""
+        stepper = ex.stepper.AdvectionDiffusion(
+            2,
+            1.0,
+            32,
+            0.01,
+            velocity=jnp.array([1.0, 0.5]),
+            diffusivity=jnp.array([0.01, 0.02]),
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(2, cutoff=5)(
+            32, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))
+
+
+class TestFisherKPPBehavior:
+    def test_population_growth(self):
+        """Fisher-KPP should cause population to grow toward u=1."""
+        L, N, dt = 1.0, 64, 0.001
+        stepper = ex.stepper.reaction.FisherKPP(
+            1, L, N, dt, diffusivity=0.01, reactivity=5.0
+        )
+        # Start with small uniform population
+        # Logistic growth: u(t) = 1/(1 + ((1-u0)/u0)*exp(-r*t))
+        # At t=2.0: u = 1/(1 + 9*exp(-10)) ≈ 0.9996
+        u = jnp.ones((1, N)) * 0.1
+        for _ in range(2000):
+            u = stepper(u)
+        # Should be close to 1.0 everywhere
+        assert u == pytest.approx(jnp.ones_like(u), abs=0.01)
+
+    def test_zero_stays_zero(self):
+        """u=0 is an unstable fixed point — zero initial condition stays zero."""
+        L, N, dt = 1.0, 64, 0.001
+        stepper = ex.stepper.reaction.FisherKPP(
+            1, L, N, dt, diffusivity=0.01, reactivity=1.0
+        )
+        u = jnp.zeros((1, N))
+        for _ in range(100):
+            u = stepper(u)
+        # Zero is a fixed point (unstable, but still a fixed point)
+        assert u == pytest.approx(jnp.zeros_like(u), abs=1e-5)
+
+
+# ===========================================================================
+# Difficulty stepper wrappers (coverage)
+# ===========================================================================
+
+
+class TestDifficultyStepperWrappers:
+    def test_difficulty_convection_stepper(self):
+        stepper = ex.stepper.generic.DifficultyConvectionStepper(
+            num_spatial_dims=1, num_points=32
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(1, cutoff=5)(
+            32, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_difficulty_gradient_norm_stepper(self):
+        stepper = ex.stepper.generic.DifficultyGradientNormStepper(
+            num_spatial_dims=1, num_points=32
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(1, cutoff=5)(
+            32, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_difficulty_nonlinear_stepper(self):
+        stepper = ex.stepper.generic.DifficultyNonlinearStepper(
+            num_spatial_dims=1, num_points=32
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(1, cutoff=5)(
+            32, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_difficulty_polynomial_stepper(self):
+        stepper = ex.stepper.generic.DifficultyPolynomialStepper(
+            num_spatial_dims=1, num_points=32
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(1, cutoff=5)(
+            32, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_diffully_linear_stepper_simple(self):
+        """DiffultyLinearStepperSimple (note: name has typo in source)."""
+        stepper = ex.stepper.generic.DiffultyLinearStepperSimple(
+            num_spatial_dims=1, num_points=32, difficulty=-2.0, order=1
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(1, cutoff=5)(
+            32, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))

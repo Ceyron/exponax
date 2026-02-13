@@ -396,3 +396,27 @@ class TestSpatialNormValidation:
         # spatial_aggregator with p=2, q=0.5 on all-ones: ((1/64)*64*1)^0.5 = 1.0
         result = float(ex.metrics.spatial_norm(u, inner_exponent=2.0))
         assert result == pytest.approx(1.0, abs=1e-5)
+
+
+# ===========================================================================
+# Fourier metric edge cases
+# ===========================================================================
+
+
+class TestFourierMetricEdgeCases:
+    def test_fourier_norm_normalized_without_ref_raises(self):
+        """fourier_norm with mode='normalized' requires state_ref."""
+        u = jnp.ones((1, 64))
+        with pytest.raises(ValueError, match="normalized"):
+            ex.metrics.fourier_norm(u, mode="normalized")
+
+    def test_fourier_norm_auto_outer_exponent(self):
+        """fourier_norm with default outer_exponent should use 1/inner."""
+        N = 64
+        grid = ex.make_grid(1, 2 * jnp.pi, N)
+        u = jnp.sin(grid)
+        # With inner_exponent=2 and outer_exponent=None (auto → 0.5),
+        # result should be finite and positive
+        result = float(ex.metrics.fourier_norm(u, inner_exponent=2.0))
+        assert result > 0
+        assert jnp.isfinite(result)
