@@ -379,3 +379,247 @@ def test_nonlinear_normalized_stepper():
     assert regular_burgers_pred == pytest.approx(
         normalized_burgers_pred, rel=1e-5, abs=1e-5
     )
+
+
+# ===========================================================================
+# Navier-Stokes vorticity tests
+# ===========================================================================
+
+
+class TestNavierStokesVorticity:
+    def test_non_2d_raises(self):
+        """NavierStokesVorticity only supports 2D."""
+        with pytest.raises(ValueError, match="2"):
+            ex.stepper.NavierStokesVorticity(1, 1.0, 32, 0.01)
+        with pytest.raises(ValueError, match="2"):
+            ex.stepper.NavierStokesVorticity(3, 1.0, 32, 0.01)
+
+    def test_step_produces_finite_output(self):
+        """A single step should produce finite (non-NaN, non-Inf) output."""
+        stepper = ex.stepper.NavierStokesVorticity(2, 1.0, 32, 0.01, diffusivity=0.01)
+        u_0 = ex.ic.RandomTruncatedFourierSeries(2, cutoff=5)(
+            32, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_output_shape(self):
+        """Output should have shape (1, N, N)."""
+        N = 32
+        stepper = ex.stepper.NavierStokesVorticity(2, 1.0, N, 0.01)
+        u_0 = ex.ic.RandomTruncatedFourierSeries(2, cutoff=5)(
+            N, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == (1, N, N)
+
+    def test_diffusion_decays_energy(self):
+        """With high diffusivity and no convection, energy should decay."""
+        stepper = ex.stepper.NavierStokesVorticity(
+            2,
+            1.0,
+            32,
+            0.01,
+            diffusivity=0.1,
+            vorticity_convection_scale=0.0,  # pure diffusion
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(2, cutoff=5)(
+            32, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        # Energy = L2 norm squared
+        energy_0 = float(jnp.sum(u_0**2))
+        energy_1 = float(jnp.sum(u_1**2))
+        assert energy_1 < energy_0
+
+    def test_zero_diffusivity_preserves_more_energy(self):
+        """With very low diffusivity, energy should be preserved better."""
+        u_0 = ex.ic.RandomTruncatedFourierSeries(2, cutoff=3)(
+            32, key=jax.random.PRNGKey(0)
+        )
+        stepper_high_visc = ex.stepper.NavierStokesVorticity(
+            2, 1.0, 32, 0.001, diffusivity=0.1
+        )
+        stepper_low_visc = ex.stepper.NavierStokesVorticity(
+            2, 1.0, 32, 0.001, diffusivity=0.001
+        )
+        u_high = stepper_high_visc(u_0)
+        u_low = stepper_low_visc(u_0)
+        # Low viscosity should preserve more energy
+        energy_high = float(jnp.sum(u_high**2))
+        energy_low = float(jnp.sum(u_low**2))
+        assert energy_low > energy_high
+
+    def test_drag_accelerates_decay(self):
+        """Positive drag (λ>0 means amplification in the linear operator, but
+        negative drag λ<0 means additional damping)."""
+        u_0 = ex.ic.RandomTruncatedFourierSeries(2, cutoff=5)(
+            32, key=jax.random.PRNGKey(0)
+        )
+        stepper_no_drag = ex.stepper.NavierStokesVorticity(
+            2,
+            1.0,
+            32,
+            0.01,
+            diffusivity=0.01,
+            drag=0.0,
+            vorticity_convection_scale=0.0,
+        )
+        stepper_drag = ex.stepper.NavierStokesVorticity(
+            2,
+            1.0,
+            32,
+            0.01,
+            diffusivity=0.01,
+            drag=-1.0,
+            vorticity_convection_scale=0.0,
+        )
+        u_no_drag = stepper_no_drag(u_0)
+        u_drag = stepper_drag(u_0)
+        energy_no_drag = float(jnp.sum(u_no_drag**2))
+        energy_drag = float(jnp.sum(u_drag**2))
+        assert energy_drag < energy_no_drag
+
+
+class TestKolmogorovFlowVorticity:
+    def test_non_2d_raises(self):
+        with pytest.raises(ValueError, match="2"):
+            ex.stepper.KolmogorovFlowVorticity(1, 1.0, 32, 0.01)
+
+    def test_step_produces_finite_output(self):
+        stepper = ex.stepper.KolmogorovFlowVorticity(
+            2, 2 * jnp.pi, 64, 0.01, diffusivity=0.01
+        )
+        u_0 = ex.ic.RandomTruncatedFourierSeries(2, cutoff=5)(
+            64, key=jax.random.PRNGKey(0)
+        )
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_injection_adds_energy(self):
+        """Kolmogorov forcing should inject energy (compared to unforced NS)."""
+        N = 64
+        L = 2 * jnp.pi
+        dt = 0.01
+        u_0 = 0.01 * ex.ic.RandomTruncatedFourierSeries(2, cutoff=3)(
+            N, key=jax.random.PRNGKey(0)
+        )
+
+        # Unforced NS with same parameters
+        ns_stepper = ex.stepper.NavierStokesVorticity(
+            2,
+            L,
+            N,
+            dt,
+            diffusivity=0.01,
+            drag=-0.1,
+        )
+        # Kolmogorov (forced)
+        kolm_stepper = ex.stepper.KolmogorovFlowVorticity(
+            2,
+            L,
+            N,
+            dt,
+            diffusivity=0.01,
+            drag=-0.1,
+            injection_mode=4,
+            injection_scale=1.0,
+        )
+
+        # Run a few steps
+        u_ns = u_0
+        u_kolm = u_0
+        for _ in range(10):
+            u_ns = ns_stepper(u_ns)
+            u_kolm = kolm_stepper(u_kolm)
+
+        energy_ns = float(jnp.sum(u_ns**2))
+        energy_kolm = float(jnp.sum(u_kolm**2))
+        # The forced simulation should have more energy
+        assert energy_kolm > energy_ns
+
+    def test_multi_step_stable(self):
+        """Multiple steps should remain stable (finite)."""
+        stepper = ex.stepper.KolmogorovFlowVorticity(
+            2, 2 * jnp.pi, 64, 0.01, diffusivity=0.01
+        )
+        u = ex.ic.RandomTruncatedFourierSeries(2, cutoff=5)(
+            64, key=jax.random.PRNGKey(0)
+        )
+        for _ in range(20):
+            u = stepper(u)
+        assert jnp.all(jnp.isfinite(u))
+
+
+# # ===========================================================================
+# # BelousovZhabotinsky tests (imported directly since not in public API)
+# # ===========================================================================
+
+
+# class TestBelousovZhabotinsky:
+#     def test_instantiate(self):
+#         """BZ stepper should instantiate without error."""
+#         from exponax.stepper.reaction._belousov_zhabotinsky import (
+#             BelousovZhabotinsky,
+#         )
+
+#         for D in [1, 2]:
+#             BelousovZhabotinsky(D, 1.0, 32, 0.001)
+
+#     def test_step_produces_finite_output(self):
+#         """A single step should produce finite output."""
+#         from exponax.stepper.reaction._belousov_zhabotinsky import (
+#             BelousovZhabotinsky,
+#         )
+
+#         stepper = BelousovZhabotinsky(1, 1.0, 64, 0.001)
+#         # BZ requires 3 channels and ICs in [0, 1]
+#         key = jax.random.PRNGKey(0)
+#         u_0 = jax.random.uniform(key, (3, 64), minval=0.0, maxval=0.5)
+#         u_1 = stepper(u_0)
+#         assert u_1.shape == (3, 64)
+#         assert jnp.all(jnp.isfinite(u_1))
+
+#     def test_requires_3_channels(self):
+#         """BZ nonlinear fun should require exactly 3 channels."""
+#         from exponax.stepper.reaction._belousov_zhabotinsky import (
+#             BelousovZhabotinskyNonlinearFun,
+#         )
+
+#         nonlin = BelousovZhabotinskyNonlinearFun(
+#             num_spatial_dims=1,
+#             num_points=32,
+#             dealiasing_fraction=0.5,
+#         )
+#         # Provide 2-channel input (wrong) - shape: (2, N//2+1) complex
+#         bad_input = jnp.zeros((2, 17), dtype=jnp.complex64)
+#         with pytest.raises(ValueError, match="3"):
+#             nonlin(bad_input)
+
+#     def test_multi_step_stability(self):
+#         """Multiple steps with small dt should remain finite."""
+#         from exponax.stepper.reaction._belousov_zhabotinsky import (
+#             BelousovZhabotinsky,
+#         )
+
+#         stepper = BelousovZhabotinsky(1, 1.0, 64, 0.0005)
+#         key = jax.random.PRNGKey(42)
+#         u = jax.random.uniform(key, (3, 64), minval=0.1, maxval=0.4)
+#         for _ in range(20):
+#             u = stepper(u)
+#         assert jnp.all(jnp.isfinite(u)), "BZ stepper produced NaN/Inf after 20 steps"
+
+#     def test_2d_instantiate_and_step(self):
+#         """BZ should also work in 2D."""
+#         from exponax.stepper.reaction._belousov_zhabotinsky import (
+#             BelousovZhabotinsky,
+#         )
+
+#         stepper = BelousovZhabotinsky(2, 1.0, 32, 0.001)
+#         key = jax.random.PRNGKey(0)
+#         u_0 = jax.random.uniform(key, (3, 32, 32), minval=0.0, maxval=0.5)
+#         u_1 = stepper(u_0)
+#         assert u_1.shape == (3, 32, 32)
+#         assert jnp.all(jnp.isfinite(u_1))
