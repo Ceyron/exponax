@@ -1,3 +1,4 @@
+import jax
 import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
@@ -167,33 +168,31 @@ class ETDRK4(BaseETDRK):
         self._nonlinear_fun = nonlinear_fun
         self._half_exp_term = jnp.exp(0.5 * dt * linear_operator)
 
-        LR = (
-            circle_radius * roots_of_unity(num_circle_points)
-            + linear_operator[..., jnp.newaxis] * dt
-        )
+        roots = roots_of_unity(num_circle_points)
+        L_dt = linear_operator * dt
 
-        self._coef_1 = dt * jnp.mean((jnp.exp(LR / 2) - 1) / LR, axis=-1).real
+        def scan_body(accs, root):
+            lr = circle_radius * root + L_dt
+            exp_lr = jnp.exp(lr)
+            exp_lr_half = jnp.exp(lr / 2)
+            c1 = ((exp_lr_half - 1) / lr).real
+            c4 = ((-4 - lr + exp_lr * (4 - 3 * lr + lr**2)) / lr**3).real
+            c5 = ((2 + lr + exp_lr * (-2 + lr)) / lr**3).real
+            c6 = ((-4 - 3 * lr - lr**2 + exp_lr * (4 - lr)) / lr**3).real
+            return (accs[0] + c1, accs[1] + c4, accs[2] + c5, accs[3] + c6), None
 
+        zeros = jnp.zeros_like(L_dt.real)
+        (s1, s4, s5, s6), _ = jax.lax.scan(scan_body, (zeros,) * 4, roots)
+        mean_c1 = s1 / num_circle_points
+        mean_c4 = s4 / num_circle_points
+        mean_c5 = s5 / num_circle_points
+        mean_c6 = s6 / num_circle_points
+        self._coef_1 = dt * mean_c1
         self._coef_2 = self._coef_1
         self._coef_3 = self._coef_1
-
-        self._coef_4 = (
-            dt
-            * jnp.mean(
-                (-4 - LR + jnp.exp(LR) * (4 - 3 * LR + LR**2)) / (LR**3), axis=-1
-            ).real
-        )
-
-        self._coef_5 = (
-            dt * jnp.mean((2 + LR + jnp.exp(LR) * (-2 + LR)) / (LR**3), axis=-1).real
-        )
-
-        self._coef_6 = (
-            dt
-            * jnp.mean(
-                (-4 - 3 * LR - LR**2 + jnp.exp(LR) * (4 - LR)) / (LR**3), axis=-1
-            ).real
-        )
+        self._coef_4 = dt * mean_c4
+        self._coef_5 = dt * mean_c5
+        self._coef_6 = dt * mean_c6
 
     def step_fourier(
         self,
