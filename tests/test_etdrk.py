@@ -63,7 +63,7 @@ def test_etdrk_convergence_order(order):
 
     # Use large dt so temporal errors dominate, scale with order so
     # higher-order methods don't converge "too fast" to the noise floor
-    dt_base = 0.4
+    dt_base = 0.2
 
     # Reference solution: very small dt with ETDRK4 (highest order)
     n_ref_steps = 256
@@ -101,6 +101,6 @@ def test_etdrk_convergence_order(order):
     # The convergence rate should be approximately equal to the ETDRK order.
     # Allow generous tolerance since we're comparing against a numerical
     # reference and using single precision.
-    assert rate > order - 1.0, (
+    assert rate > order - 0.25, (
         f"ETDRK{order}: expected rate ~{order}, got {rate:.2f} (errors: {errors})"
     )
