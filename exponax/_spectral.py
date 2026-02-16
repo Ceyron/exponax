@@ -146,6 +146,12 @@ def build_laplace_operator(
     if order % 2 != 0:
         raise ValueError("Order must be even.")
 
+    if order == 0:
+        # Return the identity operator
+        return jnp.ones(
+            (1, *derivative_operator.shape[1:]), dtype=derivative_operator.dtype
+        )
+
     return jnp.sum(derivative_operator**order, axis=0, keepdims=True)
 
 
