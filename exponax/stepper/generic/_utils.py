@@ -1,6 +1,3 @@
-import jax.numpy as jnp
-
-
 def normalize_coefficients(
     coefficients: tuple[float, ...],
     *,
@@ -146,9 +143,7 @@ def normalize_gradient_norm_scale(
     - `normalized_gradient_norm_scale`: normalized scale in front of the
         gradient norm term
     """
-    normalized_gradient_norm_scale = (
-        gradient_norm_scale * dt / jnp.square(domain_extent)
-    )
+    normalized_gradient_norm_scale = gradient_norm_scale * dt / domain_extent**2
     return normalized_gradient_norm_scale
 
 
@@ -177,9 +172,7 @@ def denormalize_gradient_norm_scale(
     - `gradient_norm_scale`: scale in front of the gradient norm term, i.e., the
         `b_2` in `𝒩(u) = - b₂ 1/2 ‖∇u‖₂²`
     """
-    gradient_norm_scale = (
-        normalized_gradient_norm_scale / dt * jnp.square(domain_extent)
-    )
+    gradient_norm_scale = normalized_gradient_norm_scale / dt * domain_extent**2
     return gradient_norm_scale
 
 
@@ -409,7 +402,7 @@ def reduce_normalized_gradient_norm_scale_to_difficulty(
     difficulty_gradient_norm_scale = (
         normalized_gradient_norm_scale
         * maximum_absolute
-        * jnp.square(num_points)
+        * num_points**2
         * num_spatial_dims
     )
     return difficulty_gradient_norm_scale
@@ -442,7 +435,7 @@ def extract_normalized_gradient_norm_scale_from_difficulty(
         `exponax.stepper.generic.normalize_gradient_norm_scale`
     """
     normalized_gradient_norm_scale = difficulty_gradient_norm_scale / (
-        maximum_absolute * jnp.square(num_points) * num_spatial_dims
+        maximum_absolute * num_points**2 * num_spatial_dims
     )
     return normalized_gradient_norm_scale
 
