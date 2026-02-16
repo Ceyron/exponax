@@ -30,8 +30,8 @@ theme:
              name: Switch to light mode
     icon:
         repo: fontawesome/brands/github  # GitHub logo in top right
-    logo: "imgs/logo.png" # Logo in top left
-    favicon: "imgs/logo.png"  # Favicon in browser tab
+    logo: "imgs/logo.svg" # Logo in top left
+    favicon: "imgs/logo.svg"  # Favicon in browser tab
 
 extra:
   social:
@@ -48,7 +48,11 @@ strict: true  # Don't allow warnings during the build process
 markdown_extensions:
     - pymdownx.arithmatex:  # Render LaTeX via MathJax
         generic: true
-    - pymdownx.superfences  # Seems to enable syntax highlighting when used with the Material theme.
+    - pymdownx.superfences:  # Seems to enable syntax highlighting when used with the Material theme.
+        custom_fences:
+          - name: mermaid
+            class: mermaid
+            format: !!python/name:pymdownx.superfences.fence_code_format
     - pymdownx.details  # Allowing hidden expandable regions denoted by ???
     - pymdownx.snippets:  # Include one Markdown file into another
         base_path: docs

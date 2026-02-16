@@ -1,3 +1,4 @@
+import jax
 import jax.numpy as jnp
 from jaxtyping import Array, Complex
 
@@ -60,12 +61,17 @@ class ETDRK1(BaseETDRK):
         super().__init__(dt, linear_operator)
         self._nonlinear_fun = nonlinear_fun
 
-        LR = (
-            circle_radius * roots_of_unity(num_circle_points)
-            + linear_operator[..., jnp.newaxis] * dt
-        )
+        roots = roots_of_unity(num_circle_points)
+        L_dt = linear_operator * dt
 
-        self._coef_1 = dt * jnp.mean((jnp.exp(LR) - 1) / LR, axis=-1).real
+        def scan_body(acc, root):
+            lr = circle_radius * root + L_dt
+            exp_lr = jnp.exp(lr)
+            return acc + ((exp_lr - 1) / lr).real, None
+
+        sum_c1, _ = jax.lax.scan(scan_body, jnp.zeros_like(L_dt.real), roots)
+        mean_c1 = sum_c1 / num_circle_points
+        self._coef_1 = dt * mean_c1
 
     def step_fourier(
         self,

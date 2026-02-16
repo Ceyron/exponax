@@ -1,3 +1,4 @@
+import jax
 import jax.numpy as jnp
 import pytest
 from jaxtyping import Array, Float
@@ -301,3 +302,52 @@ def test_map_between_resolutions_3d(
     # Looser rel tol because JAX runs in single precision by default, and the
     # FFT incorse some rounding errors
     assert u_new == pytest.approx(u_new_correct, rel=10.0, abs=3e-4)
+
+
+# ===========================================================================
+# Edge case tests for map_between_resolutions
+# ===========================================================================
+
+
+def test_map_between_resolutions_same_resolution():
+    """When old and new resolution match, should return input unchanged."""
+    N = 64
+    grid = ex.make_grid(1, 1.0, N)
+    u = jnp.sin(2 * jnp.pi * grid)
+    u_mapped = ex.map_between_resolutions(u, N)
+    assert u_mapped == pytest.approx(u, abs=1e-6)
+
+
+def test_map_between_resolutions_same_resolution_2d():
+    """Same resolution shortcut should work in 2D."""
+    N = 32
+    grid = ex.make_grid(2, 1.0, N)
+    u = jnp.sin(2 * jnp.pi * grid[0:1]) * jnp.cos(2 * jnp.pi * grid[1:2])
+    u_mapped = ex.map_between_resolutions(u, N)
+    assert u_mapped == pytest.approx(u, abs=1e-6)
+
+
+@pytest.mark.parametrize("num_spatial_dims", [1, 2, 3])
+def test_roundtrip_on_bandlimited_signal(num_spatial_dims):
+    """
+    Test that mapping between resolutions and back again recovers the original signal
+    when the signal is bandlimited to the lower resolution.
+    """
+
+    num_points = 32
+    num_points_low = 24
+    num_points_high = 48
+    bandlimited_signal = ex.ic.RandomTruncatedFourierSeries(
+        num_spatial_dims=num_spatial_dims, cutoff=4
+    )(num_points, key=jax.random.key(0))
+
+    # Map down to low resolution and back up to high resolution
+    signal_low = ex.map_between_resolutions(bandlimited_signal, num_points_low)
+    signal_from_low = ex.map_between_resolutions(signal_low, num_points)
+
+    assert signal_from_low == pytest.approx(bandlimited_signal, abs=1e-5)
+
+    signal_high = ex.map_between_resolutions(bandlimited_signal, num_points_high)
+    signal_from_high = ex.map_between_resolutions(signal_high, num_points)
+
+    assert signal_from_high == pytest.approx(bandlimited_signal, abs=1e-5)

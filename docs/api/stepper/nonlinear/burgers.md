@@ -6,7 +6,7 @@ $$ \frac{\partial u}{\partial t} + \frac{1}{2} \frac{\partial u^2}{\partial x} =
 
 In higher dimensions:
 
-$$ \frac{\partial u}{\partial t} + \frac{1}{2} \nabla \cdot (u \odot u) = \nu \nabla \cdot \nabla u $$
+$$ \frac{\partial \mathbf{u}}{\partial t} + \frac{1}{2} \nabla \cdot (\mathbf{u} \otimes \mathbf{u}) = \nu \nabla \cdot \nabla \mathbf{u} $$
 
 (with as many channels (=velocity components) as spatial dimensions)
 

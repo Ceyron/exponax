@@ -12,6 +12,8 @@ urls = {repository = "https://github.com/Ceyron/exponax" }
 dependencies = ["jax>=0.4.13", "jaxtyping>=0.2.20", "typing_extensions>=4.5.0", "equinox>=0.11.3", "matplotlib>=3.8.1"]
 
 [project.optional-dependencies]
+vape4d = ["vape4d"]
+test = ["jaxlib", "pytest", "pytest-cov"]
 docs = [
     "mkdocs==1.6.1",
     "mkdocs-material==9.7.1",
@@ -48,3 +50,14 @@ where = ["."]  # list of folders that contain the packages (["."] by default)
 include = ["exponax*"]  # package names should match these glob patterns (["*"] by default)
 exclude = []  # exclude packages matching these glob patterns (empty by default)
 namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
+
+[tool.coverage.run]
+source = ["exponax"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__",
+    "raise NotImplementedError",
+    "@abstractmethod",
+]
