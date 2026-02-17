@@ -1,3 +1,4 @@
+# Linear
 
 ::: exponax.stepper.generic.NormalizedLinearStepper
     options:

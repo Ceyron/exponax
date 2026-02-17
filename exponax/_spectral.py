@@ -232,7 +232,7 @@ def spatial_shape(num_spatial_dims: int, num_points: int) -> tuple[int, ...]:
     """
     Returns the shape of a spatial field array (without its leading channel
     axis). This follows the `Exponax` convention that the resolution is
-    indentical in each dimension.
+    identical in each dimension.
 
     !!! example
         For a 2D field array with 64 points in each dimension, the spatial shape
@@ -254,7 +254,7 @@ def spatial_shape(num_spatial_dims: int, num_points: int) -> tuple[int, ...]:
 def wavenumber_shape(num_spatial_dims: int, num_points: int) -> tuple[int, ...]:
     """
     Returns the spatial shape of a field in Fourier space (assuming the usage of
-    `exponax.fft` which internall performs a real-valued fft
+    `exponax.fft` which internally performs a real-valued fft
     `jax.numpy.fft.rfftn`).
 
     !!! example
@@ -648,7 +648,7 @@ def fft(
         (this function) does not apply any normalization to the result, only the
         [`exponax.ifft`][] function applies normalization. To extract the
         amplitude of the coefficients divide by
-        `expoanx.spectral.build_scaling_array`.
+        `exponax.spectral.build_scaling_array`.
     """
     if num_spatial_dims is None:
         num_spatial_dims = field.ndim - 1
@@ -1059,7 +1059,7 @@ def get_fourier_coefficients(
         `Exponax`. The mode `"reconstruction"` is similar to that but
         compensates for the fact that the rfft only has half of the coefficients
         along the right-most axis. The mode `"coef_extraction"` allows to read
-        of the coefficient e.g. at index [i, j] (in 2D) directly wheras in the
+        of the coefficient e.g. at index [i, j] (in 2D) directly whereas in the
         other modes, one would require to consider both the positive and
         negative wavenumbers. Can be set to `None` to not apply any scaling
         compensation. See also [`exponax.spectral.build_scaling_array`][] for
@@ -1150,7 +1150,7 @@ def get_fourier_coefficients(
         * A second cosine mode with amplitude +0.3
         * A second sine mode with amplitude -0.8
 
-        In higher dimensions, the interpretation arise out of the tensor
+        In higher dimensions, the interpretation arises out of the tensor
         product. Also be aware that for a `(1, N, N)` state, the coefficients
         are in the shape `(1, N, (N//2)+1)`.
     """

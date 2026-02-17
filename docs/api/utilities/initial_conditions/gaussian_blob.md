@@ -8,4 +8,4 @@
 
 ---
 
-:::exponax.ic.GaussianBlobs
+::: exponax.ic.GaussianBlobs

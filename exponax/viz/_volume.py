@@ -22,7 +22,7 @@ def zigzag_alpha(cmap, min_alpha=0.0):
     Args:
         cmap (Colormap): colormap
 
-    Returns:a
+    Returns:
         Colormap: new colormap
     """
     if isinstance(cmap, ListedColormap):

@@ -150,7 +150,7 @@ class GeneralNonlinearStepper(BaseStepper):
             derivative_operator=derivative_operator,
             dealiasing_fraction=self.dealiasing_fraction,
             scale_list=self.nonlinear_coefficients,
-            zero_mode_fix=True,  # ToDo: check this
+            zero_mode_fix=True,  # TODO: check this
         )
 
 

@@ -1,5 +1,5 @@
 """
-Collection of nonlinear functions for ETDRK mehtods.
+Collection of nonlinear functions for ETDRK methods.
 
 In an n-dimensional setting they are:
     1. Zero: `𝒩(u) = 0`

@@ -19,7 +19,7 @@ def make_grid(
     """
     Return a grid in the spatial domain. A grid in D dimensions is an array of
     shape (D,) + (num_points,)*D with the leading axis representing all
-    coordiate inidices.
+    coordinate indices.
 
     Notice, that if `num_spatial_dims = 1`, the returned array has a singleton
     dimension in the first axis, i.e., the shape is `(1, num_points)`.
@@ -263,7 +263,7 @@ def stack_sub_trajectories(
     together. Useful for rollout training neural operators with temporal mixing.
 
     !!! warning
-        This function can produce very large arrays, especially if `sub_le >>
+        This function can produce very large arrays, especially if `sub_len >>
         1`.
 
     **Arguments:**

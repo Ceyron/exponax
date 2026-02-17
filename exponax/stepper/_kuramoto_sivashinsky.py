@@ -40,13 +40,13 @@ class KuramotoSivashinsky(BaseStepper):
         ```
 
         with `b₂` the gradient-norm coefficient, `ψ₁` the second-order scale and
-        `ψ₂` the fourth-order. If the latter two terms were on the right-hand
+        `ψ₂` the fourth-order scale. If the latter two terms were on the right-hand
         side, they could be interpreted as diffusivity and hyper-diffusivity,
         respectively. Here, the second-order term acts destabilizing (increases
         the energy of the system) and the fourth-order term acts stabilizing
         (decreases the energy of the system). A common configuration is `b₂ = ψ₁
         = ψ₂ = 1` and the dynamics are only adapted using the `domain_extent`.
-        For this, we espect the KS equation to experience spatio-temporal chaos
+        For this, we expect the KS equation to experience spatio-temporal chaos
         roughly once `L > 60`.
 
         In this combustion (=non-conservative) format, the number of channels
@@ -77,7 +77,7 @@ class KuramotoSivashinsky(BaseStepper):
             that the gradient norm is already scaled by 1/2. This factor allows
             for further modification. Default: 1.0.
         - `second_order_scale`: The "diffusivity" `ψ₁` in the KS equation.
-        - `fourth_order_diffusivity`: The "hyper-diffusivity" `ψ₂` in the KS
+        - `fourth_order_scale`: The "hyper-diffusivity" `ψ₂` in the KS
             equation.
         - `order`: The order of the Exponential Time Differencing Runge
             Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
@@ -108,7 +108,7 @@ class KuramotoSivashinsky(BaseStepper):
             chaotic attractor is independent of the initial condition.
         - However, since the KS develops a certain spectrum based on the
             domain length, make sure to use enough discretization point to
-            capture the highes occuring mode. For a domain extent of 60, this
+            capture the highest occuring mode. For a domain extent of 60, this
             requires at least roughly 100 `num_points` in single precision
             floats.
         - For domain lengths smaller than the threshold to enter chaos, the
@@ -210,7 +210,7 @@ class KuramotoSivashinskyConservative(BaseStepper):
         the energy of the system) and the fourth-order term acts stabilizing
         (decreases the energy of the system). A common configuration is `b₁ = ψ₁
         = ψ₂ = 1` and the dynamics are only adapted using the `domain_extent`.
-        For this, we espect the KS equation to experience spatio-temporal chaos
+        For this, we expect the KS equation to experience spatio-temporal chaos
         roughly once `L > 60`.
 
         !!! info
@@ -235,7 +235,7 @@ class KuramotoSivashinskyConservative(BaseStepper):
             convection term is already scaled by 1/2. This factor allows for
             further modification. Default: 1.0.
         - `second_order_scale`: The "diffusivity" `ψ₁` in the KS equation.
-        - `fourth_order_diffusivity`: The "hyper-diffusivity" `ψ₂` in the KS
+        - `fourth_order_scale`: The "hyper-diffusivity" `ψ₂` in the KS
             equation.
         - `single_channel`: Whether to use a single channel for the spatial
             dimension. Default: `False`.

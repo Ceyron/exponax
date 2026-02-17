@@ -164,8 +164,8 @@ def animate_spatio_temporal_facet(
     - `dt`: The time step between each frame. Default is `None`. If provided,
         a title will be displayed with the current time. If not provided, just
         the frames are counted.
-    - `include_init`: Whether to the state starts at an initial condition (t=0)
-        or at the first frame in the trajectory. This affects is the the time
+    - `include_init`: Whether the state starts at an initial condition (t=0)
+        or at the first frame in the trajectory. This affects whether the time
         range is [0, (T-1)dt] or [dt, Tdt]. Default is `False`.
     - `grid`: The grid of subplots. Default is `(3, 3)`.
     - `figsize`: The size of the figure. Default is `(10, 10)`.
@@ -228,8 +228,8 @@ def animate_state_2d_facet(
     - `domain_extent`: The extent of the spatial domain. Default is `None`. This
         affects the x-axis and y-axis limits of the plot.
     - `dt`: The time step between each frame. Default is `None`.
-    - `include_init`: Whether to the state starts at an initial condition (t=0)
-        or at the first frame in the trajectory. This affects is the the time
+    - `include_init`: Whether the state starts at an initial condition (t=0)
+        or at the first frame in the trajectory. This affects whether the time
         range is [0, (T-1)dt] or [dt, Tdt]. Default is `False`.
     - `grid`: The grid of subplots. Default is `(3, 3)`.
     - `figsize`: The size of the figure. Default is `(10, 10)`.
@@ -345,8 +345,8 @@ def animate_state_3d_facet(
     - `domain_extent`: The extent of the spatial domain. Default is `None`. This
         affects the x-axis and y-axis limits of the plot.
     - `dt`: The time step between each frame. Default is `None`.
-    - `include_init`: Whether to the state starts at an initial condition (t=0)
-        or at the first frame in the trajectory. This affects is the the time
+    - `include_init`: Whether the state starts at an initial condition (t=0)
+        or at the first frame in the trajectory. This affects whether the time
         range is [0, (T-1)dt] or [dt, Tdt]. Default is `False`.
     - `bg_color`: The background color. Either `"black"`, `"white"`, or a tuple
         of RGBA values. Default is `"white"`.
