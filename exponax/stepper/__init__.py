@@ -16,8 +16,10 @@ The concrete PDE steppers are:
     - KortewegDeVries
     - KuramotoSivashinsky
     - KuramotoSivashinskyConservative
-    - NavierStokesVorticity
-    - KolmogorovFlowVorticity
+    - NavierStokesVorticity (2D, streamfunction-vorticity formulation)
+    - KolmogorovFlowVorticity (2D, streamfunction-vorticity formulation)
+    - NavierStokesVelocity (3D, velocity formulation with Leray projection)
+    - KolmogorovFlowVelocity (3D, velocity formulation with Leray projection)
 
 The flexible steppers are:
     - GeneralLinearStepper: combines an arbitrary number of (isotropic) linear
@@ -51,12 +53,16 @@ GeneralGradientNormStepper.
 The NavierStokesVorticity and KolmogorovFlowVorticity steppers are special cases
 of the GeneralVorticityConvectionStepper.
 
+The NavierStokesVelocity and KolmogorovFlowVelocity steppers use a projected
+convection nonlinearity (rotational form with Leray projection) and have no
+corresponding generic stepper.
+
 In the reaction submodule you find specific steppers that are special cases of
 the GeneralPolynomialStepper, e.g., the FisherKPPStepper.
 
-All of the specific steppers (except for the NavierStokesVorticity and
-KolmogorovFlowVorticity) are special cases of the GeneralNonlinearStepper (if
-considered isotropic and with the convection in single-channel).
+All of the specific steppers (except for the Navier-Stokes and Kolmogorov Flow
+variants) are special cases of the GeneralNonlinearStepper (if considered
+isotropic and with the convection in single-channel).
 
 
 Hence, almost every (isotropic) dynamic can be expressed with the general

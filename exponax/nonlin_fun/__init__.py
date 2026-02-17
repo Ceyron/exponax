@@ -7,6 +7,11 @@ In an n-dimensional setting they are:
     3. Gradient Norm: `𝒩(u) = b₂ 1/2 ‖∇u‖₂²`
     4. Polynomial: `𝒩(u) = ∑ᵢ cᵢ uⁱ`
     5. Vorticity Convection (only 2d): `𝒩(u) = b ([1, -1]ᵀ ⊙ ∇(Δ⁻¹u)) ⋅ ∇u`
+    6. Projected Convection (only 3d): `𝒩(u) = 𝒫(u × ω)` with `ω = ∇ × u`
+    7. Projected Convection with Kolmogorov forcing (only 3d): `𝒩(u) = 𝒫(u ×
+       ω) + f`
+    8. Leray Projection: `𝒫(u) = u - ∇(Δ⁻¹ ∇ ⋅ u)` (projects onto
+       divergence-free fields)
 
 The zero nonlinear function is used for linear equations.
 
@@ -22,7 +27,8 @@ Some reaction-diffusion equations have their own nonlinear functions that are
 found in their respective modules.
 
 A nonlinear function can also be used to encode a forcing term in the equation
-as done with `VorticityConvection2dKolmogorov`.
+as done with `VorticityConvection2dKolmogorov` and
+`ProjectedConvection3dKolmogorov`.
 """
 
 from ._base import BaseNonlinearFun
