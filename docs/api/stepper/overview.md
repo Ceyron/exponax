@@ -52,8 +52,11 @@ graph TD
     B -..->|"flip Diff. &<br/>Hyper-Diff. signs"| KSC
     KSC -..->|"Convection →<br/>Gradient Norm"| KS
 
-    Diff -->|"+ Vort. Conv.<br/>(2D only)"| NS["Navier-Stokes"]
-    NS -->|"+ Drag<br/>+ Forcing"| KF["Kolmogorov<br/>Flow"]
+    Diff -->|"+ Vort. Conv.<br/>(2D only)"| NS2["Navier-Stokes<br/>(2D vorticity)"]
+    NS2 -->|"+ Drag<br/>+ Forcing"| KF2["Kolmogorov Flow<br/>(2D vorticity)"]
+
+    Diff -->|"+ Proj. Conv.<br/>(3D only)"| NS3["Navier-Stokes<br/>(3D velocity)"]
+    NS3 -->|"+ Drag<br/>+ Forcing"| KF3["Kolmogorov Flow<br/>(3D velocity)"]
 
     Diff -->|"+ u(1−u)"| Fisher["Fisher-KPP"]
     Diff -->|"+ c₁u + c₃u³"| AC["Allen-Cahn"]
@@ -68,7 +71,7 @@ graph TD
 
     class Adv,Diff,Disp,Hyp,AD linear
     class B,KdV,KSC,KS nonlinear
-    class NS,KF vorticity
+    class NS2,KF2,NS3,KF3 vorticity
     class Fisher,AC,CH,SH,GS reaction
 ```
 
@@ -100,8 +103,10 @@ separate rows below. In 1D, the isotropic and anisotropic forms are identical.
 | [Korteweg-de Vries](nonlinear/kdv.md) | `KortewegDeVries` | N-D-M | 1,2,3 | $d$ | $\partial_t u = - b \frac{1}{2} \partial_x u^2 + a_3 \, \partial_{xxx} u + \nu \, \partial_{xx} u - \mu \, \partial_{xxxx} u$ | $\partial_t u = - b \frac{1}{2} \nabla \cdot (\mathbf{u} \otimes \mathbf{u}) + a_3 \nabla(\Delta \mathbf{u}) + \nu \nabla \cdot \nabla \mathbf{u} - \mu \, \Delta(\Delta \mathbf{u})$ |
 | [Kuramoto-Sivashinsky](nonlinear/ks.md) | `KuramotoSivashinsky` | N-I-C | 1,2,3 | 1 | $\partial_t u = - b \frac{1}{2} (\partial_x u)^2 - \psi_1 \partial_{xx} u - \psi_2 \partial_{xxxx} u$ | $\partial_t u = - b \frac{1}{2} \lVert \nabla u \rVert_2^2 - \psi_1 \nabla \cdot \nabla u - \psi_2 \Delta(\Delta u)$ |
 | [KS (conservative)](nonlinear/ks_cons.md) | `KuramotoSivashinskyConservative` | N-I-C-M | 1,2,3 | $d$ | $\partial_t u = - b \frac{1}{2} \partial_x u^2 - \psi_1 \partial_{xx} u - \psi_2 \partial_{xxxx} u$ | $\partial_t u = - b \frac{1}{2} \nabla \cdot (\mathbf{u} \otimes \mathbf{u}) - \psi_1 \nabla \cdot \nabla \mathbf{u} - \psi_2 \Delta(\Delta \mathbf{u})$ |
-| [Navier-Stokes](nonlinear/navier_stokes.md) | `NavierStokesVorticity` | N-D | 2 | 1 | | $\partial_t u = - b \left(\begin{bmatrix}1 \\ -1\end{bmatrix} \odot \nabla(\Delta^{-1} u)\right) \cdot \nabla u + \nu \nabla \cdot \nabla u$ |
-| [Kolmogorov Flow](nonlinear/navier_stokes.md) | `KolmogorovFlowVorticity` | N-I-C | 2 | 1 | | $\partial_t u = - b \left(\begin{bmatrix}1 \\ -1\end{bmatrix} \odot \nabla(\Delta^{-1} u)\right) \cdot \nabla u + \lambda u + \nu \nabla \cdot \nabla u + f$ |
+| [Navier-Stokes (2D)](nonlinear/navier_stokes.md) | `NavierStokesVorticity` | N-D | 2 | 1 | | $\partial_t u = - b \left(\begin{bmatrix}1 \\ -1\end{bmatrix} \odot \nabla(\Delta^{-1} u)\right) \cdot \nabla u + \nu \nabla \cdot \nabla u$ |
+| [Kolmogorov Flow (2D)](nonlinear/navier_stokes.md) | `KolmogorovFlowVorticity` | N-I-C | 2 | 1 | | $\partial_t u = - b \left(\begin{bmatrix}1 \\ -1\end{bmatrix} \odot \nabla(\Delta^{-1} u)\right) \cdot \nabla u + \lambda u + \nu \nabla \cdot \nabla u + f$ |
+| [Navier-Stokes (3D)](nonlinear/navier_stokes.md) | `NavierStokesVelocity` | N-D-M | 3 | 3 | | $\partial_t \mathbf{u} = \mathcal{P}(\mathbf{u} \times \boldsymbol{\omega}) + \nu \nabla \cdot \nabla \mathbf{u}$ |
+| [Kolmogorov Flow (3D)](nonlinear/navier_stokes.md) | `KolmogorovFlowVelocity` | N-I-C-M | 3 | 3 | | $\partial_t \mathbf{u} = \mathcal{P}(\mathbf{u} \times \boldsymbol{\omega}) + \lambda \mathbf{u} + \nu \nabla \cdot \nabla \mathbf{u} + \mathbf{f}$ |
 | [Fisher-KPP](reaction/fisher_kpp.md) | `FisherKPP` | N-S | 1,2,3 | 1 | $\partial_t u = \nu \, \partial_{xx} u + r \, u(1 - u)$ | $\partial_t u = \nu \nabla \cdot \nabla u + r \, u(1 - u)$ |
 | [Allen-Cahn](reaction/allen_cahn.md) | `AllenCahn` | N-S | 1,2,3 | 1 | $\partial_t u = \nu \, \partial_{xx} u + c_1 u + c_3 u^3$ | $\partial_t u = \nu \nabla \cdot \nabla u + c_1 u + c_3 u^3$ |
 | [Cahn-Hilliard](reaction/cahn_hilliard.md) | `CahnHilliard` | N-S | 1,2,3 | 1 | $\partial_t u = \nu \, \partial_{xx}(c_3 u^3 + c_1 u - \gamma \, \partial_{xx} u)$ | $\partial_t u = \nu \Delta(c_3 u^3 + c_1 u - \gamma \Delta u)$ |
@@ -168,8 +173,8 @@ graph LR
 
     subgraph GVC["<b>GeneralVorticityConvectionStepper</b><br/>(2D only)"]
         direction LR
-        E1["Navier-Stokes"]
-        E2["Kolmogorov Flow"]
+        E1["Navier-Stokes (2D)"]
+        E2["Kolmogorov Flow (2D)"]
     end
 
     GN["<b>GeneralNonlinearStepper</b><br/><small>encompasses single-channel, isotropic<br/>versions of Linear, Convection,<br/>and Gradient Norm families</small>"]
@@ -194,7 +199,7 @@ There are **three interfaces** for each generic stepper family:
 | [Gradient Norm](generic/physical/general_gradient_norm.md) | $\frac{b}{2} \lVert \nabla u \rVert_2^2$ | 1 | 1,2,3 | KS (combustion) |
 | [Polynomial](generic/physical/general_polynomial.md) | $\sum_i c_i u^i$ | 1 | 1,2,3 | Fisher-KPP, Allen-Cahn, Swift-Hohenberg |
 | [Nonlinear](generic/physical/general_nonlinear.md) | $b_0 u^2 + \frac{b_1}{2}(\vec{1} \cdot \nabla) u^2 + \frac{b_2}{2} \lVert \nabla u \rVert_2^2$ | 1 | 1,2,3 | Combines quadratic, single-channel convection, and gradient norm |
-| [Vorticity Convection](generic/physical/general_vorticity_convection.md) | $b \left(\begin{bmatrix}1 \\ -1\end{bmatrix} \odot \nabla(\Delta^{-1} u)\right) \cdot \nabla u$ | 1 | 2 | Navier-Stokes, Kolmogorov Flow |
+| [Vorticity Convection](generic/physical/general_vorticity_convection.md) | $b \left(\begin{bmatrix}1 \\ -1\end{bmatrix} \odot \nabla(\Delta^{-1} u)\right) \cdot \nabla u$ | 1 | 2 | Navier-Stokes (2D), Kolmogorov Flow (2D) |
 
 All generic steppers (except vorticity convection) combine their respective
 nonlinearity with an arbitrary number of **isotropic** linear terms:

@@ -155,7 +155,7 @@ nav:
             - Convection: 'api/utilities/nonlin_fun/convection.md'
             - Gradient Norm: 'api/utilities/nonlin_fun/gradient_norm.md'
             - Polynomial: 'api/utilities/nonlin_fun/polynomial.md'
-            - Vorticity Convection: 'api/utilities/nonlin_fun/vorticity_convection.md'
+            - Vorticity / Projected Convection: 'api/utilities/nonlin_fun/vorticity_convection.md'
             - Nonlinear: 'api/utilities/nonlin_fun/nonlinear.md'
         - Repeated Stepper: 'api/utilities/repeated_stepper.md'
         - Forced Stepper: 'api/utilities/forced_stepper.md'

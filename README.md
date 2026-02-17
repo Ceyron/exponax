@@ -116,6 +116,8 @@ that explains the basics of `Exponax`.
 | KS (conservative): $u_t + \frac{1}{2} \nabla \cdot (u \otimes u) + \Delta u + \Delta^2 u = 0$ | [`KuramotoSivashinskyConservative`](https://fkoehler.site/exponax/api/stepper/nonlinear/ks_cons/) | 1D, 2D, 3D |
 | Navier-Stokes (vorticity): $\omega_t + (u \cdot \nabla)\omega = \nu \Delta \omega$ | [`NavierStokesVorticity`](https://fkoehler.site/exponax/api/stepper/nonlinear/navier_stokes/) | 2D |
 | Kolmogorov Flow (vorticity): $\omega_t + (u \cdot \nabla)\omega = \nu \Delta \omega + f$ | [`KolmogorovFlowVorticity`](https://fkoehler.site/exponax/api/stepper/nonlinear/navier_stokes/) | 2D |
+| Navier-Stokes (velocity): $u_t = \nu \Delta u + \mathcal{P}(u \times \omega)$ | [`NavierStokesVelocity`](https://fkoehler.site/exponax/api/stepper/nonlinear/navier_stokes/) | 3D |
+| Kolmogorov Flow (velocity): $u_t = \nu \Delta u + \mathcal{P}(u \times \omega) + f$ | [`KolmogorovFlowVelocity`](https://fkoehler.site/exponax/api/stepper/nonlinear/navier_stokes/) | 3D |
 
 ### Reaction-Diffusion
 
