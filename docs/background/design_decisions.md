@@ -41,11 +41,15 @@ These constraints arise from the Fourier pseudo-spectral ETDRK approach itself.
   directly conform to the framework.
 * Reformulating higher-order PDEs into first-order systems often introduces
   channel mixing in the linear operator, which breaks the diagonal structure in
-  Fourier space and makes the method inapplicable. (Though one can use clever diaganolization tricks but this is problem-specific).
+  Fourier space and makes the method inapplicable. (Though one can use clever
+  diagonalization tricks but this is problem-specific; see
+  [`Wave`](../api/stepper/linear/wave.md) for an example.)
 
 ## No Channel Mixing in the Linear Operator (M, C)
 
-* Breaks down the diagonalization in Fourier space. (Though one can use clever diaganolization tricks but this is problem-specific).
+* Breaks down the diagonalization in Fourier space. (Though one can use clever
+  diagonalization tricks but this is problem-specific; see
+  [`Wave`](../api/stepper/linear/wave.md) for an example.)
 
 ## No Inhomogeneous Coefficients in Front of the Linear Operator (M)
 
