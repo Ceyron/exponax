@@ -78,7 +78,7 @@ class ProjectedConvection3d(BaseNonlinearFun):
 
 
 class ProjectedConvection3dKolmogorov(ProjectedConvection3d):
-    injection: Complex[Array, "1 ... (N//2)+1"]
+    injection: Complex[Array, "3 ... (N//2)+1"]
 
     def __init__(
         self,
@@ -103,15 +103,19 @@ class ProjectedConvection3dKolmogorov(ProjectedConvection3d):
             & (wavenumbers[1] == injection_mode)
             & (wavenumbers[2] == 0)
         )
-        self.injection = jnp.where(
+        # In 3D, we work with velocity directly (not vorticity), so the
+        # forcing is f = γ sin(k x₁) ê₀. Only the first velocity channel is
+        # forced, and no extra -k factor is needed (unlike the 2D vorticity
+        # formulation).
+        injection_single = jnp.where(
             injection_mask,
-            # Need to additional scale the `injection_scale` with the
-            # `injection_mode`, because we apply the forcing on the vorticity.
-            -injection_mode
-            * injection_scale
+            injection_scale
             * build_scaling_array(num_spatial_dims, num_points, mode="coef_extraction"),
             0.0,
         )
+        # Shape (3, N, N, N//2+1): forcing only in the first velocity channel
+        zeros = jnp.zeros_like(injection_single)
+        self.injection = jnp.concatenate([injection_single, zeros, zeros], axis=0)
 
     def __call__(
         self, u_hat: Complex[Array, "3 ... (N//2)+1"]
