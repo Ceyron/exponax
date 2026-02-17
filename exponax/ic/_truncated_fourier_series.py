@@ -81,7 +81,7 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
             absolute value of one. Defaults to `False`. Only one of `std_one`
             and `max_one` can be `True`.
         """
-        if offset_range == (0.0, 0.0) and std_one:
+        if offset_range != (0.0, 0.0) and std_one:
             raise ValueError("Cannot have non-zero offset and `std_one=True`.")
         if std_one and max_one:
             raise ValueError("Cannot have `std_one=True` and `max_one=True`.")
@@ -134,7 +134,7 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
         fourier_noise = fourier_noise * build_scaling_array(
             self.num_spatial_dims,
             num_points,
-            mode="coef_extraction",
+            mode="reconstruction",
         )
 
         u = ifft(

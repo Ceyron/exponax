@@ -84,7 +84,7 @@ class GaussianRandomField(BaseRandomICGenerator):
         noise = noise * amplitude
 
         noise = noise * build_scaling_array(
-            self.num_spatial_dims, num_points, mode="coef_extraction"
+            self.num_spatial_dims, num_points, mode="reconstruction"
         )
 
         ic = ifft(noise, num_spatial_dims=self.num_spatial_dims, num_points=num_points)

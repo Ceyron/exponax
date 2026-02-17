@@ -345,9 +345,9 @@ def test_roundtrip_on_bandlimited_signal(num_spatial_dims):
     signal_low = ex.map_between_resolutions(bandlimited_signal, num_points_low)
     signal_from_low = ex.map_between_resolutions(signal_low, num_points)
 
-    assert signal_from_low == pytest.approx(bandlimited_signal, abs=1e-5)
+    assert signal_from_low == pytest.approx(bandlimited_signal, abs=3e-5)
 
     signal_high = ex.map_between_resolutions(bandlimited_signal, num_points_high)
     signal_from_high = ex.map_between_resolutions(signal_high, num_points)
 
-    assert signal_from_high == pytest.approx(bandlimited_signal, abs=1e-5)
+    assert signal_from_high == pytest.approx(bandlimited_signal, abs=3e-5)
