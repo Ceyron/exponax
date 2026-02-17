@@ -76,9 +76,9 @@ from ._hyper_diffusion import HyperDiffusion
 from ._korteweg_de_vries import KortewegDeVries
 from ._kuramoto_sivashinsky import KuramotoSivashinsky, KuramotoSivashinskyConservative
 from ._navier_stokes import (
+    KolmogorovFlowVelocity,
     KolmogorovFlowVorticity,
-    NavierStokes3d,
-    NavierStokes3dKolmogorov,
+    NavierStokesVelocity,
     NavierStokesVorticity,
 )
 
@@ -96,6 +96,6 @@ __all__ = [
     "KolmogorovFlowVorticity",
     "reaction",
     "generic",
-    "NavierStokes3d",
-    "NavierStokes3dKolmogorov",
+    "NavierStokesVelocity",
+    "KolmogorovFlowVelocity",
 ]

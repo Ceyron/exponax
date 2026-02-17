@@ -316,7 +316,7 @@ class KolmogorovFlowVorticity(BaseStepper):
         )
 
 
-class NavierStokes3d(BaseStepper):
+class NavierStokesVelocity(BaseStepper):
     diffusivity: float
     drag: float
     dealiasing_fraction: float
@@ -336,7 +336,7 @@ class NavierStokes3d(BaseStepper):
         circle_radius: float = 1.0,
     ):
         if num_spatial_dims != 3:
-            raise ValueError("NavierStokes3d only supports 3 spatial dimensions.")
+            raise ValueError("NavierStokesVelocity only supports 3 spatial dimensions.")
 
         self.diffusivity = diffusivity
         self.drag = drag
@@ -367,7 +367,7 @@ class NavierStokes3d(BaseStepper):
         )
 
 
-class NavierStokes3dKolmogorov(BaseStepper):
+class KolmogorovFlowVelocity(BaseStepper):
     diffusivity: float
     drag: float
     injection_mode: int
