@@ -1,6 +1,6 @@
 import jax
 import jax.numpy as jnp
-from jaxtyping import Array, Complex
+from jaxtyping import Array, Complex, Inexact
 
 from ..nonlin_fun import BaseNonlinearFun
 from ._base_etdrk import BaseETDRK
@@ -9,8 +9,8 @@ from ._utils import roots_of_unity
 
 class ETDRK2(BaseETDRK):
     _nonlinear_fun: BaseNonlinearFun
-    _coef_1: Complex[Array, "E ... (N//2)+1"]
-    _coef_2: Complex[Array, "E ... (N//2)+1"]
+    _coef_1: Inexact[Array, "E ... (N//2)+1"]
+    _coef_2: Inexact[Array, "E ... (N//2)+1"]
 
     def __init__(
         self,
