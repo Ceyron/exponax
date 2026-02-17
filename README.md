@@ -105,6 +105,7 @@ that explains the basics of `Exponax`.
 | Advection-Diffusion: $u_t + c \cdot \nabla u = \nu \Delta u$ | [`AdvectionDiffusion`](https://fkoehler.site/exponax/api/stepper/linear/advection_diffusion/) | 1D, 2D, 3D |
 | Dispersion: $u_t = \xi \nabla^3 u$ | [`Dispersion`](https://fkoehler.site/exponax/api/stepper/linear/dispersion/) | 1D, 2D, 3D |
 | Hyper-Diffusion: $u_t = -\zeta \Delta^2 u$ | [`HyperDiffusion`](https://fkoehler.site/exponax/api/stepper/linear/hyper_diffusion/) | 1D, 2D, 3D |
+| Wave: $u_{tt} = c^2 \Delta u$ | [`Wave`](https://fkoehler.site/exponax/api/stepper/linear/wave/) | 1D, 2D, 3D |
 
 ### Nonlinear
 

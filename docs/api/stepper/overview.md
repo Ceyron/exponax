@@ -41,6 +41,7 @@ graph TD
     Diff["Diffusion<br/><small>ν ∂ₓₓu</small>"]
     Disp["Dispersion<br/><small>ξ ∂ₓₓₓu</small>"]
     Hyp["Hyper-Diffusion<br/><small>−μ ∂ₓₓₓₓu</small>"]
+    Wav["Wave<br/><small>uₜₜ = c² Δu</small>"]
 
     Adv -->|"+ Diffusion"| AD["Advection-<br/>Diffusion"]
 
@@ -69,7 +70,7 @@ graph TD
     classDef reaction fill:#F1F2E1,stroke:#a0a170,color:#4a4b20
     classDef vorticity fill:#f3e5f5,stroke:#7b1fa2,color:#4a148c
 
-    class Adv,Diff,Disp,Hyp,AD linear
+    class Adv,Diff,Disp,Hyp,AD,Wav linear
     class B,KdV,KSC,KS nonlinear
     class NS2,KF2,NS3,KF3 vorticity
     class Fisher,AC,CH,SH,GS reaction
@@ -98,6 +99,7 @@ separate rows below. In 1D, the isotropic and anisotropic forms are identical.
 | Spatially-Mixed Dispersion | `Dispersion` | L-I | 2,3 | 1 | | $\partial_t u = \boldsymbol{\xi} \cdot \nabla(\nabla \cdot \nabla u)$ |
 | [Hyper-Diffusion](linear/hyper_diffusion.md) | `HyperDiffusion` | L-D | 1,2,3 | 1 | $\partial_t u = - \mu \, \partial_{xxxx} u$ | $\partial_t u = - \mu \, ((\nabla \odot \nabla) \cdot (\nabla \odot \nabla)) u$ |
 | Spatially-Mixed Hyper-Diffusion | `HyperDiffusion` | L-D | 2,3 | 1 | | $\partial_t u = - \mu \, (\nabla \cdot \nabla)(\nabla \cdot \nabla u)$ |
+| [Wave](linear/wave.md) | `Wave` | L-I-M | 1,2,3 | 2 | $\partial_{tt} u = c^2 \, \partial_{xx} u$ | $\partial_{tt} u = c^2 \Delta u$ |
 | [Burgers](nonlinear/burgers.md) | `Burgers` | N-D-M | 1,2,3 | $d$ | $\partial_t u = - b \frac{1}{2} \partial_x u^2 + \nu \, \partial_{xx} u$ | $\partial_t u = - b \frac{1}{2} \nabla \cdot (\mathbf{u} \otimes \mathbf{u}) + \nu \nabla \cdot \nabla \mathbf{u}$ |
 | Burgers (single-channel) | `Burgers` | N-D | 2,3 | 1 | | $\partial_t u = - b \frac{1}{2} (\vec{1} \cdot \nabla) u^2 + \nu \nabla \cdot \nabla u$ |
 | [Korteweg-de Vries](nonlinear/kdv.md) | `KortewegDeVries` | N-D-M | 1,2,3 | $d$ | $\partial_t u = - b \frac{1}{2} \partial_x u^2 + a_3 \, \partial_{xxx} u + \nu \, \partial_{xx} u - \mu \, \partial_{xxxx} u$ | $\partial_t u = - b \frac{1}{2} \nabla \cdot (\mathbf{u} \otimes \mathbf{u}) + a_3 \nabla(\Delta \mathbf{u}) + \nu \nabla \cdot \nabla \mathbf{u} - \mu \, \Delta(\Delta \mathbf{u})$ |
@@ -211,3 +213,10 @@ $$
 Note that the generic steppers only support the isotropic linear operator. For
 anisotropic linear dynamics, use the concrete steppers with their respective
 anisotropic parameterizations (see table above).
+
+!!! note "Wave stepper"
+
+    The `Wave` stepper solves a second-order-in-time PDE via a handcrafted
+    diagonalization in Fourier space. It does not fit the generic stepper
+    families because those assume first-order-in-time equations with no channel
+    mixing in the linear operator.

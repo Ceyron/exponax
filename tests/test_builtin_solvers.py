@@ -17,6 +17,7 @@ def test_instantiate():
             ex.stepper.AdvectionDiffusion,
             ex.stepper.Dispersion,
             ex.stepper.HyperDiffusion,
+            ex.stepper.Wave,
             ex.stepper.Burgers,
             ex.stepper.KuramotoSivashinsky,
             ex.stepper.KuramotoSivashinskyConservative,

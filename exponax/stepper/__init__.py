@@ -12,6 +12,7 @@ The concrete PDE steppers are:
     - AdvectionDiffusion
     - Dispersion
     - HyperDiffusion
+    - Wave
     - Burgers
     - KortewegDeVries
     - KuramotoSivashinsky
@@ -57,6 +58,9 @@ The NavierStokesVelocity and KolmogorovFlowVelocity steppers use a projected
 convection nonlinearity (rotational form with Leray projection) and have no
 corresponding generic stepper.
 
+The Wave stepper uses a handcrafted diagonalization in Fourier space specific to
+the wave equation. It has no corresponding generic stepper.
+
 In the reaction submodule you find specific steppers that are special cases of
 the GeneralPolynomialStepper, e.g., the FisherKPPStepper.
 
@@ -87,6 +91,7 @@ from ._navier_stokes import (
     NavierStokesVelocity,
     NavierStokesVorticity,
 )
+from ._wave import Wave
 
 __all__ = [
     "Advection",
@@ -94,6 +99,7 @@ __all__ = [
     "AdvectionDiffusion",
     "Dispersion",
     "HyperDiffusion",
+    "Wave",
     "Burgers",
     "KortewegDeVries",
     "KuramotoSivashinsky",

@@ -115,6 +115,7 @@ nav:
             - Advection-Diffusion: 'api/stepper/linear/advection_diffusion.md'
             - Dispersion: 'api/stepper/linear/dispersion.md'
             - Hyper-Diffusion: 'api/stepper/linear/hyper_diffusion.md'
+            - Wave: 'api/stepper/linear/wave.md'
         - Nonlinear:
             - Burgers: 'api/stepper/nonlinear/burgers.md'
             - Korteweg-de Vries: 'api/stepper/nonlinear/kdv.md'
