@@ -112,7 +112,10 @@ class NavierStokesVorticity(BaseStepper):
             dynamics.
         """
         if num_spatial_dims != 2:
-            raise ValueError(f"Expected num_spatial_dims = 2, got {num_spatial_dims}.")
+            raise ValueError(
+                f"Expected num_spatial_dims = 2, got {num_spatial_dims}. "
+                "For 3D, use NavierStokesVelocity instead."
+            )
 
         self.diffusivity = diffusivity
         self.vorticity_convection_scale = vorticity_convection_scale
@@ -275,7 +278,10 @@ class KolmogorovFlowVorticity(BaseStepper):
             method. Default: 1.0.
         """
         if num_spatial_dims != 2:
-            raise ValueError(f"Expected num_spatial_dims = 2, got {num_spatial_dims}.")
+            raise ValueError(
+                f"Expected num_spatial_dims = 2, got {num_spatial_dims}. "
+                "For 3D, use KolmogorovFlowVelocity instead."
+            )
         self.diffusivity = diffusivity
         self.convection_scale = convection_scale
         self.drag = drag
@@ -336,7 +342,10 @@ class NavierStokesVelocity(BaseStepper):
         circle_radius: float = 1.0,
     ):
         if num_spatial_dims != 3:
-            raise ValueError("NavierStokesVelocity only supports 3 spatial dimensions.")
+            raise ValueError(
+                f"Expected num_spatial_dims = 3, got {num_spatial_dims}. "
+                "For 2D, use NavierStokesVorticity instead."
+            )
 
         self.diffusivity = diffusivity
         self.drag = drag
@@ -391,7 +400,10 @@ class KolmogorovFlowVelocity(BaseStepper):
         circle_radius: float = 1.0,
     ):
         if num_spatial_dims != 3:
-            raise ValueError(f"Expected num_spatial_dims = 3, got {num_spatial_dims}.")
+            raise ValueError(
+                f"Expected num_spatial_dims = 3, got {num_spatial_dims}. "
+                "For 2D, use KolmogorovFlowVorticity instead."
+            )
         self.diffusivity = diffusivity
         self.drag = drag
         self.injection_mode = injection_mode
