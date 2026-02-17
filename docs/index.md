@@ -65,7 +65,7 @@ that explains the basics of `Exponax`.
     object. Everything is based on `jax.numpy` arrays. Timesteppers are callable
     PyTrees.
 3. More than 46 pre-built dynamics:
-    1. Linear PDEs in 1d, 2d, and 3d (advection, diffusion, dispersion, etc.)
+    1. Linear PDEs in 1d, 2d, and 3d (advection, diffusion, dispersion, wave, etc.)
     2. Nonlinear PDEs in 1d, 2d, and 3d (Burgers, Kuramoto-Sivashinsky,
         Korteweg-de Vries, Navier-Stokes, etc.)
     3. Reaction-Diffusion (Gray-Scott, Swift-Hohenberg, etc.)
