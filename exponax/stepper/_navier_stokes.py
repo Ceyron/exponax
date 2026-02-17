@@ -403,6 +403,23 @@ class NavierStokesVelocity(BaseStepper):
             offering no reduction in degrees of freedom. For 2d, use
             `NavierStokesVorticity` which solves for the scalar vorticity
             instead.
+        - The nonlinear term uses the rotational form `𝒫(u × ω)` rather
+            than the convective form `𝒫(-(u ⋅ ∇)u)`. Both are equivalent at
+            the continuous level, but the rotational form is preferred for
+            pseudo-spectral methods because it requires fewer FFTs. In the
+            convective form, computing `(u ⋅ ∇)u` requires for each of the 3
+            velocity components a dot product of `u` with its gradient, i.e.,
+            `Σⱼ uⱼ ∂uᵢ/∂xⱼ`. That amounts to 3 × 3 = 9 physical-space
+            multiplications, each requiring an inverse FFT for the operand and
+            a forward FFT for the result. In the rotational form, the curl
+            `ω = ∇ × u` is free in Fourier space (a cross product with `ik`),
+            and the subsequent cross product `u × ω` in physical space
+            involves only 6 multiplications (two per output component).
+            Additionally, the gradient terms `∇(|u|²/2 + p)` are implicitly
+            eliminated by the Leray projection without ever being computed.
+            Since the FFTs are the most computationally demanding operations
+            in higher dimensions (scaling as `O(N³ log N)` in 3d), reducing
+            their count directly improves performance.
         - The higher the Reynolds number, the smaller the timestep size must
             be to ensure stability.
         """
