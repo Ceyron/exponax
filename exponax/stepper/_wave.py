@@ -41,16 +41,47 @@ class Wave(BaseStepper):
         system of two coupled fields — height `h` and velocity `v = hₜ`:
 
         ```
-            hₜ = v vₜ = c² Δh
+            hₜ = v
+            vₜ = c² Δh
         ```
-
-        This system is then **diagonalized** in Fourier space via a unitary
-        change of variables into forward- and backward-traveling wave modes.
-        Each mode evolves independently as a pure oscillation `exp(±i c |k|
-        Δt)`, which the ETDRK0 integrator solves exactly.
 
         As a result, the state has **two channels**: `u[0]` is the height field
         `h` and `u[1]` is the velocity field `v`.
+
+        **Diagonalization:**
+
+        The general solution of the wave equation is a superposition of
+        right-traveling and left-traveling waves (d'Alembert's decomposition).
+        This stepper exploits that structure: rather than time-stepping the
+        coupled `(h, v)` system directly, it transforms into independent
+        traveling-wave modes that each evolve as a simple phase rotation.
+
+        In Fourier space, each wavenumber `k` gives a 2×2 ODE for `(ĥ, v̂)`
+        that oscillates at frequency `ω = c|k|` — analogous to a harmonic
+        oscillator trading potential and kinetic energy. Three steps
+        diagonalize it:
+
+        1. **Rescale** — `h` and `v` live on different scales (displacement vs.
+           rate). Defining `w = iωĥ` puts them on equal footing. The coupled
+           system becomes symmetric: `wₜ = iω v̂`, `v̂ₜ = iω w`.
+
+        2. **Rotate** — Taking the sum and difference
+           `pos = (w + v̂)/√2`, `neg = (w − v̂)/√2` decouples the system
+           into two independent modes: `posₜ = +iω · pos` and
+           `negₜ = −iω · neg`. Physically, `pos` is the right-traveling
+           wave and `neg` the left-traveling wave.
+
+        3. **Exponentiate** — Each decoupled mode evolves as a pure phase
+           rotation: `pos(t+Δt) = exp(+iωΔt) · pos(t)`. This is what the
+           ETDRK0 integrator computes exactly.
+
+        After the exponential step, the inverse rotation and unscaling recover
+        the updated `(h, v)`.
+
+        At `k = 0` (the spatial mean), the frequency is zero and the two modes
+        collapse — the system is no longer diagonalizable. There, the exact
+        update is simply `h_mean += Δt · v_mean`, which is applied as a
+        separate correction.
 
         **Arguments:**
 
