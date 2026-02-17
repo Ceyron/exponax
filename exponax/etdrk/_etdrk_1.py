@@ -63,13 +63,26 @@ class ETDRK1(BaseETDRK):
 
         roots = roots_of_unity(num_circle_points)
         L_dt = linear_operator * dt
+        is_real_operator = bool(jnp.all(linear_operator.imag == 0))
 
-        def scan_body(acc, root):
-            lr = circle_radius * root + L_dt
-            exp_lr = jnp.exp(lr)
-            return acc + ((exp_lr - 1) / lr).real, None
+        if is_real_operator:
 
-        sum_c1, _ = jax.lax.scan(scan_body, jnp.zeros_like(L_dt.real), roots)
+            def scan_body(acc, root):
+                lr = circle_radius * root + L_dt
+                exp_lr = jnp.exp(lr)
+                return acc + ((exp_lr - 1) / lr).real, None
+
+            zeros = jnp.zeros_like(L_dt.real)
+        else:
+
+            def scan_body(acc, root):
+                lr = circle_radius * root + L_dt
+                exp_lr = jnp.exp(lr)
+                return acc + (exp_lr - 1) / lr, None
+
+            zeros = jnp.zeros_like(L_dt)
+
+        sum_c1, _ = jax.lax.scan(scan_body, zeros, roots)
         mean_c1 = sum_c1 / num_circle_points
         self._coef_1 = dt * mean_c1
 

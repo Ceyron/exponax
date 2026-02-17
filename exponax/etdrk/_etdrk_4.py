@@ -170,18 +170,45 @@ class ETDRK4(BaseETDRK):
 
         roots = roots_of_unity(num_circle_points)
         L_dt = linear_operator * dt
+        is_real_operator = bool(jnp.all(linear_operator.imag == 0))
 
-        def scan_body(accs, root):
-            lr = circle_radius * root + L_dt
-            exp_lr = jnp.exp(lr)
-            exp_lr_half = jnp.exp(lr / 2)
-            c1 = ((exp_lr_half - 1) / lr).real
-            c4 = ((-4 - lr + exp_lr * (4 - 3 * lr + lr**2)) / lr**3).real
-            c5 = ((2 + lr + exp_lr * (-2 + lr)) / lr**3).real
-            c6 = ((-4 - 3 * lr - lr**2 + exp_lr * (4 - lr)) / lr**3).real
-            return (accs[0] + c1, accs[1] + c4, accs[2] + c5, accs[3] + c6), None
+        if is_real_operator:
 
-        zeros = jnp.zeros_like(L_dt.real)
+            def scan_body(accs, root):
+                lr = circle_radius * root + L_dt
+                exp_lr = jnp.exp(lr)
+                exp_lr_half = jnp.exp(lr / 2)
+                c1 = ((exp_lr_half - 1) / lr).real
+                c4 = ((-4 - lr + exp_lr * (4 - 3 * lr + lr**2)) / lr**3).real
+                c5 = ((2 + lr + exp_lr * (-2 + lr)) / lr**3).real
+                c6 = ((-4 - 3 * lr - lr**2 + exp_lr * (4 - lr)) / lr**3).real
+                return (
+                    accs[0] + c1,
+                    accs[1] + c4,
+                    accs[2] + c5,
+                    accs[3] + c6,
+                ), None
+
+            zeros = jnp.zeros_like(L_dt.real)
+        else:
+
+            def scan_body(accs, root):
+                lr = circle_radius * root + L_dt
+                exp_lr = jnp.exp(lr)
+                exp_lr_half = jnp.exp(lr / 2)
+                c1 = (exp_lr_half - 1) / lr
+                c4 = (-4 - lr + exp_lr * (4 - 3 * lr + lr**2)) / lr**3
+                c5 = (2 + lr + exp_lr * (-2 + lr)) / lr**3
+                c6 = (-4 - 3 * lr - lr**2 + exp_lr * (4 - lr)) / lr**3
+                return (
+                    accs[0] + c1,
+                    accs[1] + c4,
+                    accs[2] + c5,
+                    accs[3] + c6,
+                ), None
+
+            zeros = jnp.zeros_like(L_dt)
+
         (s1, s4, s5, s6), _ = jax.lax.scan(scan_body, (zeros,) * 4, roots)
         mean_c1 = s1 / num_circle_points
         mean_c4 = s4 / num_circle_points
