@@ -354,10 +354,9 @@ class NavierStokes3d(BaseStepper):
         )
 
     def _build_linear_operator(self, derivative_operator):
-        laplace = build_laplace_operator(derivative_operator, order=2)
-        drag = -self.drag * build_laplace_operator(derivative_operator, order=0)
-        linear_operator = self.diffusivity * laplace + self.drag * drag
-        return linear_operator
+        return self.diffusivity * build_laplace_operator(
+            derivative_operator, order=2
+        ) + self.drag * build_laplace_operator(derivative_operator, order=0)
 
     def _build_nonlinear_fun(self, derivative_operator):
         return ProjectedConvection3d(
