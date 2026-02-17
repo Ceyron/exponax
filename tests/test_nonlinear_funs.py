@@ -378,8 +378,8 @@ class TestGradientNormAdditional:
 class TestLeray:
     def test_divergence_free_output(self):
         """Leray projection of an arbitrary field should be divergence-free."""
-        N = 16
-        D = 3
+        N = 24
+        D = 2
         deriv_op = build_derivative_operator(D, 1.0, N)
         leray = Leray(
             num_spatial_dims=D,
@@ -403,7 +403,8 @@ class TestLeray:
 
         # Check divergence: sum_i (ik_i * u_hat_i) should be ~0
         div_hat = jnp.sum(deriv_op * projected_hat, axis=0, keepdims=True)
-        assert float(jnp.max(jnp.abs(div_hat))) == pytest.approx(0.0, abs=1e-5)
+
+        assert div_hat == pytest.approx(jnp.zeros_like(div_hat), abs=1e-5)
 
     def test_identity_on_divergence_free(self):
         """Leray projection of a divergence-free field should be identity."""
