@@ -341,6 +341,71 @@ class NavierStokesVelocity(BaseStepper):
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
+        """
+        Timestepper for the 3d incompressible Navier-Stokes equations on
+        periodic boundary conditions in velocity formulation. The equation
+        reads
+
+        ```
+            uₜ = ν Δu + λu + 𝒫(u × ω)
+        ```
+
+        with `u` the three-channel velocity field and `ω = ∇ × u` the
+        vorticity. The term `𝒫` denotes the Leray projection which enforces
+        the incompressibility constraint `∇ ⋅ u = 0` by removing gradient
+        components (pressure and kinetic energy gradient). The first term on
+        the right-hand side is a diffusion with coefficient `ν` and the second
+        term is an optional drag with coefficient `λ`.
+
+        The nonlinear term uses the rotational form which exploits the vector
+        identity `(u ⋅ ∇)u = ∇(|u|²/2) + ω × u` and the fact that the Leray
+        projection annihilates all gradient fields.
+
+        The Reynolds number of the problem is `Re = U L / ν` with `U` a
+        characteristic velocity scale and `L` the `domain_extent`.
+
+        **Arguments:**
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`. Must be
+            `3`.
+        - `domain_extent`: The size of the domain `L`; the domain is assumed
+            to be a scaled hypercube `Ω = (0, L)³`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. The number of points in each dimension
+            is the same. Hence, the total number of degrees of freedom is
+            `N³`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `diffusivity`: The diffusivity (viscosity) coefficient `ν`. This
+            affects the Reynolds number. The lower the diffusivity, the "more
+            turbulent". Default is `0.01`.
+        - `drag`: The drag coefficient `λ`. Default is `0.0`.
+        - `order`: The order of the Exponential Time Differencing Runge
+            Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
+            solves the linear part of the equation. Use higher values for
+            higher accuracy and stability. The default choice of `2` is a good
+            compromise for single precision floats.
+        - `dealiasing_fraction`: The fraction of the wavenumbers to keep
+            before evaluating the nonlinearity. The default 2/3 corresponds to
+            Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2. Default:
+            2/3.
+        - `num_circle_points`: How many points to use in the complex contour
+            integral method to compute the coefficients of the exponential time
+            differencing Runge Kutta method. Default: 16.
+        - `circle_radius`: The radius of the contour used to compute the
+            coefficients of the exponential time differencing Runge Kutta
+            method. Default: 1.0.
+
+        **Notes:**
+
+        - In 3d, the velocity formulation is preferred over the vorticity
+            formulation because the vorticity is also a three-component vector,
+            offering no reduction in degrees of freedom. For 2d, use
+            `NavierStokesVorticity` which solves for the scalar vorticity
+            instead.
+        - The higher the Reynolds number, the smaller the timestep size must
+            be to ensure stability.
+        """
         if num_spatial_dims != 3:
             raise ValueError(
                 f"Expected num_spatial_dims = 3, got {num_spatial_dims}. "
@@ -399,6 +464,75 @@ class KolmogorovFlowVelocity(BaseStepper):
         num_circle_points: int = 16,
         circle_radius: float = 1.0,
     ):
+        """
+        Timestepper for the 3d Kolmogorov flow equation on periodic boundary
+        conditions in velocity formulation. The equation reads
+
+        ```
+            uₜ = ν Δu + λu + 𝒫(u × ω) + f
+        ```
+
+        For a detailed description of the terms, see the documentation of the
+        `NavierStokesVelocity` stepper. The only difference is the additional
+        forcing term `f` which injects new energy into the system. It has the
+        form
+
+        ```
+            f₀ = γ sin(k (2π/L) x₁)
+
+            f₁ = 0
+
+            f₂ = 0
+        ```
+
+        In words, only the first velocity channel is forced at a specific
+        wavenumber over the second spatial axis. This forcing is divergence-
+        free because the forced component does not vary along its own
+        direction.
+
+        The expected temporal behavior is that the velocity field develops
+        shear layers which become unstable and break up into turbulent
+        spatio-temporal chaos.
+
+        A negative drag coefficient `λ` is needed to remove some of the energy
+        piling up in low modes.
+
+        **Arguments:**
+
+        - `num_spatial_dims`: The number of spatial dimensions `d`. Must be
+            `3`.
+        - `domain_extent`: The size of the domain `L`; the domain is assumed
+            to be a scaled hypercube `Ω = (0, L)³`.
+        - `num_points`: The number of points `N` used to discretize the
+            domain. This **includes** the left boundary point and **excludes**
+            the right boundary point. The number of points in each dimension
+            is the same. Hence, the total number of degrees of freedom is
+            `N³`.
+        - `dt`: The timestep size `Δt` between two consecutive states.
+        - `diffusivity`: The diffusivity (viscosity) coefficient `ν`. This
+            affects the Reynolds number. The lower the diffusivity, the "more
+            turbulent". Default is `0.01`.
+        - `drag`: The drag coefficient `λ`. Default is `0.0`.
+        - `injection_mode`: The wavenumber `k` at which energy is injected.
+            Default is `4`.
+        - `injection_scale`: The intensity `γ` of the injection term. Default
+            is `1.0`.
+        - `order`: The order of the Exponential Time Differencing Runge
+            Kutta method. Must be one of {0, 1, 2, 3, 4}. The option `0` only
+            solves the linear part of the equation. Use higher values for
+            higher accuracy and stability. The default choice of `2` is a good
+            compromise for single precision floats.
+        - `dealiasing_fraction`: The fraction of the wavenumbers to keep
+            before evaluating the nonlinearity. The default 2/3 corresponds to
+            Orszag's 2/3 rule. To fully eliminate aliasing, use 1/2. Default:
+            2/3.
+        - `num_circle_points`: How many points to use in the complex contour
+            integral method to compute the coefficients of the exponential time
+            differencing Runge Kutta method. Default: 16.
+        - `circle_radius`: The radius of the contour used to compute the
+            coefficients of the exponential time differencing Runge Kutta
+            method. Default: 1.0.
+        """
         if num_spatial_dims != 3:
             raise ValueError(
                 f"Expected num_spatial_dims = 3, got {num_spatial_dims}. "

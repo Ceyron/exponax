@@ -29,9 +29,68 @@ class ProjectedConvection3d(BaseNonlinearFun):
         dealiasing_fraction: float = 2 / 3,
     ):
         """
-        Based on
+        Performs a pseudo-spectral evaluation of the nonlinear convection term
+        for the 3d incompressible Navier-Stokes equations in velocity
+        formulation using the rotational form. In state space, it reads
 
-        https://arxiv.org/pdf/1602.03638
+        ```
+            𝒩(u) = 𝒫(u × ω)
+        ```
+
+        with `u` the velocity, `ω = ∇ × u` the vorticity, and `𝒫` the Leray
+        projection onto divergence-free fields.
+
+        The incompressible Navier-Stokes equations read
+
+        ```
+            uₜ = -(u ⋅ ∇)u - ∇p + ν Δu
+        ```
+
+        The [Lamb vector identity](https://en.wikipedia.org/wiki/Lamb_vector)
+        allows rewriting the convection term as
+
+        ```
+            (u ⋅ ∇)u = ∇(|u|²/2) + ω × u
+        ```
+
+        Substituting and rearranging gives
+
+        ```
+            uₜ = u × ω - ∇(|u|²/2 + p) + ν Δu
+        ```
+
+        where `u × ω = -(ω × u)`. The Leray projection `𝒫` projects onto the
+        space of divergence-free fields by removing any gradient component
+        (i.e., `𝒫(∇φ) = 0` for any scalar `φ`). Since both the pressure
+        gradient `∇p` and the kinetic energy gradient `∇(|u|²/2)` are
+        gradients of scalar fields, the projection annihilates them:
+
+        ```
+            𝒫(uₜ) = 𝒫(u × ω) + ν Δu
+        ```
+
+        Hence, the nonlinear term reduces to `𝒩(u) = 𝒫(u × ω)`, and the
+        pressure never needs to be computed explicitly.
+
+        The curl is computed in Fourier space, the cross product `u × ω` in
+        physical space (pseudo-spectral), and the result is projected back
+        in Fourier space.
+
+        Based on https://arxiv.org/pdf/1602.03638
+
+        **Arguments:**
+
+        - `num_spatial_dims`: The number of spatial dimensions `D`. Must be
+            `3`.
+        - `num_points`: The number of points `N` used to discretize the domain.
+            This **includes** the left boundary point and **excludes** the right
+            boundary point. In higher dimensions; the number of points in each
+            dimension is the same.
+        - `derivative_operator`: A complex array of shape `(3, ..., N//2+1)`
+            that represents the derivative operator in Fourier space.
+        - `dealiasing_fraction`: The fraction of the highest resolved modes
+            that are not aliased. Defaults to `2/3` which corresponds to
+            Orszag's 2/3 rule.
         """
         if num_spatial_dims != 3:
             raise ValueError(
@@ -90,6 +149,49 @@ class ProjectedConvection3dKolmogorov(ProjectedConvection3d):
         derivative_operator: Complex[Array, " 3 ... (N//2)+1"],
         dealiasing_fraction: float,
     ):
+        """
+        Performs a pseudo-spectral evaluation of the nonlinear convection term
+        together with a Kolmogorov-like injection term for the 3d
+        incompressible Navier-Stokes equations in velocity formulation. In
+        state space, it reads
+
+        ```
+            𝒩(u) = 𝒫(u × ω) + f
+        ```
+
+        For details on the projected convection term, see
+        `exponax.nonlin_fun.ProjectedConvection3d`. The forcing term has the
+        form
+
+        ```
+            f₀ = γ sin(k (2π/L) x₁)
+
+            f₁ = 0
+
+            f₂ = 0
+        ```
+
+        i.e., energy of intensity `γ` is injected at wavenumber `k` in the
+        first velocity channel varying over the second spatial axis. This
+        forcing is naturally divergence-free because the forced component does
+        not vary along its own direction.
+
+        **Arguments:**
+
+        - `num_spatial_dims`: The number of spatial dimensions `D`. Must be
+            `3`.
+        - `num_points`: The number of points `N` used to discretize the domain.
+            This **includes** the left boundary point and **excludes** the right
+            boundary point. In higher dimensions; the number of points in each
+            dimension is the same.
+        - `injection_mode`: The wavenumber `k` at which energy is injected.
+        - `injection_scale`: The intensity `γ` of the injection term.
+        - `derivative_operator`: A complex array of shape `(3, ..., N//2+1)`
+            that represents the derivative operator in Fourier space.
+        - `dealiasing_fraction`: The fraction of the highest resolved modes
+            that are not aliased. Defaults to `2/3` which corresponds to
+            Orszag's 2/3 rule.
+        """
         super().__init__(
             num_spatial_dims,
             num_points,
