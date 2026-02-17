@@ -4,7 +4,7 @@ import pytest
 
 import exponax as ex
 from exponax._spectral import fft, ifft
-from exponax.stepper._wave import Wave
+from exponax.stepper import Wave
 
 L = 2 * jnp.pi
 PI = jnp.pi
