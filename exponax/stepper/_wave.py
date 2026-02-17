@@ -89,4 +89,14 @@ class Wave(BaseStepper):
         waves_hat = self._forward_transform(u_hat)
         waves_hat_next = super().step_fourier(waves_hat)
         u_hat_next = self._inverse_transform(waves_hat_next)
+
+        # The k=0 (mean/DC) mode cannot be diagonalized because the two
+        # eigenvalues collapse to zero and the system matrix becomes
+        # [[0, 1], [0, 0]]. The diagonalization leaves this mode unchanged,
+        # but the exact solution is h_mean(t+dt) = h_mean(t) + dt * v_mean(t).
+        # Apply this linear drift explicitly.
+        h_dc_idx = (0,) + (0,) * self.num_spatial_dims
+        v_dc_idx = (1,) + (0,) * self.num_spatial_dims
+        u_hat_next = u_hat_next.at[h_dc_idx].add(self.dt * u_hat[v_dc_idx])
+
         return u_hat_next
