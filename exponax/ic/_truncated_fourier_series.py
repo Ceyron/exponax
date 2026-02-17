@@ -3,9 +3,11 @@ import jax.random as jr
 from jaxtyping import Array, Float, PRNGKeyArray
 
 from .._spectral import (
+    _enforce_hermitian_symmetry,
     build_scaling_array,
     ifft,
     low_pass_filter_mask,
+    oddball_filter_mask,
     wavenumber_shape,
 )
 from ._base_ic import BaseRandomICGenerator
@@ -121,6 +123,11 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
 
         fourier_noise = fourier_noise * low_pass_filter
 
+        # Remove Nyquist modes (fixes cutoff >= N//2 case where low-pass
+        # filter alone doesn't exclude them)
+        oddball_mask = oddball_filter_mask(self.num_spatial_dims, num_points)
+        fourier_noise = fourier_noise * oddball_mask
+
         offset = jr.uniform(
             offset_key,
             shape=(1,),
@@ -129,6 +136,11 @@ class RandomTruncatedFourierSeries(BaseRandomICGenerator):
         )[0]
         fourier_noise = (
             fourier_noise.flatten().at[0].set(offset).reshape(fourier_noise_shape)
+        )
+
+        # Enforce hermitian symmetry so coefficients are consistent with irfftn
+        fourier_noise = _enforce_hermitian_symmetry(
+            fourier_noise, self.num_spatial_dims, num_points
         )
 
         fourier_noise = fourier_noise * build_scaling_array(

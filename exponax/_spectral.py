@@ -611,6 +611,56 @@ def get_modes_slices(
     return all_modes_slices
 
 
+def _enforce_hermitian_symmetry(
+    field_hat: Complex[Array, "C ... (N//2)+1"],
+    num_spatial_dims: int,
+    num_points: int,
+) -> Complex[Array, "C ... (N//2)+1"]:
+    """
+    Enforce hermitian symmetry on the non-rfft axes of an rfft representation.
+
+    For real-valued inputs, the DFT satisfies X[k] = conj(X[-k]). JAX's rfftn
+    on CPU (PocketFFT) can produce slight asymmetries on non-rfft axes (relative
+    error ~1e-7). This function symmetrizes the k_last=0 and k_last=N//2 slices
+    to restore exact hermitian symmetry.
+
+    This is a no-op for 1D (no non-rfft axes).
+    """
+    if num_spatial_dims <= 1:
+        return field_hat
+
+    # Non-rfft spatial axes (using negative indices to be robust to
+    # presence/absence of leading axes like channel)
+    non_rfft_axes = tuple(range(-num_spatial_dims, -1))
+
+    # Slices along the last (rfft) axis where hermitian symmetry must hold
+    special_k_last = [0]
+    if num_points % 2 == 0:
+        special_k_last.append(num_points // 2)
+
+    for k_last_idx in special_k_last:
+        # Extract the slice, removing the last (rfft) axis
+        slc = field_hat[..., k_last_idx]
+
+        # Compute negated-wavenumber version: flip then roll by 1 on each
+        # non-rfft axis maps index i to (-i) % N.
+        # After removing the last axis, the non-rfft axes shift: axis -d
+        # in the original becomes axis -(d-1) in the slice (since we lost
+        # the last axis). E.g. for 3D: axes (-3,-2) become (-2,-1).
+        flipped = slc
+        for ax in non_rfft_axes:
+            slc_ax = ax + 1  # shift because last axis was removed
+            flipped = jnp.flip(flipped, axis=slc_ax)
+            flipped = jnp.roll(flipped, shift=1, axis=slc_ax)
+
+        # Symmetrize: average with conjugate of negated-wavenumber version
+        sym = (slc + jnp.conj(flipped)) / 2
+
+        field_hat = field_hat.at[..., k_last_idx].set(sym)
+
+    return field_hat
+
+
 def fft(
     field: Float[Array, "C ... N"],
     *,
@@ -653,7 +703,9 @@ def fft(
     if num_spatial_dims is None:
         num_spatial_dims = field.ndim - 1
 
-    return jnp.fft.rfftn(field, axes=space_indices(num_spatial_dims))
+    num_points = field.shape[-1]
+    field_hat = jnp.fft.rfftn(field, axes=space_indices(num_spatial_dims))
+    return _enforce_hermitian_symmetry(field_hat, num_spatial_dims, num_points)
 
 
 def ifft(
