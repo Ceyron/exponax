@@ -6,7 +6,9 @@ from exponax._spectral import build_derivative_operator, fft, ifft
 from exponax.nonlin_fun import (
     ConvectionNonlinearFun,
     GradientNormNonlinearFun,
+    Leray,
     PolynomialNonlinearFun,
+    ProjectedConvection3d,
     VorticityConvection2d,
 )
 from exponax.nonlin_fun._general_nonlinear import GeneralNonlinearFun
@@ -366,3 +368,174 @@ class TestGradientNormAdditional:
         result_hat = grad_norm(u_hat)
         # Without fix, DC mode should be nonzero (gradient norm squared is positive)
         assert float(jnp.abs(result_hat[0, 0])) > 1e-6
+
+
+# ===========================================================================
+# Leray projection tests
+# ===========================================================================
+
+
+class TestLeray:
+    def test_divergence_free_output(self):
+        """Leray projection of an arbitrary field should be divergence-free."""
+        N = 16
+        D = 3
+        deriv_op = build_derivative_operator(D, 1.0, N)
+        leray = Leray(
+            num_spatial_dims=D,
+            num_points=N,
+            derivative_operator=deriv_op,
+        )
+
+        # Arbitrary 3-channel field (not divergence-free)
+        grid = ex.make_grid(D, 1.0, N)
+        u = jnp.concatenate(
+            [
+                jnp.sin(2 * jnp.pi * grid[0:1]),
+                jnp.cos(4 * jnp.pi * grid[1:2]),
+                jnp.sin(6 * jnp.pi * grid[2:3]),
+            ],
+            axis=0,
+        )
+        u_hat = fft(u, num_spatial_dims=D)
+
+        projected_hat = leray(u_hat)
+
+        # Check divergence: sum_i (ik_i * u_hat_i) should be ~0
+        div_hat = jnp.sum(deriv_op * projected_hat, axis=0, keepdims=True)
+        assert float(jnp.max(jnp.abs(div_hat))) == pytest.approx(0.0, abs=1e-5)
+
+    def test_identity_on_divergence_free(self):
+        """Leray projection of a divergence-free field should be identity."""
+        N = 16
+        D = 3
+        L = 1.0
+        deriv_op = build_derivative_operator(D, L, N)
+        leray = Leray(
+            num_spatial_dims=D,
+            num_points=N,
+            derivative_operator=deriv_op,
+        )
+
+        # Construct an analytically divergence-free field via curl of a
+        # vector potential: u = ∇ × A is guaranteed divergence-free.
+        # A = (0, 0, sin(2π x₀/L) sin(2π x₁/L)) gives:
+        #   u₀ = ∂A₂/∂x₁ = (2π/L) sin(2π x₀/L) cos(2π x₁/L)
+        #   u₁ = -∂A₂/∂x₀ = -(2π/L) cos(2π x₀/L) sin(2π x₁/L)
+        #   u₂ = 0
+        # div(u) = ∂u₀/∂x₀ + ∂u₁/∂x₁ = (2π/L)² cos cos - (2π/L)² cos cos = 0
+        grid = ex.make_grid(D, L, N)
+        k = 2 * jnp.pi / L
+        u = jnp.concatenate(
+            [
+                k
+                * jnp.sin(k * grid[0:1])
+                * jnp.cos(k * grid[1:2])
+                * jnp.ones_like(grid[2:3]),
+                -k
+                * jnp.cos(k * grid[0:1])
+                * jnp.sin(k * grid[1:2])
+                * jnp.ones_like(grid[2:3]),
+                jnp.zeros_like(grid[2:3])
+                * jnp.ones_like(grid[0:1])
+                * jnp.ones_like(grid[1:2]),
+            ],
+            axis=0,
+        )
+        u_hat = fft(u, num_spatial_dims=D)
+
+        projected_hat = leray(u_hat)
+
+        projected = ifft(projected_hat, num_spatial_dims=D, num_points=N)
+        assert projected == pytest.approx(u, abs=1e-4)
+
+    def test_idempotent(self):
+        """Applying Leray projection twice should give the same result."""
+        N = 16
+        D = 3
+        deriv_op = build_derivative_operator(D, 1.0, N)
+        leray = Leray(
+            num_spatial_dims=D,
+            num_points=N,
+            derivative_operator=deriv_op,
+        )
+
+        grid = ex.make_grid(D, 1.0, N)
+        u = jnp.concatenate(
+            [
+                jnp.sin(2 * jnp.pi * grid[0:1]),
+                jnp.cos(4 * jnp.pi * grid[1:2]),
+                jnp.sin(6 * jnp.pi * grid[2:3]),
+            ],
+            axis=0,
+        )
+        u_hat = fft(u, num_spatial_dims=D)
+
+        once_hat = leray(u_hat)
+        twice_hat = leray(once_hat)
+
+        once = ifft(once_hat, num_spatial_dims=D, num_points=N)
+        twice = ifft(twice_hat, num_spatial_dims=D, num_points=N)
+        assert twice == pytest.approx(once, abs=1e-5)
+
+
+# ===========================================================================
+# ProjectedConvection3d tests
+# ===========================================================================
+
+
+class TestProjectedConvection3d:
+    def test_non_3d_raises(self):
+        """ProjectedConvection3d only supports 3D."""
+        N = 16
+        deriv_op_2d = build_derivative_operator(2, 1.0, N)
+        with pytest.raises(ValueError, match="3"):
+            ProjectedConvection3d(
+                num_spatial_dims=2,
+                num_points=N,
+                derivative_operator=deriv_op_2d,
+            )
+
+    def test_output_is_divergence_free(self):
+        """The projected convection output should be divergence-free."""
+        N = 16
+        D = 3
+        deriv_op = build_derivative_operator(D, 1.0, N)
+        proj_conv = ProjectedConvection3d(
+            num_spatial_dims=D,
+            num_points=N,
+            derivative_operator=deriv_op,
+        )
+
+        # Arbitrary 3-channel input (the Leray projection inside handles it)
+        import jax
+
+        u = jax.random.normal(jax.random.PRNGKey(0), (3, N, N, N)) * 0.1
+        u_hat = fft(u, num_spatial_dims=D)
+
+        result_hat = proj_conv(u_hat)
+
+        # Check divergence of result (tolerance accounts for dealiasing truncation)
+        div_hat = jnp.sum(deriv_op * result_hat, axis=0, keepdims=True)
+        assert float(jnp.max(jnp.abs(div_hat))) == pytest.approx(0.0, abs=1e-3)
+
+    def test_finite_output(self):
+        """ProjectedConvection3d should produce finite output."""
+        N = 16
+        D = 3
+        deriv_op = build_derivative_operator(D, 1.0, N)
+        proj_conv = ProjectedConvection3d(
+            num_spatial_dims=D,
+            num_points=N,
+            derivative_operator=deriv_op,
+        )
+
+        import jax
+
+        u = jax.random.normal(jax.random.PRNGKey(0), (3, N, N, N)) * 0.1
+        u_hat = fft(u, num_spatial_dims=D)
+
+        result_hat = proj_conv(u_hat)
+        result = ifft(result_hat, num_spatial_dims=D, num_points=N)
+        assert result.shape == (3, N, N, N)
+        assert jnp.all(jnp.isfinite(result))

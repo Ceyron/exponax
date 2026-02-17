@@ -46,6 +46,12 @@ def test_instantiate():
     ]:
         simulator(2, domain_extent, num_points, dt)
 
+    for simulator in [
+        ex.stepper.NavierStokesVelocity,
+        ex.stepper.KolmogorovFlowVelocity,
+    ]:
+        simulator(3, domain_extent, num_points, dt)
+
     for num_spatial_dims in [1, 2, 3]:
         ex.poisson.Poisson(num_spatial_dims, domain_extent, num_points)
 
@@ -548,6 +554,162 @@ class TestKolmogorovFlowVorticity:
         u = ex.ic.RandomTruncatedFourierSeries(2, cutoff=5)(
             64, key=jax.random.PRNGKey(0)
         )
+        for _ in range(20):
+            u = stepper(u)
+        assert jnp.all(jnp.isfinite(u))
+
+
+# ===========================================================================
+# Navier-Stokes 3D velocity tests
+# ===========================================================================
+
+
+class TestNavierStokesVelocity:
+    def test_non_3d_raises(self):
+        """NavierStokesVelocity only supports 3D."""
+        with pytest.raises(ValueError, match="3"):
+            ex.stepper.NavierStokesVelocity(1, 1.0, 16, 0.01)
+        with pytest.raises(ValueError, match="3"):
+            ex.stepper.NavierStokesVelocity(2, 1.0, 16, 0.01)
+
+    def test_step_produces_finite_output(self):
+        """A single step should produce finite (non-NaN, non-Inf) output."""
+        N = 16
+        stepper = ex.stepper.NavierStokesVelocity(3, 1.0, N, 0.01, diffusivity=0.01)
+        u_0 = jax.random.normal(jax.random.PRNGKey(0), (3, N, N, N)) * 0.1
+        u_1 = stepper(u_0)
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_output_shape(self):
+        """Output should have shape (3, N, N, N)."""
+        N = 16
+        stepper = ex.stepper.NavierStokesVelocity(3, 1.0, N, 0.01)
+        u_0 = jax.random.normal(jax.random.PRNGKey(0), (3, N, N, N)) * 0.1
+        u_1 = stepper(u_0)
+        assert u_1.shape == (3, N, N, N)
+
+    def test_diffusion_decays_energy(self):
+        """With high diffusivity and no convection, energy should decay."""
+        N = 16
+        stepper = ex.stepper.NavierStokesVelocity(
+            3,
+            1.0,
+            N,
+            0.01,
+            diffusivity=0.1,
+            order=0,  # linear only
+        )
+        u_0 = jax.random.normal(jax.random.PRNGKey(0), (3, N, N, N)) * 0.1
+        u_1 = stepper(u_0)
+        energy_0 = float(jnp.sum(u_0**2))
+        energy_1 = float(jnp.sum(u_1**2))
+        assert energy_1 < energy_0
+
+    def test_zero_diffusivity_preserves_more_energy(self):
+        """With very low diffusivity, energy should be preserved better."""
+        N = 16
+        u_0 = jax.random.normal(jax.random.PRNGKey(0), (3, N, N, N)) * 0.1
+        stepper_high_visc = ex.stepper.NavierStokesVelocity(
+            3, 1.0, N, 0.001, diffusivity=0.1
+        )
+        stepper_low_visc = ex.stepper.NavierStokesVelocity(
+            3, 1.0, N, 0.001, diffusivity=0.001
+        )
+        u_high = stepper_high_visc(u_0)
+        u_low = stepper_low_visc(u_0)
+        energy_high = float(jnp.sum(u_high**2))
+        energy_low = float(jnp.sum(u_low**2))
+        assert energy_low > energy_high
+
+    def test_drag_accelerates_decay(self):
+        """Negative drag should cause additional damping."""
+        N = 16
+        u_0 = jax.random.normal(jax.random.PRNGKey(0), (3, N, N, N)) * 0.1
+        stepper_no_drag = ex.stepper.NavierStokesVelocity(
+            3,
+            1.0,
+            N,
+            0.01,
+            diffusivity=0.01,
+            drag=0.0,
+            order=0,
+        )
+        stepper_drag = ex.stepper.NavierStokesVelocity(
+            3,
+            1.0,
+            N,
+            0.01,
+            diffusivity=0.01,
+            drag=-1.0,
+            order=0,
+        )
+        u_no_drag = stepper_no_drag(u_0)
+        u_drag = stepper_drag(u_0)
+        energy_no_drag = float(jnp.sum(u_no_drag**2))
+        energy_drag = float(jnp.sum(u_drag**2))
+        assert energy_drag < energy_no_drag
+
+
+class TestKolmogorovFlowVelocity:
+    def test_non_3d_raises(self):
+        with pytest.raises(ValueError, match="3"):
+            ex.stepper.KolmogorovFlowVelocity(1, 1.0, 16, 0.01)
+        with pytest.raises(ValueError, match="3"):
+            ex.stepper.KolmogorovFlowVelocity(2, 1.0, 16, 0.01)
+
+    def test_step_produces_finite_output(self):
+        N = 16
+        stepper = ex.stepper.KolmogorovFlowVelocity(
+            3, 2 * jnp.pi, N, 0.01, diffusivity=0.01
+        )
+        u_0 = jax.random.normal(jax.random.PRNGKey(0), (3, N, N, N)) * 0.1
+        u_1 = stepper(u_0)
+        assert u_1.shape == u_0.shape
+        assert jnp.all(jnp.isfinite(u_1))
+
+    def test_injection_adds_energy(self):
+        """Kolmogorov forcing should inject energy (compared to unforced NS)."""
+        N = 16
+        L = 2 * jnp.pi
+        dt = 0.01
+        u_0 = jax.random.normal(jax.random.PRNGKey(0), (3, N, N, N)) * 0.01
+
+        ns_stepper = ex.stepper.NavierStokesVelocity(
+            3,
+            L,
+            N,
+            dt,
+            diffusivity=0.01,
+            drag=-0.1,
+        )
+        kolm_stepper = ex.stepper.KolmogorovFlowVelocity(
+            3,
+            L,
+            N,
+            dt,
+            diffusivity=0.01,
+            drag=-0.1,
+            injection_mode=4,
+            injection_scale=1.0,
+        )
+
+        u_ns = u_0
+        u_kolm = u_0
+        for _ in range(10):
+            u_ns = ns_stepper(u_ns)
+            u_kolm = kolm_stepper(u_kolm)
+
+        energy_ns = float(jnp.sum(u_ns**2))
+        energy_kolm = float(jnp.sum(u_kolm**2))
+        assert energy_kolm > energy_ns
+
+    def test_multi_step_stable(self):
+        """Multiple steps should remain stable (finite)."""
+        N = 16
+        stepper = ex.stepper.KolmogorovFlowVelocity(
+            3, 2 * jnp.pi, N, 0.01, diffusivity=0.01
+        )
+        u = jax.random.normal(jax.random.PRNGKey(0), (3, N, N, N)) * 0.1
         for _ in range(20):
             u = stepper(u)
         assert jnp.all(jnp.isfinite(u))
