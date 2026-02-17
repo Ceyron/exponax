@@ -57,6 +57,12 @@ class ETDRK1(BaseETDRK):
             The numerically stable evaluation of the coefficients follows
             [Kassam and Trefethen
             (2005)](https://doi.org/10.1137/S1064827502410633).
+
+        !!! note
+            If the linear operator has non-zero imaginary part (e.g., for
+            advection or dispersion), the precomputed coefficients are stored
+            as complex-valued arrays, doubling the memory compared to a purely
+            real operator (e.g., pure diffusion).
         """
         super().__init__(dt, linear_operator)
         self._nonlinear_fun = nonlinear_fun
