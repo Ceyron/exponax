@@ -52,6 +52,8 @@ class ETDRK1(BaseETDRK):
 
         !!! warning
             The nonlinear function must take care of proper dealiasing.
+            `BaseNonlinearFun` handles this automatically via its `fft` and
+            `ifft` methods which apply pre- and post-dealiasing.
 
         !!! note
             The numerically stable evaluation of the coefficients follows

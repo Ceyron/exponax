@@ -135,8 +135,7 @@ class ETDRK3(BaseETDRK):
             last axis must be of size `(N//2)+1` where `N` is the number of
             dimensions in the former spatial axes.
         - `nonlinear_fun`: The Fourier pseudo-spectral treatment of the
-            nonlinear differential operator. ! The operator must take care of
-            proper dealiasing.
+            nonlinear differential operator.
         - `num_circle_points`: The number of points on the unit circle used to
             approximate the numerically challenging coefficients.
         - `circle_radius`: The radius of the circle used to approximate the
@@ -144,6 +143,8 @@ class ETDRK3(BaseETDRK):
 
         !!! warning
             The nonlinear function must take care of proper dealiasing.
+            `BaseNonlinearFun` handles this automatically via its `fft` and
+            `ifft` methods which apply pre- and post-dealiasing.
 
         !!! note
             The numerically stable evaluation of the coefficients follows

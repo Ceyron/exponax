@@ -36,11 +36,21 @@ class BaseNonlinearFun(eqx.Module, ABC):
             dealiasing is performed.
 
         !!! info
+            Dealiasing is applied both before and after the nonlinear
+            evaluation: the `ifft` method zeros out high modes before
+            transforming to physical space (pre-dealiasing), and the `fft`
+            method zeros out high modes after transforming back to Fourier
+            space (post-dealiasing). Pre-dealiasing ensures that the
+            physical-space representation is free of aliased modes before
+            computing nonlinear products. Post-dealiasing removes any aliases
+            created by those products, so that the returned nonlinear term is
+            spectrally clean.
+
+        !!! info
             Some dealiasing strategies (like Orszag's 2/3 rule) are designed to
             not fully remove aliasing (which would require 1/2 in the case of
             quadratic nonlinearities), rather to only have aliases being created
-            in those modes that will be zeroed out anyway in the next
-            dealiasing step. See also [Orszag
+            in those modes that will be zeroed out anyway. See also [Orszag
             (1971)](https://doi.org/10.1175/1520-0469(1971)028%3C1074:OTEOAI%3E2.0.CO;2)
         """
         self.num_spatial_dims = num_spatial_dims
@@ -67,6 +77,11 @@ class BaseNonlinearFun(eqx.Module, ABC):
         Dealias the Fourier representation of a state `u_hat` by zeroing out all
         the coefficients associated with modes beyond `dealiasing_fraction` set
         in the constructor.
+
+        !!! note
+            In most cases you do not need to call this method directly. The
+            `fft` and `ifft` methods apply the dealiasing mask automatically
+            (post-dealiasing and pre-dealiasing, respectively).
 
         **Arguments:**
 
