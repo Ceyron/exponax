@@ -65,7 +65,7 @@ class PolynomialNonlinearFun(BaseNonlinearFun):
         self,
         u_hat: Complex[Array, "C ... (N//2)+1"],
     ) -> Complex[Array, "C ... (N//2)+1"]:
-        u = self.ifft(self.dealias(u_hat))
+        u = self.ifft(u_hat)
         u_power = 1.0
         u_nonlin = 0.0
         for coeff in self.coefficients:

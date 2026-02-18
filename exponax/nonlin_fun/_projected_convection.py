@@ -121,8 +121,8 @@ class ProjectedConvection3d(BaseNonlinearFun):
             velocity_hat,
         )
 
-        curl = self.ifft(self.dealias(curl_hat))
-        velocity = self.ifft(self.dealias(velocity_hat))
+        curl = self.ifft(curl_hat)
+        velocity = self.ifft(velocity_hat)
 
         convection = _cross_product_3d(
             velocity,

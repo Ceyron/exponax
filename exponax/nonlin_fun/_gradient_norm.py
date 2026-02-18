@@ -86,7 +86,7 @@ class GradientNormNonlinearFun(BaseNonlinearFun):
         u_hat: Complex[Array, "C ... (N//2)+1"],
     ) -> Complex[Array, "C ... (N//2)+1"]:
         u_gradient_hat = self.derivative_operator[None, :] * u_hat[:, None]
-        u_gradient = self.ifft(self.dealias(u_gradient_hat))
+        u_gradient = self.ifft(u_gradient_hat)
 
         # Reduces the axis introduced by the gradient
         u_gradient_norm_squared = jnp.sum(u_gradient**2, axis=1)

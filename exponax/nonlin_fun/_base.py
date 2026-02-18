@@ -84,7 +84,8 @@ class BaseNonlinearFun(eqx.Module, ABC):
     def fft(self, u: Float[Array, "C ... N"]) -> Complex[Array, "C ... (N//2)+1"]:
         """
         Correctly wrapped **real-valued** Fourier transform for the shape of the
-        state vector associated with this nonlinear function.
+        state vector associated with this nonlinear function. If a dealiasing
+        mask is set, the output is dealiased (post-dealiasing).
 
         **Arguments:**
 
@@ -94,12 +95,17 @@ class BaseNonlinearFun(eqx.Module, ABC):
 
         - `u_hat`: The (real-valued) Fourier transform of the state vector.
         """
-        return fft(u, num_spatial_dims=self.num_spatial_dims)
+        u_hat = fft(u, num_spatial_dims=self.num_spatial_dims)
+        if self.dealiasing_mask is not None:
+            u_hat = self.dealiasing_mask * u_hat
+        return u_hat
 
     def ifft(self, u_hat: Complex[Array, "C ... (N//2)+1"]) -> Float[Array, "C ... N"]:
         """
         Correctly wrapped **real-valued** inverse Fourier transform for the shape
-        of the state vector associated with this nonlinear function.
+        of the state vector associated with this nonlinear function. If a
+        dealiasing mask is set, the input is dealiased before transforming
+        (pre-dealiasing).
 
         **Arguments:**
 
@@ -109,6 +115,8 @@ class BaseNonlinearFun(eqx.Module, ABC):
 
         - `u`: The state vector in real space.
         """
+        if self.dealiasing_mask is not None:
+            u_hat = self.dealiasing_mask * u_hat
         return ifft(
             u_hat, num_spatial_dims=self.num_spatial_dims, num_points=self.num_points
         )

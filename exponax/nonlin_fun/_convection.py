@@ -127,8 +127,7 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
             raise ValueError(
                 "Number of channels in u_hat should match number of spatial dimensions"
             )
-        u_hat_dealiased = self.dealias(u_hat)
-        u = self.ifft(u_hat_dealiased)
+        u = self.ifft(u_hat)
         u_outer_product = u[None, :] * u[:, None]
         u_outer_product_hat = self.fft(u_outer_product)
         convection = 0.5 * jnp.sum(
@@ -162,11 +161,8 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
             raise ValueError(
                 "Number of channels in u_hat should match number of spatial dimensions"
             )
-        u_hat_dealiased = self.dealias(u_hat)
-        u = self.ifft(u_hat_dealiased)
-        nabla_u = self.ifft(
-            self.derivative_operator[None, :] * u_hat_dealiased[:, None]
-        )
+        u = self.ifft(u_hat)
+        nabla_u = self.ifft(self.derivative_operator[None, :] * u_hat[:, None])
         conv_u = jnp.sum(
             u[None, :] * nabla_u,
             axis=1,
@@ -195,8 +191,7 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
 
         - `convection`: The evaluation of the convection term in Fourier space.
         """
-        u_hat_dealiased = self.dealias(u_hat)
-        u = self.ifft(u_hat_dealiased)
+        u = self.ifft(u_hat)
         u_square = u**2
         u_square_hat = self.fft(u_square)
         sum_of_derivatives_operator = jnp.sum(
@@ -225,9 +220,8 @@ class ConvectionNonlinearFun(BaseNonlinearFun):
 
         - `convection`: The evaluation of the convection term in Fourier space.
         """
-        u_hat_dealiased = self.dealias(u_hat)
-        u = self.ifft(u_hat_dealiased)
-        nabla_u = self.ifft(self.derivative_operator * u_hat_dealiased)
+        u = self.ifft(u_hat)
+        nabla_u = self.ifft(self.derivative_operator * u_hat)
         conv_u = jnp.sum(
             u * nabla_u,
             axis=0,
