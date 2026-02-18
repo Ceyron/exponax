@@ -1,14 +1,17 @@
 import jax.numpy as jnp
-import jax.random as jr
 from jaxtyping import Array, Float, PRNGKeyArray
 
 from .._spectral import (
     build_scaled_wavenumbers,
-    build_scaling_array,
+    fft,
     ifft,
-    wavenumber_shape,
 )
-from ._base_ic import BaseRandomICGenerator
+from ._base_ic import (
+    BaseRandomICGenerator,
+    normalize_ic,
+    validate_normalization_options,
+)
+from ._white_noise import WhiteNoise
 
 
 class GaussianRandomField(BaseRandomICGenerator):
@@ -18,6 +21,7 @@ class GaussianRandomField(BaseRandomICGenerator):
     zero_mean: bool
     std_one: bool
     max_one: bool
+    white_noise: WhiteNoise
 
     def __init__(
         self,
@@ -46,20 +50,24 @@ class GaussianRandomField(BaseRandomICGenerator):
             absolute value of one. Defaults to `False`. Only one of `std_one`
             and `max_one` can be `True`.
         """
-        if not zero_mean and std_one:
-            raise ValueError("Cannot have `zero_mean=False` and `std_one=True`.")
-        if std_one and max_one:
-            raise ValueError("Cannot have `std_one=True` and `max_one=True`.")
+        validate_normalization_options(
+            zero_mean=zero_mean, std_one=std_one, max_one=max_one
+        )
         self.num_spatial_dims = num_spatial_dims
         self.domain_extent = domain_extent
         self.powerlaw_exponent = powerlaw_exponent
         self.zero_mean = zero_mean
         self.std_one = std_one
         self.max_one = max_one
+        self.white_noise = WhiteNoise(num_spatial_dims)
 
     def __call__(
         self, num_points: int, *, key: PRNGKeyArray
     ) -> Float[Array, "1 ... N"]:
+        noise = self.white_noise(num_points, key=key)
+
+        noise_hat = fft(noise, num_spatial_dims=self.num_spatial_dims)
+
         wavenumber_grid = build_scaled_wavenumbers(
             self.num_spatial_dims, self.domain_extent, num_points
         )
@@ -72,30 +80,14 @@ class GaussianRandomField(BaseRandomICGenerator):
             amplitude.flatten().at[0].set(1.0).reshape(wavenumber_norm_grid.shape)
         )
 
-        real_key, imag_key = jr.split(key, 2)
-        noise = jr.normal(
-            real_key,
-            shape=(1,) + wavenumber_shape(self.num_spatial_dims, num_points),
-        ) + 1j * jr.normal(
-            imag_key,
-            shape=(1,) + wavenumber_shape(self.num_spatial_dims, num_points),
+        noise_hat = noise_hat * amplitude
+
+        ic = ifft(
+            noise_hat, num_spatial_dims=self.num_spatial_dims, num_points=num_points
         )
 
-        noise = noise * amplitude
-
-        noise = noise * build_scaling_array(
-            self.num_spatial_dims, num_points, mode="reconstruction"
+        ic = normalize_ic(
+            ic, zero_mean=self.zero_mean, std_one=self.std_one, max_one=self.max_one
         )
-
-        ic = ifft(noise, num_spatial_dims=self.num_spatial_dims, num_points=num_points)
-
-        if self.zero_mean:
-            ic = ic - jnp.mean(ic)
-
-        if self.std_one:
-            ic = ic / jnp.std(ic)
-
-        if self.max_one:
-            ic = ic / jnp.max(jnp.abs(ic))
 
         return ic

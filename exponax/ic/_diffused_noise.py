@@ -1,10 +1,12 @@
-import jax.numpy as jnp
-import jax.random as jr
 from jaxtyping import Array, Float, PRNGKeyArray
 
-from .._spectral import spatial_shape
 from ..stepper import Diffusion
-from ._base_ic import BaseRandomICGenerator
+from ._base_ic import (
+    BaseRandomICGenerator,
+    normalize_ic,
+    validate_normalization_options,
+)
+from ._white_noise import WhiteNoise
 
 
 class DiffusedNoise(BaseRandomICGenerator):
@@ -14,6 +16,7 @@ class DiffusedNoise(BaseRandomICGenerator):
     zero_mean: bool
     std_one: bool
     max_one: bool
+    white_noise: WhiteNoise
 
     def __init__(
         self,
@@ -46,22 +49,21 @@ class DiffusedNoise(BaseRandomICGenerator):
         - `max_one`: Whether to normalize the noise to the maximum absolute
             value of one. Defaults to `False`.
         """
-        if not zero_mean and std_one:
-            raise ValueError("Cannot have `zero_mean=False` and `std_one=True`.")
-        if std_one and max_one:
-            raise ValueError("Cannot have `std_one=True` and `max_one=True`.")
+        validate_normalization_options(
+            zero_mean=zero_mean, std_one=std_one, max_one=max_one
+        )
         self.num_spatial_dims = num_spatial_dims
         self.domain_extent = domain_extent
         self.intensity = intensity
         self.zero_mean = zero_mean
         self.std_one = std_one
         self.max_one = max_one
+        self.white_noise = WhiteNoise(num_spatial_dims)
 
     def __call__(
         self, num_points: int, *, key: PRNGKeyArray
     ) -> Float[Array, "1 ... N"]:
-        noise_shape = (1,) + spatial_shape(self.num_spatial_dims, num_points)
-        noise = jr.normal(key, shape=noise_shape)
+        noise = self.white_noise(num_points, key=key)
 
         diffusion_stepper = Diffusion(
             self.num_spatial_dims,
@@ -72,13 +74,8 @@ class DiffusedNoise(BaseRandomICGenerator):
         )
         ic = diffusion_stepper(noise)
 
-        if self.zero_mean:
-            ic = ic - jnp.mean(ic)
-
-        if self.std_one:
-            ic = ic / jnp.std(ic)
-
-        if self.max_one:
-            ic = ic / jnp.max(jnp.abs(ic))
+        ic = normalize_ic(
+            ic, zero_mean=self.zero_mean, std_one=self.std_one, max_one=self.max_one
+        )
 
         return ic
