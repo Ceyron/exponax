@@ -15,6 +15,7 @@ import exponax as ex
             ex.ic.RandomDiscontinuities,
             ex.ic.RandomGaussianBlobs,
             ex.ic.RandomTruncatedFourierSeries,
+            ex.ic.WhiteNoise,
         ]
     ],
 )
@@ -32,6 +33,7 @@ def test_instantiate(num_spatial_dims, ic_gen):
             ex.ic.RandomDiscontinuities,
             ex.ic.RandomGaussianBlobs,
             ex.ic.RandomTruncatedFourierSeries,
+            ex.ic.WhiteNoise,
         ]
     ],
 )
@@ -51,6 +53,7 @@ def test_generate(num_spatial_dims, ic_gen):
             ex.ic.RandomDiscontinuities,
             ex.ic.RandomGaussianBlobs,
             ex.ic.RandomTruncatedFourierSeries,
+            ex.ic.WhiteNoise,
         ]
     ],
 )
@@ -75,6 +78,7 @@ def test_generate_ic_set(num_spatial_dims, ic_gen):
             ex.ic.GaussianRandomField,
             ex.ic.RandomGaussianBlobs,
             ex.ic.RandomTruncatedFourierSeries,
+            ex.ic.WhiteNoise,
         ]
     ],
 )
@@ -140,6 +144,39 @@ def test_scaled_ic():
     ic_scaled = scaled_gen(num_points, key=key)
 
     assert ic_scaled == pytest.approx(ic_base * scale, abs=1e-6)
+
+
+# ===========================================================================
+# WhiteNoise tests
+# ===========================================================================
+
+
+class TestWhiteNoise:
+    @pytest.mark.parametrize("num_spatial_dims", [1, 2, 3])
+    def test_output_shape(self, num_spatial_dims):
+        gen = ex.ic.WhiteNoise(num_spatial_dims)
+        num_points = 16
+        ic = gen(num_points, key=jax.random.PRNGKey(0))
+        expected_shape = (1,) + (num_points,) * num_spatial_dims
+        assert ic.shape == expected_shape
+
+    def test_determinism(self):
+        gen = ex.ic.WhiteNoise(1)
+        ic_a = gen(32, key=jax.random.PRNGKey(42))
+        ic_b = gen(32, key=jax.random.PRNGKey(42))
+        assert ic_a == pytest.approx(ic_b, abs=1e-7)
+
+    def test_different_keys_differ(self):
+        gen = ex.ic.WhiteNoise(1)
+        ic_a = gen(32, key=jax.random.PRNGKey(0))
+        ic_b = gen(32, key=jax.random.PRNGKey(1))
+        assert not jnp.allclose(ic_a, ic_b)
+
+    def test_custom_std(self):
+        gen = ex.ic.WhiteNoise(1, std=2.0)
+        ic = gen(1024, key=jax.random.PRNGKey(0))
+        # With 1024 samples, empirical std should be close to 2.0
+        assert float(jnp.std(ic)) == pytest.approx(2.0, abs=0.2)
 
 
 # ===========================================================================
@@ -502,3 +539,32 @@ class TestScaledICGeneratorGenIcFun:
         result = ic_fun(grid)
         assert result.shape == (1, 32)
         assert jnp.all(jnp.isfinite(result))
+
+
+# ===========================================================================
+# Nyquist spike regression test
+# ===========================================================================
+
+
+class TestNoNyquistSpike:
+    """Verify that Fourier-space IC generators do not produce spurious energy
+    at the Nyquist mode for even resolutions in 2D/3D."""
+
+    @pytest.mark.parametrize(
+        "ic_gen_cls",
+        [
+            ex.ic.GaussianRandomField,
+            ex.ic.RandomTruncatedFourierSeries,
+        ],
+    )
+    def test_2d_even_resolution_clean_spectrum(self, ic_gen_cls):
+        num_points = 32
+        gen = ic_gen_cls(2)
+        ic = gen(num_points, key=jax.random.PRNGKey(0))
+        spectrum = ex.spectral.get_spectrum(ic)
+        # The last bin (Nyquist) should not dominate over nearby bins.
+        # A spike would make the Nyquist bin orders of magnitude larger.
+        nyquist_power = float(spectrum[0, -1])
+        nearby_power = float(spectrum[0, -3])
+        # Nyquist should not be more than 10x the nearby bin
+        assert nyquist_power < 10 * nearby_power + 1e-12

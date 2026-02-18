@@ -19,6 +19,7 @@ from ._multi_channel import MultiChannelIC, RandomMultiChannelICGenerator
 from ._scaled import ScaledIC, ScaledICGenerator
 from ._sine_waves_1d import RandomSineWaves1d, SineWaves1d
 from ._truncated_fourier_series import RandomTruncatedFourierSeries
+from ._white_noise import WhiteNoise
 
 __all__ = [
     "BaseIC",
@@ -37,4 +38,5 @@ __all__ = [
     "ScaledICGenerator",
     "SineWaves1d",
     "RandomSineWaves1d",
+    "WhiteNoise",
 ]
