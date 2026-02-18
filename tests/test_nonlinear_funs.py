@@ -183,6 +183,43 @@ def test_dealiasing_removes_high_modes():
     )
 
 
+def test_fft_ifft_apply_dealiasing():
+    """
+    The `fft` and `ifft` methods on BaseNonlinearFun should automatically
+    apply the dealiasing mask (post-dealiasing for fft, pre-dealiasing for
+    ifft).
+    """
+    num_points = 64
+    num_spatial_dims = 1
+    nyquist = num_points // 2
+    cutoff = int(2 / 3 * nyquist)
+
+    poly_fun = PolynomialNonlinearFun(
+        num_spatial_dims=num_spatial_dims,
+        num_points=num_points,
+        dealiasing_fraction=2 / 3,
+        coefficients=(0.0, 1.0),
+    )
+
+    # Create input with energy in all modes
+    u_hat = jnp.ones((1, num_points // 2 + 1), dtype=jnp.complex64)
+
+    # ifft should zero high modes before transforming (pre-dealiasing)
+    u = poly_fun.ifft(u_hat)
+    # Round-trip back with the raw fft (not the method) to inspect
+    u_hat_after_ifft = fft(jnp.broadcast_to(u, (1, num_points)), num_spatial_dims=1)
+    assert u_hat_after_ifft[0, cutoff + 1 :] == pytest.approx(
+        jnp.zeros(num_points // 2 + 1 - cutoff - 1), abs=1e-6
+    )
+
+    # fft should zero high modes after transforming (post-dealiasing)
+    u_physical = jnp.ones((1, num_points))
+    u_hat_result = poly_fun.fft(u_physical)
+    assert u_hat_result[0, cutoff + 1 :] == pytest.approx(
+        jnp.zeros(num_points // 2 + 1 - cutoff - 1), abs=1e-6
+    )
+
+
 # ===========================================================================
 # Validation error path tests
 # ===========================================================================

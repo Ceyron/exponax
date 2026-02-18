@@ -86,10 +86,10 @@ class VorticityConvection2d(BaseNonlinearFun):
         del_vorticity_del_x_hat = self.derivative_operator[0:1] * vorticity_hat
         del_vorticity_del_y_hat = self.derivative_operator[1:2] * vorticity_hat
 
-        u = self.ifft(self.dealias(u_hat))
-        v = self.ifft(self.dealias(v_hat))
-        del_vorticity_del_x = self.ifft(self.dealias(del_vorticity_del_x_hat))
-        del_vorticity_del_y = self.ifft(self.dealias(del_vorticity_del_y_hat))
+        u = self.ifft(u_hat)
+        v = self.ifft(v_hat)
+        del_vorticity_del_x = self.ifft(del_vorticity_del_x_hat)
+        del_vorticity_del_y = self.ifft(del_vorticity_del_y_hat)
 
         convection = u * del_vorticity_del_x + v * del_vorticity_del_y
 
