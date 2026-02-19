@@ -276,6 +276,11 @@ class KolmogorovFlowVorticity(BaseStepper):
         - `circle_radius`: The radius of the contour used to compute the
             coefficients of the exponential time differencing Runge Kutta
             method. Default: 1.0.
+
+        **Notes:**
+
+        - Interesting pointer to explore:
+          http://trieste-conf.itp.ac.ru/Boffetta.pdf
         """
         if num_spatial_dims != 2:
             raise ValueError(
