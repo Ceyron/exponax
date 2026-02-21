@@ -3,13 +3,25 @@ name = "exponax"
 version = "0.2.0"
 description = "Efficient differentiable PDE solvers in JAX."
 readme = "README.md"
-requires-python ="~=3.10"
-authors = [
-  {name = "Felix Koehler"},
+requires-python = "~=3.10"
+authors = [{ name = "Felix Koehler" }]
+keywords = [
+    "jax",
+    "sciml",
+    "deep-learning",
+    "pde",
+    "etdrk",
+    "statistical-physics",
+    "stochastic-processes",
 ]
-keywords = ["jax", "sciml", "deep-learning", "pde", "etdrk"]
-urls = {repository = "https://github.com/Ceyron/exponax" }
-dependencies = ["jax>=0.4.13", "jaxtyping>=0.2.20", "typing_extensions>=4.5.0", "equinox>=0.11.3", "matplotlib>=3.8.1"]
+urls = { repository = "https://github.com/Ceyron/exponax" }
+dependencies = [
+    "jax>=0.4.13",
+    "jaxtyping>=0.2.20",
+    "typing_extensions>=4.5.0",
+    "equinox>=0.11.3",
+    "matplotlib>=3.8.1",
+]
 
 [project.optional-dependencies]
 vape4d = ["vape4d"]
@@ -21,7 +33,7 @@ docs = [
     "mkdocstrings-python==2.0.1",
     "mknotebooks==0.8.0",
     "griffe==1.15.0",
-    "black==26.1.0",  # Needed for API autoformat
+    "black==26.1.0",              # Needed for API autoformat
 ]
 
 [tool.ruff]
@@ -39,17 +51,19 @@ select = [
     "SIM", # flake8-simplify
 ]
 ignore = [
-    "F722",  # jaxtyping uses non-standard annotation syntax
+    "F722", # jaxtyping uses non-standard annotation syntax
 ]
 
 [tool.ruff.lint.isort]
 known-first-party = ["exponax"]
 
 [tool.setuptools.packages.find]
-where = ["."]  # list of folders that contain the packages (["."] by default)
-include = ["exponax*"]  # package names should match these glob patterns (["*"] by default)
-exclude = []  # exclude packages matching these glob patterns (empty by default)
-namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
+where = ["."] # list of folders that contain the packages (["."] by default)
+include = [
+    "exponax*",
+] # package names should match these glob patterns (["*"] by default)
+exclude = [] # exclude packages matching these glob patterns (empty by default)
+namespaces = false # to disable scanning PEP 420 namespaces (true by default)
 
 [tool.coverage.run]
 source = ["exponax"]
@@ -61,3 +75,9 @@ exclude_lines = [
     "raise NotImplementedError",
     "@abstractmethod",
 ]
+
+[tool.pytest.ini_options]
+markers = ["slow: marks tests as slow (deselect with '-m \"not slow\"')"]
+
+[dependency-groups]
+dev = ["pytest (>=9.0.2,<10.0.0)", "ipykernel (>=7.2.0,<8.0.0)"]
