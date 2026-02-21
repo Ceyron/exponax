@@ -17,6 +17,14 @@ from ._utils import (
     wrap_bc,
 )
 
+from ._stochastic_utils import (
+    stochastic_rollout,
+    stochastic_ensemble_rollout,
+    structure_factor,
+    richardson_weak_extrapolation,
+    strang_split_step,
+)
+
 __version__ = importlib.metadata.version("exponax")
 
 __all__ = [
@@ -31,7 +39,12 @@ __all__ = [
     "make_grid",
     "rollout",
     "repeat",
+    "richardson_weak_extrapolation",
     "stack_sub_trajectories",
+    "stochastic_ensemble_rollout",
+    "stochastic_rollout",
+    "strang_split_step",
+    "structure_factor",
     "build_ic_set",
     "wrap_bc",
     "metrics",
