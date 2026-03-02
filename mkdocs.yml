@@ -108,6 +108,7 @@ nav:
         - Additional:
             - Nice Features: 'examples/additional_features.ipynb'
             - Performance Hints: 'examples/performance_hints.ipynb'
+        - Awesome List: 'awesome-list.md'
     - Stepper:
         - Overview: 'api/stepper/overview.md'
         - Linear:
