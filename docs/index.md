@@ -86,12 +86,14 @@ it:
 
 ```bibtex
 @article{koehler2024apebench,
-  title={{APEBench}: A Benchmark for Autoregressive Neural Emulators of {PDE}s},
-  author={Felix Koehler and Simon Niedermayr and R{\"}udiger Westermann and Nils Thuerey},
-  journal={Advances in Neural Information Processing Systems (NeurIPS)},
-  volume={38},
+  title={Apebench: A benchmark for autoregressive neural emulators of pdes},
+  author={Koehler, Felix and Niedermayr, Simon and Westermann, R{\"u}diger and Thuerey, Nils},
+  journal={Advances in Neural Information Processing Systems},
+  volume={37},
+  pages={120252--120310},
   year={2024}
 }
+
 ```
 
 (Feel free to also give the project a star on GitHub if you like it.)
