@@ -615,6 +615,7 @@ def fft(
     field: Float[Array, "C ... N"],
     *,
     num_spatial_dims: int | None = None,
+    oddball_filter: bool = True,
 ) -> Complex[Array, "C ... (N//2)+1"]:
     """
     Perform a **real-valued** FFT of a field. This function is designed for
@@ -637,6 +638,16 @@ def fft(
         it follows the Exponax convention. For example, it is not allowed to
         have a leading batch axis, in such a case use `jax.vmap` on this
         function.
+    - `oddball_filter`: Whether to zero out the Nyquist mode (oddball mode)
+        for even-length axes. Default is `True`. For even `N`, the Nyquist
+        mode at `k = N/2` is problematic: its imaginary part should be
+        exactly zero for real-valued input, but floating-point rounding in
+        the FFT introduces small nonzero values. Moreover, spectral
+        derivatives at this mode produce a sine component that cannot be
+        represented on the grid. Zeroing it out avoids these artifacts at
+        the cost of one degree of freedom per even axis. Set to `False` for
+        a faithful transform without filtering (e.g., for diagnostics).
+        See also [`exponax.spectral.oddball_filter_mask`][].
 
     **Returns:**
 
@@ -653,7 +664,13 @@ def fft(
     if num_spatial_dims is None:
         num_spatial_dims = field.ndim - 1
 
-    return jnp.fft.rfftn(field, axes=space_indices(num_spatial_dims))
+    field_hat = jnp.fft.rfftn(field, axes=space_indices(num_spatial_dims))
+
+    if oddball_filter:
+        num_points = field.shape[-1]
+        field_hat = field_hat * oddball_filter_mask(num_spatial_dims, num_points)
+
+    return field_hat
 
 
 def ifft(
