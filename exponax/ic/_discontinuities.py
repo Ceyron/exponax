@@ -17,7 +17,7 @@ class Discontinuity(eqx.Module):
     value: float
 
     def __call__(self, x: Array) -> Array:
-        mask = jnp.ones_like(x, dtype=bool)
+        mask = jnp.ones_like(x[0:1], dtype=bool)
         for i, (lb, ub) in enumerate(
             zip(self.lower_limits, self.upper_limits, strict=False)
         ):

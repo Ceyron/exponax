@@ -76,6 +76,7 @@ def test_generate_ic_set(num_spatial_dims, ic_gen):
         for num_spatial_dims in [1, 2, 3]
         for ic_gen in [
             ex.ic.GaussianRandomField,
+            ex.ic.RandomDiscontinuities,
             ex.ic.RandomGaussianBlobs,
             ex.ic.RandomTruncatedFourierSeries,
             ex.ic.WhiteNoise,
