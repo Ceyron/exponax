@@ -384,8 +384,10 @@ class TestGradientNormAdditional:
         result = ifft(result_hat, num_spatial_dims=D, num_points=N)
         assert result.shape == u.shape
         assert jnp.all(jnp.isfinite(result))
-        # DC mode should be near zero due to zero_mode_fix
-        assert float(jnp.abs(result_hat[0, 0, 0])) == pytest.approx(0.0, abs=1e-2)
+        # DC mode should be near zero due to zero_mode_fix. The FFT is
+        # unnormalized, so scale by the number of points to compare the mean.
+        dc_mean = float(jnp.abs(result_hat[0, 0, 0])) / N**D
+        assert dc_mean == pytest.approx(0.0, abs=1e-4)
 
     def test_without_zero_mode_fix(self):
         """Without zero_mode_fix, DC mode may be nonzero."""
