@@ -22,6 +22,12 @@ docs = [
     "mknotebooks==0.8.0",
     "griffe==1.15.0",
     "black==26.1.0",  # Needed for API autoformat
+    # Transitive packages that shape the rendered output
+    "pymdown-extensions==10.21.3",  # mkdocstrings 1.0.3 breaks on >=12.2
+    "markdown==3.10.2",
+    "mkdocs-autorefs==1.4.4",
+    "pygments==2.20.0",
+    "nbconvert==7.17.1",
 ]
 
 [tool.ruff]
