@@ -1,3 +1,4 @@
+import jax
 import jax.numpy as jnp
 import jax.random as jr
 from jaxtyping import Array, Float, PRNGKeyArray
@@ -42,7 +43,10 @@ class SineWaves1d(BaseIC):
             absolute value of one. Defaults to `False`. Only one of
             `std_one` and `max_one` can be `True`.
         """
-        if offset != 0.0 and std_one:
+        # The offset is a tracer when this is built inside a transformation
+        # (e.g. `build_ic_set` via `RandomSineWaves1d`), so it can only be
+        # checked when concrete. `RandomSineWaves1d` validates it upfront.
+        if std_one and not isinstance(offset, jax.core.Tracer) and offset != 0.0:
             raise ValueError("Cannot have non-zero offset and `std_one=True`.")
         if std_one and max_one:
             raise ValueError("Cannot have `std_one=True` and `max_one=True`.")

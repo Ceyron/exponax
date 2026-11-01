@@ -389,6 +389,18 @@ class TestRandomSineWaves1d:
         with pytest.raises(ValueError, match="std_one.*max_one"):
             ex.ic.RandomSineWaves1d(1, std_one=True, max_one=True)
 
+    @pytest.mark.parametrize(
+        "kwargs",
+        [{}, {"std_one": True}, {"max_one": True}, {"offset_range": (-1.0, 1.0)}],
+    )
+    def test_build_ic_set(self, kwargs):
+        gen = ex.ic.RandomSineWaves1d(1, **kwargs)
+        ic_set = ex.build_ic_set(
+            gen, num_points=32, num_samples=4, key=jax.random.PRNGKey(0)
+        )
+        assert ic_set.shape == (4, 1, 32)
+        assert jnp.all(jnp.isfinite(ic_set))
+
 
 # ===========================================================================
 # MultiChannelIC gen_ic_fun tests
