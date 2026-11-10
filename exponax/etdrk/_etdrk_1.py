@@ -1,6 +1,6 @@
 import jax
 import jax.numpy as jnp
-from jaxtyping import Array, Complex
+from jaxtyping import Array, Complex, Inexact
 
 from ..nonlin_fun import BaseNonlinearFun
 from ._base_etdrk import BaseETDRK
@@ -9,7 +9,7 @@ from ._utils import roots_of_unity
 
 class ETDRK1(BaseETDRK):
     _nonlinear_fun: BaseNonlinearFun
-    _coef_1: Complex[Array, "E ... (N//2)+1"]
+    _coef_1: Inexact[Array, "E ... (N//2)+1"]
 
     def __init__(
         self,
@@ -59,19 +59,38 @@ class ETDRK1(BaseETDRK):
             The numerically stable evaluation of the coefficients follows
             [Kassam and Trefethen
             (2005)](https://doi.org/10.1137/S1064827502410633).
+
+        !!! note
+            If the linear operator has non-zero imaginary part (e.g., for
+            advection or dispersion), the precomputed coefficients are stored
+            as complex-valued arrays, doubling the memory compared to a purely
+            real operator (e.g., pure diffusion).
         """
         super().__init__(dt, linear_operator)
         self._nonlinear_fun = nonlinear_fun
 
         roots = roots_of_unity(num_circle_points)
         L_dt = linear_operator * dt
+        is_real_operator = bool(jnp.all(linear_operator.imag == 0))
 
-        def scan_body(acc, root):
-            lr = circle_radius * root + L_dt
-            exp_lr = jnp.exp(lr)
-            return acc + ((exp_lr - 1) / lr).real, None
+        if is_real_operator:
 
-        sum_c1, _ = jax.lax.scan(scan_body, jnp.zeros_like(L_dt.real), roots)
+            def scan_body(acc, root):
+                lr = circle_radius * root + L_dt
+                exp_lr = jnp.exp(lr)
+                return acc + ((exp_lr - 1) / lr).real, None
+
+            zeros = jnp.zeros_like(L_dt.real)
+        else:
+
+            def scan_body(acc, root):
+                lr = circle_radius * root + L_dt
+                exp_lr = jnp.exp(lr)
+                return acc + (exp_lr - 1) / lr, None
+
+            zeros = jnp.zeros_like(L_dt)
+
+        sum_c1, _ = jax.lax.scan(scan_body, zeros, roots)
         mean_c1 = sum_c1 / num_circle_points
         self._coef_1 = dt * mean_c1
 
